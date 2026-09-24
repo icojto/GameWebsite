@@ -433,6 +433,15 @@ body[data-view='game'] { overflow: hidden; overscroll-behavior: none; }
   .game-note { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
 }
 
+/* Content-heavy games use the document's scroll on phones, including landscape. */
+@media (max-width: 680px), (max-height: 600px) {
+  body[data-view='game'][data-flow='true'] { overflow: auto; }
+  .is-flow-game .game-main { height: auto; min-height: calc(100dvh - 86px); grid-template-rows: auto auto; }
+  .is-flow-game .game-frame-shell { grid-template-rows: auto auto auto; min-height: 0; }
+  .is-flow-game .iframe-panel { height: auto; }
+  .is-flow-game .game-frame { display: block; min-height: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
