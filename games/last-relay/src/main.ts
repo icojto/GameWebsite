@@ -47,7 +47,6 @@ function showPause() {
 }
 $('pause').onclick = showPause;
 document.addEventListener('visibilitychange', () => { if (document.hidden) showPause(); accumulator = 0; });
-window.addEventListener('resize', () => { if (innerWidth < innerHeight && innerWidth < 700) showPause(); });
 function resultOverlay() {
   if (saved) return; saved = true;
   record.bestWave = Math.max(record.bestWave, match.wave + 1); record.bestKills = Math.max(record.bestKills, match.kills); record.victory ||= match.result === 'VICTORY'; if (!qaEnabled) saveRecord(record); bestText();

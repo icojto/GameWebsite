@@ -96,9 +96,10 @@ function renderHome(): void {
 
 function renderGame(game: CatalogGame): void {
   document.body.dataset.view = 'game';
+  document.body.dataset.flow = String(game.slug !== 'orbit-break');
   document.title = `${game.title} · Studio Arcade`;
   app!.innerHTML = `
-    <div class="site-shell game-page">
+    <div class="site-shell game-page${game.slug === 'orbit-break' ? '' : ' is-flow-game'}">
       ${renderHeader('games')}
       <main id="main-content" class="game-main">
         <section class="game-intro" aria-labelledby="game-title">
@@ -118,7 +119,7 @@ function renderGame(game: CatalogGame): void {
         <section class="game-frame-shell" aria-label="${game.title} play area">
           <div class="game-toolbar">
             <span class="live-label"><i></i> Ready to play</span>
-            <span>Reverse to evade</span>
+            <span>${game.slug === 'orbit-break' ? 'Reverse to evade' : game.eyebrow}</span>
             <button class="frame-reload" type="button" aria-label="Reload ${game.title}">↻ Reload</button>
           </div>
           <div class="iframe-panel">
@@ -142,8 +143,8 @@ function renderGame(game: CatalogGame): void {
             ></iframe>
           </div>
           <div class="game-note">
-            <span><strong>One action:</strong> Space, click, or tap to start, reverse, and restart.</span>
-            <span>Your best score stays in this browser.</span>
+            <span><strong>Controls:</strong> ${game.controls.join(' · ')}</span>
+            <span>Progress stays in this browser when supported.</span>
           </div>
         </section>
       </main>
@@ -257,12 +258,48 @@ function bindGameFrame(game: CatalogGame): void {
   const errorState = error;
 
   let timeout = window.setTimeout(showError, 10_000);
+  let contentObserver: ResizeObserver | undefined;
+  let measureFrame = 0;
+  const flowLayout = window.matchMedia('(max-width: 680px), (max-height: 600px)');
+  const portrait = window.matchMedia('(orientation: portrait)');
+
+  function resizeFrame(reset = false): void {
+    if (game.slug === 'orbit-break' || !flowLayout.matches) {
+      gameFrame.style.height = '';
+      return;
+    }
+    const minimum = game.slug === 'last-relay' && portrait.matches ? 620 : portrait.matches ? 470 : 400;
+    // Reset only on viewport changes; resetting during a content resize would loop.
+    if (reset || !gameFrame.style.height) gameFrame.style.height = `${minimum}px`;
+    window.cancelAnimationFrame(measureFrame);
+    measureFrame = window.requestAnimationFrame(() => {
+      try {
+        const doc = gameFrame.contentDocument;
+        if (!doc) return;
+        const height = Math.max(minimum, doc.body?.scrollHeight ?? 0, doc.documentElement.scrollHeight);
+        gameFrame.style.height = `${Math.ceil(height)}px`;
+      } catch { /* A frame outside our origin keeps its minimum height. */ }
+    });
+  }
+
+  flowLayout.addEventListener('change', () => resizeFrame(true));
+  portrait.addEventListener('change', () => resizeFrame(true));
+  window.addEventListener('resize', () => resizeFrame(true));
 
   gameFrame.addEventListener('load', () => {
     window.clearTimeout(timeout);
     loadingState.hidden = true;
     errorState.hidden = true;
     gameFrame.classList.add('is-ready');
+    contentObserver?.disconnect();
+    resizeFrame(true);
+    try {
+      const doc = gameFrame.contentDocument;
+      if (doc?.body) {
+        contentObserver = new ResizeObserver(() => resizeFrame());
+        contentObserver.observe(doc.body);
+      }
+    } catch { /* The minimum height still allows the game to load. */ }
     try { gameFrame.contentWindow?.focus(); } catch { /* The iframe remains pointer-focusable. */ }
   });
   gameFrame.addEventListener('error', showError);
@@ -276,6 +313,7 @@ function bindGameFrame(game: CatalogGame): void {
   }
 
   function reloadFrame(): void {
+    contentObserver?.disconnect();
     window.clearTimeout(timeout);
     errorState.hidden = true;
     loadingState.hidden = false;
