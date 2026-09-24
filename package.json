@@ -1,0 +1,24 @@
+{
+  "name": "studio-game-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "npm run build:games && vite --host 127.0.0.1",
+    "check": "tsc --noEmit && npm run check:games",
+    "check:games": "node scripts/check-games.mjs",
+    "build:games": "node scripts/build-games.mjs",
+    "build": "npm run build:games && tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "phaser": "^4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}
