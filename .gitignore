@@ -1,0 +1,14 @@
+node_modules/
+dist/
+public/games/
+.sites-runtime/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+coverage/
+*.local
+*.log
