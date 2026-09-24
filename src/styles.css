@@ -442,6 +442,16 @@ body[data-view='game'] { overflow: hidden; overscroll-behavior: none; }
   .is-flow-game .game-frame { display: block; min-height: 0; }
 }
 
+/* Orbit Break fills the available landscape viewport instead of keeping the
+   portrait-sized mobile minimum, which clips the arena beside the portal chrome. */
+@media (max-height: 600px) and (orientation: landscape) {
+  body[data-view='game'] { overflow: auto; }
+  .game-page:not(.is-flow-game) .game-main { height: auto; min-height: calc(100dvh - 64px); grid-template-rows: auto auto; }
+  .game-page:not(.is-flow-game) .game-frame-shell { grid-template-rows: auto auto auto; min-height: 0; }
+  .game-page:not(.is-flow-game) .iframe-panel { height: calc(100dvh - 155px); min-height: 210px; }
+  .game-page:not(.is-flow-game) .game-frame { display: block; width: 100%; height: 100%; min-height: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
