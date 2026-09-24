@@ -6,6 +6,8 @@ if (!app) throw new Error('Portal root is missing.');
 
 type Theme = 'light' | 'dark';
 type CatalogGame = (typeof gameCatalog)[number];
+const siteBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+const sitePath = (route: string): string => `${siteBase}${route}${/^\/games\/[^/]+$/.test(route) ? '/' : ''}`;
 
 const storedTheme = window.localStorage.getItem('studioArcade.theme');
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -33,7 +35,10 @@ document.addEventListener('click', (event) => {
 });
 
 function renderRoute(): void {
-  const path = normalizePath(window.location.pathname);
+  const pathname = normalizePath(window.location.pathname);
+  const path = pathname === siteBase ? '/' : pathname.startsWith(`${siteBase}/`)
+    ? pathname.slice(siteBase.length)
+    : pathname;
   const game = gameCatalog.find((candidate) => candidate.route === path);
   if (game) renderGame(game);
   else if (path === '/') renderHome();
@@ -54,7 +59,7 @@ function renderHome(): void {
             <h1 id="hero-title">One clear signal.<br /><em>Endless ways to break it.</em></h1>
             <p class="hero-summary">${featuredGame.description} Reverse at the right moment and stay alive as the arena closes in.</p>
             <div class="hero-actions">
-              <a class="primary-action" href="${featuredGame.route}">
+            <a class="primary-action" href="${sitePath(featuredGame.route)}">
                 <span class="play-disc" aria-hidden="true">▶</span>
                 Play ${featuredGame.title}
                 <span aria-hidden="true">→</span>
@@ -63,7 +68,7 @@ function renderHome(): void {
             </div>
           </div>
 
-          <a class="orbit-stage" href="${featuredGame.route}" aria-label="Play ${featuredGame.title}">
+          <a class="orbit-stage" href="${sitePath(featuredGame.route)}" aria-label="Play ${featuredGame.title}">
             <span class="stage-label">Game 001</span>
             ${renderOrbitVisual('orbit-visual')}
             <span class="stage-footer">
@@ -98,7 +103,7 @@ function renderGame(game: CatalogGame): void {
       <main id="main-content" class="game-main">
         <section class="game-intro" aria-labelledby="game-title">
           <div>
-            <a class="back-link" href="/" aria-label="Back to the game library"><span aria-hidden="true">←</span> Browse games</a>
+            <a class="back-link" href="${sitePath('/')}" aria-label="Back to the game library"><span aria-hidden="true">←</span> Browse games</a>
             <div class="game-title-line">
               <p class="eyebrow"><span></span>${game.status}</p>
               <h1 id="game-title">${game.title}</h1>
@@ -130,7 +135,7 @@ function renderGame(game: CatalogGame): void {
             <iframe
               class="game-frame"
               title="${game.title} — playable game"
-              src="${game.embedPath}"
+              src="${sitePath(game.embedPath)}"
               allow="autoplay"
               loading="eager"
               tabindex="0"
@@ -157,7 +162,7 @@ function renderNotFound(): void {
       <main id="main-content" class="not-found">
         <p class="eyebrow"><span></span>Signal lost</p>
         <h1>That route is outside the arena.</h1>
-        <a class="primary-action" href="/"><span aria-hidden="true">←</span> Back to games</a>
+        <a class="primary-action" href="${sitePath('/')}"><span aria-hidden="true">←</span> Back to games</a>
       </main>
     </div>
   `;
@@ -167,13 +172,13 @@ function renderNotFound(): void {
 function renderHeader(active: 'home' | 'games' | ''): string {
   return `
     <header class="topbar" aria-label="Primary navigation">
-      <a class="brand" href="/" aria-label="Studio Arcade home">
+      <a class="brand" href="${sitePath('/')}" aria-label="Studio Arcade home">
         <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
         <span><strong>Studio Arcade</strong><small>Original games, made here</small></span>
       </a>
       <nav class="nav-links" aria-label="Portal">
-        <a class="nav-link${active === 'home' ? ' is-active' : ''}" href="/">Home</a>
-        <a class="nav-link${active === 'games' ? ' is-active' : ''}" href="/#collection">Games</a>
+        <a class="nav-link${active === 'home' ? ' is-active' : ''}" href="${sitePath('/')}">Home</a>
+        <a class="nav-link${active === 'games' ? ' is-active' : ''}" href="${sitePath('/')}#collection">Games</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch color theme" aria-pressed="false">
         <span class="sun-icon" aria-hidden="true">☀</span>
@@ -186,7 +191,7 @@ function renderHeader(active: 'home' | 'games' | ''): string {
 function renderGameCard(game: CatalogGame): string {
   return `
     <article class="game-card">
-      <a class="card-art" href="${game.route}" aria-label="Open ${game.title}">
+      <a class="card-art" href="${sitePath(game.route)}" aria-label="Open ${game.title}">
         ${renderCardVisual(game)}
         <span class="status-pill">${game.status}</span>
         <span class="card-play" aria-hidden="true">▶</span>
@@ -194,13 +199,13 @@ function renderGameCard(game: CatalogGame): string {
       <div class="card-body">
         <div>
           <p class="card-kicker">${game.id.replace('-', ' ')}</p>
-          <h3><a href="${game.route}">${game.title}</a></h3>
+          <h3><a href="${sitePath(game.route)}">${game.title}</a></h3>
         </div>
         <p>${game.summary}</p>
         <ul class="tag-list" aria-label="Game details">
           ${game.tags.map((tag) => `<li>${tag}</li>`).join('')}
         </ul>
-        <a class="text-link" href="${game.route}">Play now <span aria-hidden="true">→</span></a>
+        <a class="text-link" href="${sitePath(game.route)}">Play now <span aria-hidden="true">→</span></a>
       </div>
     </article>
   `;
@@ -275,7 +280,7 @@ function bindGameFrame(game: CatalogGame): void {
     errorState.hidden = true;
     loadingState.hidden = false;
     gameFrame.classList.remove('is-ready');
-    gameFrame.src = `${game.embedPath}?reload=${Date.now()}`;
+    gameFrame.src = `${sitePath(game.embedPath)}?reload=${Date.now()}`;
     timeout = window.setTimeout(showError, 10_000);
   }
 }
