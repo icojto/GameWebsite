@@ -15,7 +15,8 @@ Prepares the five-game Vite portal for the repository's GitHub Pages URL, `https
 - `npm.cmd ci` — passed from the committed lockfile.
 - `npm.cmd run check` — passed for portal and all five game sources.
 - Pages production build — passed for portal and all five embeds; only advisory Phaser chunk-size warnings.
-- `npm.cmd run verify:pages` — passed for homepage, five direct game pages, five embeds, linked JavaScript/CSS assets, and Signal Below SVG art under `/GameWebsite/`.
+- `npm.cmd run verify:pages` — passed for homepage, five direct game pages with and without trailing slashes, five embeds, linked JavaScript/CSS assets, and all four Signal Below SVG scenes under `/GameWebsite/`.
+- The live Pages URL currently returns HTTP 404; the branch has not published a site.
 - Workflow has not been run; it will run only after this change reaches `main`.
 
 ## Publication and review

@@ -14,6 +14,7 @@
 - `npm.cmd ci`: passed from the portal lockfile (21 packages, 0 reported vulnerabilities).
 - `npm.cmd run check`: passed for portal and all five game sources.
 - `GITHUB_PAGES=true npm.cmd run build`: passed for the portal and all five game embeds. Vite emitted advisory warnings for Phaser-sized chunks.
-- `npm.cmd run verify:pages`: passed for homepage, all five direct game pages, all five embeds and linked nested assets, and Signal Below's SVG scene asset.
+- `npm.cmd run verify:pages`: passed for homepage, all five direct game pages with and without trailing slashes, all five embeds and linked nested assets, and Signal Below's four SVG scene assets.
+- The configured live URL returned HTTP 404 during this preparation; the portal has not been published there by this branch.
 
 No feature-branch deployment was run. The Pages endpoint itself was not changed in this task. A browser interaction pass and physical Android/iPhone checks remain for publication review.

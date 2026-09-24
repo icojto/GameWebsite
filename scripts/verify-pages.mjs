@@ -55,6 +55,7 @@ try {
   const homepage = await fetchOk(pagesBase);
   await checkHtmlAssets(homepage);
   for (const game of gameCatalog) {
+    await fetchOk(`${pagesBase}${game.route.slice(1)}`);
     const page = await fetchOk(`${pagesBase}${game.route.slice(1)}/`);
     assert.match(page, /Studio Arcade/);
     await checkHtmlAssets(page);
@@ -62,9 +63,11 @@ try {
     const count = await checkHtmlAssets(embed);
     console.log(`${game.title}: direct page, embed, ${count} assets OK`);
   }
-  const scene = await fetchOk(`${pagesBase}games/signal-below/embed/art/operations.svg`);
-  assert.match(scene, /<svg/);
-  console.log('Homepage and Signal Below scene asset OK');
+  for (const name of ['operations', 'yard', 'archive', 'sublevel']) {
+    const scene = await fetchOk(`${pagesBase}games/signal-below/embed/art/${name}.svg`);
+    assert.match(scene, /<svg/);
+  }
+  console.log('Homepage and four Signal Below scene assets OK');
 } finally {
   await new Promise((resolve) => server.close(resolve));
 }
