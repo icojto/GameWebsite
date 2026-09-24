@@ -11,7 +11,8 @@
     "check": "tsc --noEmit && npm run check:games",
     "check:games": "node scripts/check-games.mjs",
     "build:games": "node scripts/build-games.mjs",
-    "build": "npm run build:games && tsc --noEmit && vite build",
+    "build": "npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs",
+    "verify:pages": "node scripts/verify-pages.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {

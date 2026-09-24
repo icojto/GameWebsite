@@ -57,3 +57,23 @@ The current abstract Orbit Break treatment is intentionally procedural. Final st
 6. Test the generated card, route, iframe, controls, sound, and mobile sizing.
 
 No homepage template change is needed: catalog entries automatically create cards and routes.
+
+## GitHub Pages preparation
+
+The project site is configured for `https://icojto.github.io/GameWebsite/`. The Pages build uses `/GameWebsite/` as Vite's base and builds each game embed under `/GameWebsite/games/<slug>/embed/`. Static `index.html` files are generated for all five game routes, so a game page can be opened directly or refreshed.
+
+To reproduce the Pages artifact locally on Windows:
+
+```powershell
+cd GameWebsite
+npm.cmd ci
+npm.cmd run check
+$env:GITHUB_PAGES = 'true'
+npm.cmd run build
+npm.cmd run verify:pages
+Remove-Item Env:GITHUB_PAGES
+```
+
+The verifier serves `dist` locally under `/GameWebsite/` and checks the homepage, every direct game page and embed, linked JavaScript/CSS assets, and Signal Below's SVG scene. It does not publish anything.
+
+The workflow at `.github/workflows/pages.yml` runs only for pushes to `main`; it installs with `npm ci`, checks, builds, verifies, uploads `dist`, and deploys to the `github-pages` environment. To publish, review and merge the Pages Draft PR into `main`, then confirm the **Deploy GitHub Pages** workflow succeeds in the Actions tab and open the site URL above. GitHub currently reports Pages source as **GitHub Actions**. The repository and Pages site are currently public; verify that publication is intended before merging.
