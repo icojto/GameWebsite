@@ -1,4 +1,4 @@
-# Studio Arcade portal prototype
+# OdesosGames portal
 
 A lightweight local portal for first-party browser games. The portal now contains five complete game paths.
 

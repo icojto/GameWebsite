@@ -53,7 +53,7 @@ try {
   for (const game of gameCatalog) {
     await fetchOk(game.route);
     const page = await fetchOk(`${game.route}/`);
-    assert.match(page, /Studio Arcade/);
+    assert.match(page, /OdesosGames/);
     await checkHtmlAssets(page);
     const embed = await fetchOk(game.embedPath);
     const count = await checkHtmlAssets(embed);
