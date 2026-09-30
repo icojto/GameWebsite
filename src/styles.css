@@ -353,8 +353,9 @@ footer span:first-child { color: var(--ink); font-weight: 800; text-transform: u
 .game-note strong { color: #eaf8ff; }
 .live-label { display: inline-flex; gap: 0.5rem; align-items: center; color: #d7faff; font-weight: 700; }
 .live-label i { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-bright); box-shadow: 0 0 10px var(--cyan-bright); }
-.frame-reload { padding: 0.35rem 0.6rem; border: 1px solid rgba(144, 182, 214, 0.2); border-radius: 0.55rem; color: #d6e4f3; background: transparent; font: inherit; cursor: pointer; }
-.frame-reload:hover { border-color: var(--cyan-bright); color: #fff; }
+.frame-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.45rem; }
+.frame-action { min-height: 30px; padding: 0.35rem 0.6rem; border: 1px solid rgba(144, 182, 214, 0.2); border-radius: 0.55rem; color: #d6e4f3; background: transparent; font: inherit; cursor: pointer; }
+.frame-action:hover, .frame-action[aria-pressed='true'] { border-color: var(--cyan-bright); color: #fff; background: rgba(32, 233, 255, 0.1); }
 
 .iframe-panel { position: relative; min-height: 0; background: #05070d; }
 .game-frame { width: 100%; height: 100%; min-height: 360px; border: 0; opacity: 0; background: #05070d; transition: opacity 180ms ease; }
@@ -378,6 +379,29 @@ footer span:first-child { color: var(--ink); font-weight: 800; text-transform: u
 .loading-orbit { position: relative; width: 54px; height: 54px; margin-bottom: 0.6rem; border: 1px solid rgba(32,233,255,0.5); border-radius: 50%; }
 .loading-orbit i { position: absolute; top: -4px; left: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; background: var(--cyan-bright); box-shadow: 0 0 10px var(--cyan-bright); animation: loading-spin 900ms linear infinite; transform-origin: 4px 31px; }
 .frame-error button { margin-top: 0.7rem; padding: 0.7rem 1rem; border: 0; border-radius: 999px; color: #07111f; background: var(--cyan-bright); font-weight: 800; cursor: pointer; }
+.orientation-message { display: none; }
+
+.game-dialog { width: min(calc(100% - 2rem), 34rem); padding: clamp(1.4rem, 4vw, 2.3rem); border: 1px solid rgba(131, 219, 255, 0.35); border-radius: 1.25rem; color: #eaf8ff; background: #09111e; box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5); }
+.game-dialog::backdrop { background: rgba(3, 8, 16, 0.72); backdrop-filter: blur(4px); }
+.game-dialog h2 { margin: 0.35rem 0 0.8rem; font-size: clamp(1.8rem, 5vw, 2.4rem); }
+.game-dialog h3 { margin: 1.4rem 0 0.65rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.game-dialog p { color: #b6c6d9; line-height: 1.65; }
+.dialog-close { position: absolute; top: 0.85rem; right: 0.85rem; display: grid; place-items: center; width: 2rem; height: 2rem; border: 1px solid rgba(144, 182, 214, 0.3); border-radius: 50%; color: #eaf8ff; background: transparent; font-size: 1.3rem; cursor: pointer; }
+.dialog-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.dialog-list li { padding: 0.48rem 0.7rem; border: 1px solid rgba(144, 182, 214, 0.24); border-radius: 0.6rem; color: #d9e9f7; font-weight: 700; }
+.dialog-theme { min-height: 42px; padding: 0.6rem 0.9rem; border: 1px solid var(--cyan-bright); border-radius: 0.65rem; color: #06121e; background: var(--cyan-bright); font: inherit; font-weight: 800; cursor: pointer; }
+.dialog-note { margin-top: 1.2rem; font-size: 0.85rem; }
+
+.viewport-portrait .iframe-panel { width: min(100%, 36rem); margin: 0 auto; }
+.viewport-landscape .iframe-panel, .viewport-scene .iframe-panel { aspect-ratio: 16 / 9; min-height: 0; }
+.viewport-landscape .game-frame, .viewport-scene .game-frame { min-height: 0; }
+.game-frame-shell:fullscreen { width: 100%; height: 100%; border: 0; border-radius: 0; }
+.game-frame-shell:fullscreen .iframe-panel { width: 100%; max-width: none; height: 100%; aspect-ratio: auto; }
+
+@media (orientation: portrait) {
+  .game-page[data-orientation-required='landscape'] .orientation-message { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; gap: 0.35rem; padding: 2rem; color: #dff7ff; text-align: center; background: rgba(5, 13, 24, 0.9); }
+  .game-page[data-orientation-required='landscape'] .orientation-message strong { color: var(--cyan-bright); }
+}
 
 @keyframes loading-spin { to { transform: rotate(360deg); } }
 
@@ -431,6 +455,12 @@ body[data-view='game'] { overflow: hidden; overscroll-behavior: none; }
   .game-toolbar > span:nth-child(2) { display: none; }
   .game-frame { min-height: 470px; }
   .game-note { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
+  .game-toolbar { align-items: flex-start; }
+  .game-toolbar > span:nth-child(2) { display: none; }
+  .frame-actions { justify-content: flex-end; }
+  .frame-action { font-size: 0.7rem; }
+  .viewport-portrait .iframe-panel { width: 100%; }
+  .viewport-landscape .iframe-panel, .viewport-scene .iframe-panel { aspect-ratio: auto; }
 }
 
 /* Content-heavy games use the document's scroll on phones, including landscape. */

@@ -20,6 +20,7 @@ export const gameCatalog = [
     accent: '#20e9ff',
     accentAlt: '#ff2caa',
     status: 'Playable',
+    viewport: 'free',
   },
   {
     id: 'game-002',
@@ -38,6 +39,7 @@ export const gameCatalog = [
     accent: '#ffb43c',
     accentAlt: '#ee5d5d',
     status: 'Playable',
+    viewport: 'portrait',
   },
   {
     id: 'game-003',
@@ -56,6 +58,8 @@ export const gameCatalog = [
     accent: '#7ce8ff',
     accentAlt: '#7386ff',
     status: 'Playable',
+    viewport: 'landscape',
+    orientationRequired: 'landscape',
   },
   {
     id: 'game-004',
@@ -74,6 +78,7 @@ export const gameCatalog = [
     accent: '#9ee17b',
     accentAlt: '#44bfa3',
     status: 'Playable',
+    viewport: 'responsive',
   },
   {
     id: 'game-005',
@@ -92,6 +97,7 @@ export const gameCatalog = [
     accent: '#8ad6cf',
     accentAlt: '#b899e8',
     status: 'Playable',
+    viewport: 'scene',
   },
 ];
 

@@ -48,7 +48,7 @@ function renderRoute(): void {
 function renderHome(): void {
   const featuredGame = gameCatalog.find((game) => game.featured) ?? gameCatalog[0];
   document.body.dataset.view = 'home';
-  document.title = 'Studio Arcade · Original games, made here';
+  document.title = 'OdesosGames · Original games, made here';
   app!.innerHTML = `
     <div class="site-shell">
       ${renderHeader('home')}
@@ -88,7 +88,7 @@ function renderHome(): void {
           </div>
         </section>
       </main>
-      <footer><span>Studio Arcade</span><span>First local portal prototype · ${gameCatalog.length} playable game</span></footer>
+      <footer><span>OdesosGames</span><span>Independent browser games · ${gameCatalog.length} playable games</span></footer>
     </div>
   `;
   bindSharedControls();
@@ -97,9 +97,9 @@ function renderHome(): void {
 function renderGame(game: CatalogGame): void {
   document.body.dataset.view = 'game';
   document.body.dataset.flow = String(game.slug !== 'orbit-break');
-  document.title = `${game.title} · Studio Arcade`;
+  document.title = `${game.title} · OdesosGames`;
   app!.innerHTML = `
-    <div class="site-shell game-page${game.slug === 'orbit-break' ? '' : ' is-flow-game'}">
+    <div class="site-shell game-page viewport-${game.viewport}${game.slug === 'orbit-break' ? '' : ' is-flow-game'}"${game.orientationRequired ? ` data-orientation-required="${game.orientationRequired}"` : ''}>
       ${renderHeader('games')}
       <main id="main-content" class="game-main">
         <section class="game-intro" aria-labelledby="game-title">
@@ -118,11 +118,16 @@ function renderGame(game: CatalogGame): void {
 
         <section class="game-frame-shell" aria-label="${game.title} play area">
           <div class="game-toolbar">
-            <span class="live-label"><i></i> Ready to play</span>
+            <span class="live-label"><i></i> OdesosGames player</span>
             <span>${game.slug === 'orbit-break' ? 'Reverse to evade' : game.eyebrow}</span>
-            <button class="frame-reload" type="button" aria-label="Reload ${game.title}">↻ Reload</button>
+            <span class="frame-actions">
+              <button class="frame-action frame-help" type="button">How to play</button>
+              <button class="frame-action frame-settings" type="button">Settings</button>
+              <button class="frame-action frame-fullscreen" type="button" aria-pressed="false">Fullscreen</button>
+            </span>
           </div>
           <div class="iframe-panel">
+            <p class="orientation-message" role="status"><strong>Landscape works best.</strong> Rotate your device to keep the relay controls in view.</p>
             <div class="frame-loading" role="status" aria-live="polite">
               <span class="loading-orbit" aria-hidden="true"><i></i></span>
               <strong>Loading ${game.title}</strong>
@@ -146,6 +151,7 @@ function renderGame(game: CatalogGame): void {
             <span><strong>Controls:</strong> ${game.controls.join(' · ')}</span>
             <span>Progress stays in this browser when supported.</span>
           </div>
+          <dialog class="game-dialog" aria-label="${game.title} player information"></dialog>
         </section>
       </main>
     </div>
@@ -156,7 +162,7 @@ function renderGame(game: CatalogGame): void {
 
 function renderNotFound(): void {
   document.body.dataset.view = 'home';
-  document.title = 'Page not found · Studio Arcade';
+  document.title = 'Page not found · OdesosGames';
   app!.innerHTML = `
     <div class="site-shell not-found-page">
       ${renderHeader('')}
@@ -173,9 +179,9 @@ function renderNotFound(): void {
 function renderHeader(active: 'home' | 'games' | ''): string {
   return `
     <header class="topbar" aria-label="Primary navigation">
-      <a class="brand" href="${sitePath('/')}" aria-label="Studio Arcade home">
+      <a class="brand" href="${sitePath('/')}" aria-label="OdesosGames home">
         <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
-        <span><strong>Studio Arcade</strong><small>Original games, made here</small></span>
+        <span><strong>OdesosGames</strong><small>Original games, made here</small></span>
       </a>
       <nav class="nav-links" aria-label="Portal">
         <a class="nav-link${active === 'home' ? ' is-active' : ''}" href="${sitePath('/')}">Home</a>
@@ -250,7 +256,11 @@ function bindGameFrame(game: CatalogGame): void {
   const frame = document.querySelector<HTMLIFrameElement>('.game-frame');
   const loading = document.querySelector<HTMLElement>('.frame-loading');
   const error = document.querySelector<HTMLElement>('.frame-error');
-  const reload = document.querySelector<HTMLButtonElement>('.frame-reload');
+  const fullscreen = document.querySelector<HTMLButtonElement>('.frame-fullscreen');
+  const help = document.querySelector<HTMLButtonElement>('.frame-help');
+  const settings = document.querySelector<HTMLButtonElement>('.frame-settings');
+  const dialog = document.querySelector<HTMLDialogElement>('.game-dialog');
+  const shell = document.querySelector<HTMLElement>('.game-frame-shell');
   const retry = error?.querySelector<HTMLButtonElement>('button');
   if (!frame || !loading || !error) return;
   const gameFrame = frame;
@@ -303,8 +313,11 @@ function bindGameFrame(game: CatalogGame): void {
     try { gameFrame.contentWindow?.focus(); } catch { /* The iframe remains pointer-focusable. */ }
   });
   gameFrame.addEventListener('error', showError);
-  reload?.addEventListener('click', reloadFrame);
   retry?.addEventListener('click', reloadFrame);
+  help?.addEventListener('click', () => openDialog('help'));
+  settings?.addEventListener('click', () => openDialog('settings'));
+  fullscreen?.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', updateFullscreenControl);
 
   function showError(): void {
     loadingState.hidden = true;
@@ -320,6 +333,55 @@ function bindGameFrame(game: CatalogGame): void {
     gameFrame.classList.remove('is-ready');
     gameFrame.src = `${sitePath(game.embedPath)}?reload=${Date.now()}`;
     timeout = window.setTimeout(showError, 10_000);
+  }
+
+  function openDialog(kind: 'help' | 'settings'): void {
+    if (!dialog) return;
+    if (kind === 'help') {
+      dialog.innerHTML = `
+        <button class="dialog-close" type="button" aria-label="Close">×</button>
+        <p class="eyebrow"><span></span>How to play</p>
+        <h2>${game.title}</h2>
+        <p>${game.description}</p>
+        <h3>Controls</h3>
+        <ul class="dialog-list">${game.controls.map((control) => `<li>${control}</li>`).join('')}</ul>
+        ${game.orientationRequired ? '<p class="dialog-note">This game is designed for landscape play. Rotate your device for the full control layout.</p>' : ''}
+      `;
+    } else {
+      dialog.innerHTML = `
+        <button class="dialog-close" type="button" aria-label="Close">×</button>
+        <p class="eyebrow"><span></span>Player settings</p>
+        <h2>Display & access</h2>
+        <p>${game.title} keeps its game-specific preferences in its own runtime. This shared player provides display controls without changing game state.</p>
+        <button class="dialog-theme" type="button">Switch portal theme</button>
+        <p class="dialog-note">Use Fullscreen for a distraction-free play area. Restart stays inside the game itself.</p>
+      `;
+    }
+    dialog.querySelector<HTMLButtonElement>('.dialog-close')?.addEventListener('click', () => dialog.close());
+    dialog.querySelector<HTMLButtonElement>('.dialog-theme')?.addEventListener('click', () => {
+      const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+      setTheme(nextTheme);
+      window.localStorage.setItem('studioArcade.theme', nextTheme);
+      updateThemeControl(document.querySelector<HTMLButtonElement>('.theme-toggle'), nextTheme);
+    });
+    dialog.showModal();
+  }
+
+  async function toggleFullscreen(): Promise<void> {
+    if (!shell) return;
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await shell.requestFullscreen();
+    } catch {
+      // Browsers can deny fullscreen without a user gesture or permission.
+      fullscreen?.setAttribute('aria-label', 'Fullscreen is unavailable in this browser');
+    }
+  }
+
+  function updateFullscreenControl(): void {
+    const active = document.fullscreenElement === shell;
+    fullscreen?.setAttribute('aria-pressed', String(active));
+    if (fullscreen) fullscreen.textContent = active ? 'Exit fullscreen' : 'Fullscreen';
   }
 }
 
