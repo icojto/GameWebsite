@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gameCatalog } from '../src/games/catalog.mjs';
+import { gameCatalog, publicGameCatalog } from '../src/games/catalog.mjs';
 
 const portalRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distRoot = path.join(portalRoot, 'dist');
@@ -38,6 +38,10 @@ async function fetchOk(pathname) {
   return response.text();
 }
 
+async function fetchStatus(pathname) {
+  return fetch(new URL(pathname, origin));
+}
+
 async function checkHtmlAssets(html) {
   assert.doesNotMatch(html, /\/GameWebsite\//, 'Found stale project-path asset URL');
   const assets = [...html.matchAll(/(?:src|href)="(\/[^"#?]+)"/g)]
@@ -50,7 +54,8 @@ async function checkHtmlAssets(html) {
 try {
   const homepage = await fetchOk('/');
   await checkHtmlAssets(homepage);
-  for (const game of gameCatalog) {
+  assert.deepEqual(publicGameCatalog.map((game) => game.slug), ['orbit-break', 'reactor-stack']);
+  for (const game of publicGameCatalog) {
     await fetchOk(game.route);
     const page = await fetchOk(`${game.route}/`);
     assert.match(page, /OdesosGames/);
@@ -58,6 +63,13 @@ try {
     const embed = await fetchOk(game.embedPath);
     const count = await checkHtmlAssets(embed);
     console.log(`${game.title}: direct page, embed, ${count} assets OK`);
+  }
+  for (const game of gameCatalog.filter((candidate) => candidate.visibility === 'hidden')) {
+    assert.equal((await fetchStatus(game.route)).status, 404, `${game.route} remained public`);
+    assert.equal((await fetchStatus(`${game.route}/`)).status, 404, `${game.route}/ remained public`);
+    const embed = await fetchOk(game.embedPath);
+    const count = await checkHtmlAssets(embed);
+    console.log(`${game.title}: on-hold source build, ${count} embed assets OK`);
   }
   for (const name of ['operations', 'yard', 'archive', 'sublevel']) {
     const scene = await fetchOk(`/games/signal-below/embed/art/${name}.svg`);
