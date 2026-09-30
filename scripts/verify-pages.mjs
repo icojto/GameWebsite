@@ -7,14 +7,9 @@ import { gameCatalog } from '../src/games/catalog.mjs';
 
 const portalRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distRoot = path.join(portalRoot, 'dist');
-const pagesBase = '/GameWebsite/';
 const server = createServer(async (request, response) => {
   const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
-  if (!pathname.startsWith(pagesBase)) {
-    response.writeHead(404).end();
-    return;
-  }
-  const relative = pathname.slice(pagesBase.length);
+  const relative = pathname.slice(1);
   const filename = path.resolve(distRoot, relative);
   if (filename !== distRoot && !filename.startsWith(`${distRoot}${path.sep}`)) {
     response.writeHead(403).end();
@@ -44,7 +39,8 @@ async function fetchOk(pathname) {
 }
 
 async function checkHtmlAssets(html) {
-  const assets = [...html.matchAll(/(?:src|href)="(\/GameWebsite\/[^"#?]+)"/g)]
+  assert.doesNotMatch(html, /\/GameWebsite\//, 'Found stale project-path asset URL');
+  const assets = [...html.matchAll(/(?:src|href)="(\/[^"#?]+)"/g)]
     .map((match) => match[1]);
   assert.ok(assets.length >= 2, 'Expected nested asset links');
   for (const asset of assets) await fetchOk(asset);
@@ -52,19 +48,19 @@ async function checkHtmlAssets(html) {
 }
 
 try {
-  const homepage = await fetchOk(pagesBase);
+  const homepage = await fetchOk('/');
   await checkHtmlAssets(homepage);
   for (const game of gameCatalog) {
-    await fetchOk(`${pagesBase}${game.route.slice(1)}`);
-    const page = await fetchOk(`${pagesBase}${game.route.slice(1)}/`);
+    await fetchOk(game.route);
+    const page = await fetchOk(`${game.route}/`);
     assert.match(page, /Studio Arcade/);
     await checkHtmlAssets(page);
-    const embed = await fetchOk(`${pagesBase}${game.embedPath.slice(1)}`);
+    const embed = await fetchOk(game.embedPath);
     const count = await checkHtmlAssets(embed);
     console.log(`${game.title}: direct page, embed, ${count} assets OK`);
   }
   for (const name of ['operations', 'yard', 'archive', 'sublevel']) {
-    const scene = await fetchOk(`${pagesBase}games/signal-below/embed/art/${name}.svg`);
+    const scene = await fetchOk(`/games/signal-below/embed/art/${name}.svg`);
     assert.match(scene, /<svg/);
   }
   console.log('Homepage and four Signal Below scene assets OK');

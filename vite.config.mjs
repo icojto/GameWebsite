@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 
-// GitHub Pages serves project repositories below /<repository>/.
+// The configured Pages custom domain serves this site from its root.
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === 'true' ? '/GameWebsite/' : '/',
+  base: '/',
 });

@@ -60,7 +60,7 @@ No homepage template change is needed: catalog entries automatically create card
 
 ## GitHub Pages preparation
 
-The project site is configured for `https://icojto.github.io/GameWebsite/`. The Pages build uses `/GameWebsite/` as Vite's base and builds each game embed under `/GameWebsite/games/<slug>/embed/`. Static `index.html` files are generated for all five game routes, so a game page can be opened directly or refreshed.
+The project site is configured for `https://odesosgames.com/`. The Pages build uses `/` as Vite's base and builds each game embed under `/games/<slug>/embed/`. Static `index.html` files are generated for all five game routes, so a game page can be opened directly or refreshed. The old `https://icojto.github.io/GameWebsite/` URL redirects to the custom domain; it is not a second deployment path.
 
 To reproduce the Pages artifact locally on Windows:
 
@@ -68,12 +68,10 @@ To reproduce the Pages artifact locally on Windows:
 cd GameWebsite
 npm.cmd ci
 npm.cmd run check
-$env:GITHUB_PAGES = 'true'
 npm.cmd run build
 npm.cmd run verify:pages
-Remove-Item Env:GITHUB_PAGES
 ```
 
-The verifier serves `dist` locally under `/GameWebsite/` and checks the homepage, every direct game page and embed, linked JavaScript/CSS assets, and Signal Below's SVG scene. It does not publish anything.
+The verifier serves `dist` locally from `/` and checks the homepage, every direct game page and embed, linked JavaScript/CSS assets, and Signal Below's SVG scene. It rejects stale `/GameWebsite/` links and does not publish anything.
 
-The workflow at `.github/workflows/pages.yml` runs only for pushes to `main`; it installs with `npm ci`, checks, builds, verifies, uploads `dist`, and deploys to the `github-pages` environment. To publish, review and merge the Pages Draft PR into `main`, then confirm the **Deploy GitHub Pages** workflow succeeds in the Actions tab and open the site URL above. GitHub currently reports Pages source as **GitHub Actions**. The repository and Pages site are currently public; verify that publication is intended before merging.
+The workflow at `.github/workflows/pages.yml` runs only for pushes to `main`; it installs with `npm ci`, checks, builds, verifies, uploads `dist`, and deploys to the `github-pages` environment. GitHub Pages must remain configured with **GitHub Actions** as its source and `odesosgames.com` as its custom domain in repository Settings → Pages. For a workflow-published site, GitHub ignores a repository `CNAME` file; the Pages setting is authoritative. To publish a fix, review and merge its PR into `main`, confirm the **Deploy GitHub Pages** workflow succeeds in the Actions tab, and open the site URL above. The repository and Pages site are currently public; verify that publication is intended before merging.

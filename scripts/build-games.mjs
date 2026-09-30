@@ -7,7 +7,6 @@ import { gameBuilds, gameCatalog } from '../src/games/catalog.mjs';
 const portalRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const gamesOutputRoot = path.join(portalRoot, 'public', 'games');
 const viteBin = path.join(portalRoot, 'node_modules', 'vite', 'bin', 'vite.js');
-const siteBase = process.env.GITHUB_PAGES === 'true' ? '/GameWebsite' : '';
 
 await mkdir(gamesOutputRoot, { recursive: true });
 await access(viteBin);
@@ -31,7 +30,7 @@ for (const game of gameCatalog) {
     viteBin,
     'build',
     '--base',
-    `${siteBase}${game.embedBase}`,
+    game.embedBase,
     '--outDir',
     outputDir,
     '--emptyOutDir',
