@@ -1,6 +1,6 @@
 /**
- * The public catalog drives every game shelf and route in the portal.
- * Add future games here instead of hard-coding homepage sections.
+ * The complete catalog preserves build and maintenance records for every game.
+ * The public catalog below controls portal shelves, routes, and counts.
  */
 export const gameCatalog = [
   {
@@ -21,6 +21,7 @@ export const gameCatalog = [
     accentAlt: '#ff2caa',
     status: 'Playable',
     viewport: 'free',
+    visibility: 'public',
   },
   {
     id: 'game-002',
@@ -40,6 +41,7 @@ export const gameCatalog = [
     accentAlt: '#ee5d5d',
     status: 'Playable',
     viewport: 'portrait',
+    visibility: 'public',
   },
   {
     id: 'game-003',
@@ -60,6 +62,7 @@ export const gameCatalog = [
     status: 'Playable',
     viewport: 'landscape',
     orientationRequired: 'landscape',
+    visibility: 'hidden',
   },
   {
     id: 'game-004',
@@ -79,6 +82,7 @@ export const gameCatalog = [
     accentAlt: '#44bfa3',
     status: 'Playable',
     viewport: 'responsive',
+    visibility: 'hidden',
   },
   {
     id: 'game-005',
@@ -98,8 +102,11 @@ export const gameCatalog = [
     accentAlt: '#b899e8',
     status: 'Playable',
     viewport: 'scene',
+    visibility: 'hidden',
   },
 ];
+
+export const publicGameCatalog = gameCatalog.filter((game) => game.visibility === 'public');
 
 /** Build-only source locations, resolved from the portal root. */
 export const gameBuilds = {

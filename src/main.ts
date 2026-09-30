@@ -1,11 +1,11 @@
 import './styles.css';
-import { gameCatalog } from './games/catalog.mjs';
+import { publicGameCatalog } from './games/catalog.mjs';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Portal root is missing.');
 
 type Theme = 'light' | 'dark';
-type CatalogGame = (typeof gameCatalog)[number];
+type CatalogGame = (typeof publicGameCatalog)[number];
 const siteBase = import.meta.env.BASE_URL.replace(/\/$/, '');
 const sitePath = (route: string): string => `${siteBase}${route}${/^\/games\/[^/]+$/.test(route) ? '/' : ''}`;
 
@@ -39,14 +39,14 @@ function renderRoute(): void {
   const path = pathname === siteBase ? '/' : pathname.startsWith(`${siteBase}/`)
     ? pathname.slice(siteBase.length)
     : pathname;
-  const game = gameCatalog.find((candidate) => candidate.route === path);
+  const game = publicGameCatalog.find((candidate) => candidate.route === path);
   if (game) renderGame(game);
   else if (path === '/') renderHome();
   else renderNotFound();
 }
 
 function renderHome(): void {
-  const featuredGame = gameCatalog.find((game) => game.featured) ?? gameCatalog[0];
+  const featuredGame = publicGameCatalog.find((game) => game.featured) ?? publicGameCatalog[0];
   document.body.dataset.view = 'home';
   document.title = 'OdesosGames · Original games, made here';
   app!.innerHTML = `
@@ -84,11 +84,11 @@ function renderHome(): void {
             <p>One game today. A repeatable home for everything that comes next.</p>
           </div>
           <div class="game-grid">
-            ${gameCatalog.map(renderGameCard).join('')}
+            ${publicGameCatalog.map(renderGameCard).join('')}
           </div>
         </section>
       </main>
-      <footer><span>OdesosGames</span><span>Independent browser games · ${gameCatalog.length} playable games</span></footer>
+      <footer><span>OdesosGames</span><span>Independent browser games · ${publicGameCatalog.length} playable games</span></footer>
     </div>
   `;
   bindSharedControls();
