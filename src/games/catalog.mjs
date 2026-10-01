@@ -20,7 +20,7 @@ export const gameCatalog = [
     accent: '#20e9ff',
     accentAlt: '#ff2caa',
     status: 'Playable',
-    viewport: 'free',
+    player: { layout: 'fill' },
     visibility: 'public',
   },
   {
@@ -40,7 +40,7 @@ export const gameCatalog = [
     accent: '#ffb43c',
     accentAlt: '#ee5d5d',
     status: 'Playable',
-    viewport: 'portrait',
+    player: { layout: 'portrait' },
     visibility: 'public',
   },
   {
@@ -60,7 +60,7 @@ export const gameCatalog = [
     accent: '#7ce8ff',
     accentAlt: '#7386ff',
     status: 'Playable',
-    viewport: 'landscape',
+    player: { layout: 'landscape' },
     orientationRequired: 'landscape',
     visibility: 'hidden',
   },
@@ -81,7 +81,7 @@ export const gameCatalog = [
     accent: '#9ee17b',
     accentAlt: '#44bfa3',
     status: 'Playable',
-    viewport: 'responsive',
+    player: { layout: 'responsive' },
     visibility: 'hidden',
   },
   {
@@ -101,7 +101,7 @@ export const gameCatalog = [
     accent: '#8ad6cf',
     accentAlt: '#b899e8',
     status: 'Playable',
-    viewport: 'scene',
+    player: { layout: 'scene' },
     visibility: 'hidden',
   },
 ];
