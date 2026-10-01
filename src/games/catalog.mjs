@@ -20,7 +20,7 @@ export const gameCatalog = [
     accent: '#20e9ff',
     accentAlt: '#ff2caa',
     status: 'Playable',
-    player: { layout: 'fill' },
+    player: { layout: 'fill', orientation: 'any' },
     visibility: 'public',
   },
   {
@@ -40,7 +40,7 @@ export const gameCatalog = [
     accent: '#ffb43c',
     accentAlt: '#ee5d5d',
     status: 'Playable',
-    player: { layout: 'portrait' },
+    player: { layout: 'portrait', orientation: 'prefer-portrait' },
     visibility: 'public',
   },
   {

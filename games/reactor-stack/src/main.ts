@@ -7,10 +7,12 @@ import { readBest, saveBest } from './storage.ts';
 
 document.querySelector('#app')!.innerHTML = `
 <header><div><div class="eyebrow">HRISTO STUDIOS / 002</div><h1>REACTOR STACK</h1></div><span class="signal">● ONLINE</span></header>
-<section class="stats"><div><div class="label">OUTPUT / SCORE</div><div class="number" id="score">0000</div></div><div class="objective"><div class="label">STABILIZE THE CORE</div><div class="number"><strong id="stability">0 / 100</strong></div></div></section>
-<div class="track"><span id="stability-bar"></span></div><div class="board-heading"><span>CONTAINMENT GRID</span><span id="turn">TURN 00</span></div><div id="board" aria-label="Five column, six row reactor board"></div>
-<div class="heat-heading"><span id="heat-label">CORE TEMPERATURE</span><span id="heat">0%</span></div><div class="track"><span id="heat-bar"></span></div>
-<p id="hint" aria-live="polite">Tap a cell, then a neighbor. Match equal tiers to merge.</p><nav><button id="restart">RESTART</button><button id="menu">MENU</button><button id="audio" aria-pressed="true">SOUND ON</button></nav><footer><span>EXPERIMENTAL ENERGY SYSTEMS</span><span id="best">BEST 0</span></footer>
+<div class="reactor-layout">
+  <section class="reactor-playfield"><div class="board-heading"><span>CONTAINMENT GRID</span><span id="turn">TURN 00</span></div><div id="board" aria-label="Five column, six row reactor board"></div></section>
+  <section class="reactor-side"><section class="stats"><div><div class="label">OUTPUT / SCORE</div><div class="number" id="score">0000</div></div><div class="objective"><div class="label">STABILIZE THE CORE</div><div class="number"><strong id="stability">0 / 100</strong></div></div></section>
+  <div class="track"><span id="stability-bar"></span></div><div class="heat-heading"><span id="heat-label">CORE TEMPERATURE</span><span id="heat">0%</span></div><div class="track"><span id="heat-bar"></span></div>
+  <p id="hint" aria-live="polite">Tap a cell, then a neighbor. Match equal tiers to merge.</p><nav><button id="restart">RESTART</button><button id="menu">MENU</button><button id="audio" aria-pressed="true">SOUND ON</button></nav><footer><span>EXPERIMENTAL ENERGY SYSTEMS</span><span id="best">BEST 0</span></footer></section>
+</div>
 <section class="overlay" id="overlay"><div class="panel"><div class="reactor-icon">◈</div><div class="eyebrow" id="kicker">CONTAINMENT PROTOCOL / 002</div><h2 id="title">REACTOR<br>STACK</h2><p id="description">A damaged reactor. Thirty containment slots.<br>Combine energy cells before the core overheats.</p><div class="tiers"><span>Ⅰ ION</span><span>Ⅱ FLUX</span><span>Ⅲ PLASMA</span><span>Ⅳ FUSION</span><span>Ⅴ CORE</span></div><button class="primary" id="start">INITIALIZE REACTOR →</button><small id="instructions">Drag or tap into one neighboring slot.<br>Equal tiers merge. Every move adds heat.<br>Reach 100 stability to secure the reactor.</small></div></section>`;
 const el = (id: string) => document.getElementById(id)!;
 let audio: AudioContext | undefined, muted = false;
