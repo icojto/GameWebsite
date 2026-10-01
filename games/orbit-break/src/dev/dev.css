@@ -1,0 +1,29 @@
+.odesos-dev-panel { position: absolute; inset: 0; z-index: 30; pointer-events: none; font: 11px/1.4 "Segoe UI", system-ui, sans-serif; color: #d9f7ff; }
+.odesos-dev-panel button, .odesos-dev-panel input, .odesos-dev-panel textarea { font: inherit; }
+.dev-trigger { position: absolute; right: 6px; bottom: 6px; padding: 3px 6px; border: 1px solid #17849b; border-radius: 4px; color: #20e9ff; background: #05141d; pointer-events: auto; cursor: pointer; }
+.dev-drawer { position: absolute; top: 0; right: 0; bottom: 0; width: min(350px, 100%); display: grid; grid-template-rows: auto auto minmax(0, 1fr); border-left: 1px solid #2f8b9e; background: #06111beF; box-shadow: -12px 0 35px #0009; pointer-events: auto; }
+.dev-drawer[hidden] { display: none; }
+.dev-drawer > header { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid #1d4a5a; letter-spacing: .12em; }
+.dev-drawer > header span { color: #20e9ff; }
+.dev-drawer > header button { border: 0; color: #fff; background: none; font-size: 20px; cursor: pointer; }
+.dev-drawer nav { display: flex; gap: 4px; overflow-x: auto; padding: 6px; border-bottom: 1px solid #173d4b; }
+.dev-drawer nav button { flex: 0 0 auto; padding: 4px 6px; border: 1px solid #2a5461; border-radius: 3px; color: #a9c4cd; background: #0b1b27; cursor: pointer; }
+.dev-drawer nav button[aria-current="page"] { color: #07121b; background: #20e9ff; }
+.dev-body { overflow: auto; padding: 10px 12px 24px; }
+.dev-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 31px; border-bottom: 1px solid #143745; }
+.dev-row span { min-width: 0; }
+.dev-row input[type="number"] { width: 75px; padding: 3px; border: 1px solid #397182; border-radius: 3px; color: #e8fcff; background: #081f2b; }
+.dev-row input[type="checkbox"] { accent-color: #20e9ff; }
+.dev-row output { max-width: 58%; overflow-wrap: anywhere; color: #20e9ff; text-align: right; }
+.dev-action, .dev-log button { margin: 3px 3px 3px 0; padding: 5px 7px; border: 1px solid #2c7d8c; border-radius: 3px; color: #dcfaff; background: #0b3746; cursor: pointer; }
+.dev-action:hover, .dev-log button:hover { background: #145669; }
+.dev-log { display: grid; gap: 8px; }
+.dev-log p { margin: 0; color: #a6bdc8; }
+.dev-log label { display: grid; gap: 4px; }
+.dev-log input, .dev-log textarea { width: 100%; padding: 5px; border: 1px solid #397182; border-radius: 3px; color: #e8fcff; background: #081f2b; }
+.dev-log-actions { display: flex; flex-wrap: wrap; }
+.dev-changes { display: grid; gap: 3px; }
+.dev-changes > div { display: flex; justify-content: space-between; gap: 8px; padding: 4px; border-bottom: 1px solid #1b3e4c; }
+.dev-changes span { color: #f384c7; }
+.odesos-dev-panel button:focus-visible, .odesos-dev-panel input:focus-visible, .odesos-dev-panel textarea:focus-visible { outline: 2px solid #20e9ff; outline-offset: 2px; }
+@media (max-width: 600px) { .dev-drawer { top: auto; left: 0; width: 100%; height: min(72%, 530px); border-left: 0; border-top: 1px solid #2f8b9e; } }

@@ -1,9 +1,16 @@
-# Orbit Break integration snapshot
+# Orbit Break v2
 
-This directory contains the portal's gameplay-source snapshot of Orbit Break from original commit `751f772fb18cfb59bd623fa5d3c262e915b0f8ca`.
+This is the portal-owned Orbit Break game source. It began as an integration snapshot of the original game at `751f772fb18cfb59bd623fa5d3c262e915b0f8ca`; v2 is developed here. The separate original repository is unchanged.
 
-The TypeScript, CSS, and HTML gameplay files are unchanged. The portal root owns dependency installation, type checking, and the nested-base Vite build. Use the root commands documented in `../../README.md`.
+The root `package.json` owns dependencies. From the portal root on Windows:
 
-Controls remain **Space**, click, or tap to start, reverse direction, and restart. The best score remains browser-local.
+```powershell
+npm.cmd ci
+npm.cmd run dev:orbit
+npm.cmd run test:orbit
+npm.cmd run check
+npm.cmd run build
+npm.cmd run verify:pages
+```
 
-The separate original Orbit Break repository remains the source of truth and is not modified by portal builds.
+`dev:orbit` serves the standalone game at the printed local URL. The portal build embeds it at `/games/orbit-break/embed/` inside the existing player viewport. Space, canvas click, or tap starts/reverses/restarts; UI buttons are separate from the one-action gameplay input. The DEV panel appears only in development mode; use its DEV button or Ctrl+Shift+D. It never writes tuning or session logs to storage. The player profile is browser-local under `orbitBreak.profile.v2`, with best-score migration from `orbitBreak.bestScore`.

@@ -4,7 +4,7 @@ A lightweight local portal for first-party browser games. The portal now contain
 
 `Homepage → Orbit Break card → /games/orbit-break → embedded playable game`
 
-The repository includes an unchanged integration snapshot of Orbit Break under `games/orbit-break`. The build compiles that snapshot into the ignored `public/games/` directory, then Vite includes it in the portal's production output. A clean checkout does not need the separate original game repository.
+The repository includes portal-owned Orbit Break v2 source under `games/orbit-break`. The build compiles it into the ignored `public/games/` directory, then Vite includes it in the portal's production output. A clean checkout does not need the separate original game repository.
 
 Games 002-005 are also integrated from repository-local snapshots: Reactor Stack (`games/reactor-stack`), Last Relay (`games/last-relay`), Station Quartermaster (`games/station-quartermaster`), and Signal Below (`games/signal-below`). Each is built from its real game source and required authored assets. The original game repositories remain unchanged.
 
@@ -38,10 +38,10 @@ Open the URL printed by Vite Preview, normally <http://127.0.0.1:4173/>. Verify 
 ## How the game integration works
 
 - `src/games/catalog.mjs` is the single catalog for homepage cards, game routes, iframe locations, and repository-local source locations.
-- `games/orbit-break` is an unchanged gameplay-source snapshot from the original Orbit Break repository at commit `751f772fb18cfb59bd623fa5d3c262e915b0f8ca`.
+- `games/orbit-break` began as a gameplay-source snapshot from the original Orbit Break repository at commit `751f772fb18cfb59bd623fa5d3c262e915b0f8ca`; v2 is maintained in this portal repository.
 - `scripts/build-games.mjs` uses the portal's installed Vite and Phaser packages and writes only into the ignored `public/games/` directory.
 - Orbit Break is built with base `/games/orbit-break/embed/` and loaded from `/games/orbit-break/embed/index.html`, so its generated JavaScript and CSS resolve correctly under the nested path.
-- The iframe keeps Phaser input and audio isolated from portal navigation. The game keeps its existing browser-local best score behavior.
+- The iframe keeps Phaser input and audio isolated from portal navigation. The game migrates the browser-local legacy best score into a versioned local profile with quests, XP, Stars, scores, and cosmetic equipment.
 
 All five games use the same isolation pattern: the homepage creates cards only, while a game iframe is created only when its dedicated page opens. Each embed has its own nested Vite base at `/games/<slug>/embed/`, preserving independent styles, input, audio, and browser-local storage.
 

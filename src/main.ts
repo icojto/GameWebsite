@@ -68,7 +68,7 @@ function renderHome(): void {
                 Play ${featuredGame.title}
                 <span aria-hidden="true">→</span>
               </a>
-              <span class="quick-note">No download · Saves best score locally</span>
+              <span class="quick-note">No download · Saves progress locally</span>
             </div>
           </div>
 
@@ -226,7 +226,7 @@ function renderGameCard(game: CatalogGame): string {
 
 function renderCardVisual(game: CatalogGame): string {
   if (game.artVariant === 'orbit') {
-    return '<span class="mini-orbit" aria-hidden="true"><i></i><b></b></span>';
+    return '<span class="mini-orbit" aria-hidden="true"><i class="mini-player"></i><b class="mini-core"></b><em class="mini-shot mini-shot-a"></em><em class="mini-shot mini-shot-b"></em><em class="mini-shot mini-shot-c"></em><em class="mini-shot mini-shot-d"></em></span>';
   }
   return `<span class="card-title-art" aria-hidden="true">${game.title}</span>`;
 }
@@ -237,6 +237,8 @@ function renderOrbitVisual(className: string): string {
       <span class="orbit-ring"><i class="orbit-player"></i></span>
       <i class="hazard hazard-one"></i>
       <i class="hazard hazard-two"></i>
+      <i class="hazard hazard-three"></i>
+      <i class="hazard hazard-four"></i>
       <b class="orbit-core"></b>
     </span>
   `;
