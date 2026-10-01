@@ -247,6 +247,18 @@ h1 em {
 .hazard { position: absolute; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 18px solid var(--magenta); filter: drop-shadow(0 0 9px rgba(255,44,170,0.72)); }
 .hazard-one { top: 32%; right: 12%; transform: rotate(160deg); }
 .hazard-two { bottom: 24%; left: 15%; transform: rotate(-20deg); }
+.hazard-three { top: 17%; left: 29%; transform: rotate(62deg); }
+.hazard-four { bottom: 18%; right: 28%; transform: rotate(-100deg); }
+.orbit-stage .orbit-ring { animation: orbit-wake 6s ease-in-out infinite; }
+.orbit-stage .orbit-player { transform-origin: 7px calc(min(30vw, 145px) + 7px); animation: orbit-preview-player 6s ease-in-out infinite; }
+.orbit-stage .hazard { animation: orbit-preview-hazard 6s ease-in-out infinite; }
+.orbit-stage .hazard-one { --travel-x: -38px; --travel-y: 27px; animation-delay: 0s; }
+.orbit-stage .hazard-two { --travel-x: 37px; --travel-y: -22px; animation-delay: .22s; }
+.orbit-stage .hazard-three { --travel-x: 25px; --travel-y: 33px; animation-delay: .48s; }
+.orbit-stage .hazard-four { --travel-x: -22px; --travel-y: -28px; animation-delay: .68s; }
+@keyframes orbit-wake { 0%, 100% { transform: scale(.96); box-shadow: 0 0 12px rgba(32,233,255,.12); } 18%, 80% { transform: scale(1); box-shadow: 0 0 24px rgba(32,233,255,.24); } }
+@keyframes orbit-preview-player { 0%, 17% { rotate: 0deg; } 48% { rotate: 210deg; } 66% { rotate: 258deg; } 80% { rotate: 210deg; } 100% { rotate: 0deg; } }
+@keyframes orbit-preview-hazard { 0%, 30% { opacity: 0; translate: 0 0; } 38% { opacity: 1; } 69% { opacity: 1; translate: var(--travel-x) var(--travel-y); } 82%, 100% { opacity: 0; translate: var(--travel-x) var(--travel-y); } }
 .stage-footer { display: flex; align-items: center; justify-content: space-between; margin: 0 1.3rem 1.3rem; padding: 1.05rem 1.1rem; border: 1px solid rgba(255,255,255,0.13); border-radius: 1.2rem; background: rgba(8,17,31,0.72); backdrop-filter: blur(12px); }
 .stage-footer > span:first-child { display: grid; gap: 0.18rem; }
 .stage-footer small { color: #91a2b9; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -267,6 +279,13 @@ h1 em {
 .mini-orbit { position: relative; width: 190px; height: 190px; border: 2px solid rgba(32,233,255,0.7); border-radius: 50%; box-shadow: 0 0 28px rgba(32,233,255,0.18); }
 .mini-orbit i { position: absolute; top: -8px; left: calc(50% - 8px); width: 16px; height: 16px; border: 4px solid var(--cyan-bright); border-radius: 50%; background: #fff; }
 .mini-orbit b { position: absolute; top: calc(50% - 7px); left: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 12px rgba(32,233,255,0.08); }
+.mini-orbit { animation: orbit-wake 6s ease-in-out infinite; }
+.mini-orbit .mini-player { transform-origin: 8px 103px; animation: orbit-preview-player 6s ease-in-out infinite; }
+.mini-shot { position: absolute; width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid var(--magenta); filter: drop-shadow(0 0 6px var(--magenta)); animation: orbit-preview-hazard 6s ease-in-out infinite; }
+.mini-shot-a { top: 12%; right: -22%; --travel-x: -42px; --travel-y: 20px; }
+.mini-shot-b { bottom: 15%; left: -25%; --travel-x: 40px; --travel-y: -14px; animation-delay: .2s; }
+.mini-shot-c { top: -15%; left: 24%; --travel-x: 16px; --travel-y: 38px; animation-delay: .42s; }
+.mini-shot-d { bottom: -17%; right: 20%; --travel-x: -16px; --travel-y: -34px; animation-delay: .62s; }
 .card-title-art { position: relative; z-index: 1; max-width: 10ch; color: #f4fbff; font-size: clamp(2.2rem, 7vw, 4.5rem); font-weight: 800; line-height: 0.9; letter-spacing: -0.06em; text-align: center; }
 .status-pill { position: absolute; top: 1.2rem; left: 1.2rem; padding: 0.5rem 0.72rem; border: 1px solid rgba(32,233,255,0.45); border-radius: 999px; color: #bdf8ff; background: rgba(9,23,42,0.7); font-size: 0.74rem; font-weight: 700; }
 .card-play { position: absolute; right: 1.2rem; bottom: 1.2rem; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; color: #07111f; background: var(--cyan-bright); transition: transform 180ms ease; }
@@ -411,4 +430,7 @@ body[data-view='game'] { overscroll-behavior: none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
   .loading-orbit i { animation: none; }
+  .orbit-stage .orbit-ring, .orbit-stage .orbit-player, .orbit-stage .hazard,
+  .mini-orbit, .mini-orbit .mini-player, .mini-shot { animation: none; }
+  .orbit-stage .hazard, .mini-shot { opacity: 1; }
 }
