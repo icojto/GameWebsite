@@ -30,9 +30,11 @@ const controller = new TurnController(Math.random, copyConfig());
 let best = readBest(), upgradeArmed = false, runStartedAt = 0, completedRecorded = false;
 type SessionEntry = { result: string; reason: string; score: number; moves: number; duration: number; peakHeat: number; stability: number; merges: number[]; coolUsed: number; upgradeUsed: number };
 const sessionLog: SessionEntry[] = [];
+const REACTOR_SCENE_KEY = 'ReactorScene';
 
 class ReactorScene extends Phaser.Scene {
   cells = new Map<number, Phaser.GameObjects.Container>(); grid!: Phaser.GameObjects.Graphics; selection!: Phaser.GameObjects.Graphics; geometry = { size: 1, left: 0, top: 0 }; gesture = new Gesture(); effects = 0; debug = { indices: false, legal: false, selection: true, geometry: false, bounds: false }; debugNodes: Phaser.GameObjects.Text[] = [];
+  constructor() { super(REACTOR_SCENE_KEY); }
   create() {
     this.grid = this.add.graphics(); this.selection = this.add.graphics().setDepth(10);
     this.scale.on('resize', () => { this.layoutBoard(); this.render(); this.highlight(); });
@@ -62,7 +64,7 @@ class ReactorScene extends Phaser.Scene {
 }
 
 const game = new Phaser.Game({ type: Phaser.AUTO, parent: 'board', width: 600, height: 600, backgroundColor: '#09141e', antialias: true, scene: ReactorScene, scale: { mode: Phaser.Scale.RESIZE }, input: { activePointers: 2 }, audio: { noAudio: true } });
-const scene = () => game.scene.getScene('ReactorScene') as ReactorScene;
+const scene = () => game.scene.getScene(REACTOR_SCENE_KEY) as ReactorScene;
 const resizeBoard = () => { const board=el('board'), rect=board.getBoundingClientRect(); if (rect.width > 0 && rect.height > 0) game.scale.resize(Math.round(rect.width),Math.round(rect.height)); const shell=el('game-shell'), mode=layoutMode(shell.clientWidth,shell.clientHeight); shell.dataset.layout=mode; el('mode-label').textContent=mode === 'wide' ? 'REACTOR CONTAINMENT' : 'CONTAINMENT GRID'; };
 new ResizeObserver(resizeBoard).observe(el('game-shell')); window.addEventListener('resize',resizeBoard); setTimeout(resizeBoard,0);
 function message(value:string) { scene().message(value); }
