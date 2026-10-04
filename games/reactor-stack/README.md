@@ -1,6 +1,6 @@
 # Reactor Stack — Game 002
 
-A compact portrait-first reactor merge game built with TypeScript, Phaser, and Vite. No backend or external asset services.
+A container-responsive reactor merge game built with TypeScript, Phaser, and Vite. No backend or external asset services.
 
 ## Run
 
@@ -36,7 +36,7 @@ All game tuning lives in `src/config.ts`:
 
 | Setting | Value |
 | --- | --- |
-| Board | 5 columns × 6 rows |
+| Board | 6 columns × 6 rows |
 | Initial cells | 6 |
 | Initial / spawn tiers | Tier 1: 90%; Tier 2: 10% |
 | Starting heat / stability / score | 0 / 0 / 0 |
@@ -67,6 +67,6 @@ Development server only: `/?qa=win` starts with adjacent tier-4 cells and 76 sta
 
 ## QA boundary
 
-See `docs/EXECUTION_REPORT.md` for executed checks and `docs/PATCH_LOG.md` for the patch record. Physical iOS/Android touch, subjective sound/merge satisfaction, 3–8 minute balance, and tab-suspension behavior remain human QA. Short portrait and landscape viewports intentionally scroll instead of shrinking the board to tiny targets. No keyboard board navigation is supplied.
+See `docs/PRODUCTION_PASS.md` for the current implementation, validation, and human QA checklist. Physical iOS/Android touch, subjective sound/merge satisfaction, 3–8 minute balance, and tab-suspension behavior remain human QA. The active game fits its allocated container without browser-page scrolling. No keyboard board navigation is supplied.
 
 Next: Aegis audit and Hristo gameplay/art QA. No Game 003 work or Factory extraction is part of this project.
