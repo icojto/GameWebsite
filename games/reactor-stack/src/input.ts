@@ -1,7 +1,7 @@
-import { config as c } from './config.ts';
-export function cellAt(x: number, y: number, left: number, top: number, size: number): number | null {
+import { DEFAULT_CONFIG, type RuntimeConfig } from './config.ts';
+export function cellAt(x: number, y: number, left: number, top: number, size: number, config: RuntimeConfig = DEFAULT_CONFIG): number | null {
   const col = Math.floor((x - left) / size), row = Math.floor((y - top) / size);
-  return col >= 0 && col < c.gridWidth && row >= 0 && row < c.gridHeight ? row * c.gridWidth + col : null;
+  return col >= 0 && col < config.gridWidth && row >= 0 && row < config.gridHeight ? row * config.gridWidth + col : null;
 }
 // Phaser supplies the same logical coordinates for mouse and touch.
 export class Gesture {

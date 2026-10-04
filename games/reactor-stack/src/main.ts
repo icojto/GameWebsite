@@ -1,121 +1,82 @@
 import Phaser from 'phaser';
 import './style.css';
-import { config as c } from './config.ts';
-import { TurnController } from './rules.ts';
+import { ReactorAudio } from './audio.ts';
+import { DEFAULT_CONFIG, clampConfig, copyConfig } from './config.ts';
 import { Gesture, cellAt } from './input.ts';
-import { readBest, saveBest } from './storage.ts';
+import { layoutMode } from './layout.ts';
+import { TurnController, legalDestinations, type State } from './rules.ts';
+import { readBest, readScores, recordScore } from './storage.ts';
 
 document.querySelector('#app')!.innerHTML = `
-<header><div><div class="eyebrow">HRISTO STUDIOS / 002</div><h1>REACTOR STACK</h1></div><span class="signal">● ONLINE</span></header>
-<div class="reactor-layout">
-  <section class="reactor-playfield"><div class="board-heading"><span>CONTAINMENT GRID</span><span id="turn">TURN 00</span></div><div id="board" aria-label="Five column, six row reactor board"></div></section>
-  <section class="reactor-side"><section class="stats"><div><div class="label">OUTPUT / SCORE</div><div class="number" id="score">0000</div></div><div class="objective"><div class="label">STABILIZE THE CORE</div><div class="number"><strong id="stability">0 / 100</strong></div></div></section>
-  <div class="track"><span id="stability-bar"></span></div><div class="heat-heading"><span id="heat-label">CORE TEMPERATURE</span><span id="heat">0%</span></div><div class="track"><span id="heat-bar"></span></div>
-  <p id="hint" aria-live="polite">Tap a cell, then a neighbor. Match equal tiers to merge.</p><nav><button id="restart">RESTART</button><button id="menu">MENU</button><button id="audio" aria-pressed="true">SOUND ON</button></nav><footer><span>EXPERIMENTAL ENERGY SYSTEMS</span><span id="best">BEST 0</span></footer></section>
+<div class="game-shell" id="game-shell" data-layout="portrait">
+  <aside class="control-panel" aria-label="Reactor controls">
+    <div class="brand"><span class="brand-mark">◉</span><h1>REACTOR STACK</h1></div>
+    <section class="goal"><span class="kicker">STABILIZE THE CORE</span><div class="core-dial"><span id="stability">0</span></div><strong id="stability-label">0 / 100</strong></section>
+    <section class="move-readout"><span class="kicker">MOVES</span><strong id="moves">0</strong></section>
+    <button class="control-button pause-button" id="pause">Ⅱ <span>PAUSE</span></button>
+    <section class="power-section"><span class="kicker">POWER UPS</span><div class="powers"><button class="power" id="cool"><b>❄</b><span>COOL CORE</span><em id="cool-count">1</em></button><button class="power" id="upgrade"><b>⇧</b><span>UPGRADE</span><em id="upgrade-count">1</em></button></div></section>
+    <button class="high-score" id="scores"><span>HIGH SCORE</span><strong id="best">0</strong><b>›</b></button>
+  </aside>
+  <main class="board-area"><div class="board-header"><span id="mode-label">CONTAINMENT GRID</span><span id="hint" aria-live="polite">Select a cell, then a neighbor.</span></div><div class="board-holder"><div id="board" aria-label="Six column, six row reactor board"></div></div><div class="heat"><span id="heat-label">CORE HEAT</span><div class="heat-track"><i id="heat-bar"></i></div><strong id="heat">0%</strong></div></main>
+  <section class="portrait-bar"><button id="portrait-pause">PAUSE</button><button id="portrait-cool">COOL <span id="portrait-cool-count">1</span></button><button id="portrait-upgrade">UPGRADE <span id="portrait-upgrade-count">1</span></button><button id="portrait-scores">SCORES</button></section>
 </div>
-<section class="overlay" id="overlay"><div class="panel"><div class="reactor-icon">◈</div><div class="eyebrow" id="kicker">CONTAINMENT PROTOCOL / 002</div><h2 id="title">REACTOR<br>STACK</h2><p id="description">A damaged reactor. Thirty containment slots.<br>Combine energy cells before the core overheats.</p><div class="tiers"><span>Ⅰ ION</span><span>Ⅱ FLUX</span><span>Ⅲ PLASMA</span><span>Ⅳ FUSION</span><span>Ⅴ CORE</span></div><button class="primary" id="start">INITIALIZE REACTOR →</button><small id="instructions">Drag or tap into one neighboring slot.<br>Equal tiers merge. Every move adds heat.<br>Reach 100 stability to secure the reactor.</small></div></section>`;
+<section class="overlay" id="menu-overlay"><div class="dialog menu-dialog"><div class="reactor-icon">◉</div><span class="kicker" id="menu-kicker">CONTAINMENT PROTOCOL / 002</span><h2 id="menu-title">REACTOR STACK</h2><p id="menu-copy">Move cells into adjacent empty slots or merge equal reactor cells. Build stability before heat reaches critical.</p><button class="primary" id="start">INITIALIZE REACTOR</button><small>Tap or drag into a neighboring slot. Tier V moves, but cannot merge.</small></div></section>
+<section class="overlay" id="pause-overlay" hidden><div class="dialog"><span class="kicker">INTERFACE PAUSED</span><h2>PAUSED</h2><button class="primary" id="resume">RESUME</button><button class="dialog-button" id="sound">SOUND ON</button><button class="dialog-button" id="restart">RESTART RUN</button><button class="dialog-button" id="main-menu">MAIN MENU</button></div></section>
+<section class="overlay" id="scores-overlay" hidden><div class="dialog scores-dialog"><span class="kicker">PERSISTENT LOCAL DATA</span><h2>LOCAL SCORES</h2><ol id="score-list"></ol><button class="dialog-button" id="close-scores">CLOSE</button></div></section>`;
+
 const el = (id: string) => document.getElementById(id)!;
-let audio: AudioContext | undefined, muted = false;
-function tone(kind: 'move' | 'merge' | 'win' | 'fail' | 'warning', tier = 1) {
-  if (muted) return;
-  try {
-    audio ??= new AudioContext(); void audio.resume();
-    const oscillator = audio.createOscillator(), gain = audio.createGain();
-    oscillator.type = kind === 'fail' ? 'sawtooth' : 'sine';
-    const f = kind === 'fail' ? 120 : kind === 'win' ? 660 : kind === 'warning' ? 160 : 180 + tier * 90;
-    oscillator.frequency.setValueAtTime(f, audio.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(kind === 'fail' ? 35 : f * 1.5, audio.currentTime + .16);
-    gain.gain.setValueAtTime(.045, audio.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audio.currentTime + .22);
-    oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(); oscillator.stop(audio.currentTime + .24);
-    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-  } catch { /* Audio is optional. */ }
-}
+const audio = new ReactorAudio();
+const controller = new TurnController(Math.random, copyConfig());
+let best = readBest(), upgradeArmed = false, runStartedAt = 0, completedRecorded = false;
+type SessionEntry = { result: string; reason: string; score: number; moves: number; duration: number; peakHeat: number; stability: number; merges: number[]; coolUsed: number; upgradeUsed: number };
+const sessionLog: SessionEntry[] = [];
+const REACTOR_SCENE_KEY = 'ReactorScene';
 
 class ReactorScene extends Phaser.Scene {
-  controller = new TurnController(); gesture = new Gesture(); best = readBest();
-  cells = new Map<number, Phaser.GameObjects.Container>();
-  selection!: Phaser.GameObjects.Graphics;
+  cells = new Map<number, Phaser.GameObjects.Container>(); grid!: Phaser.GameObjects.Graphics; selection!: Phaser.GameObjects.Graphics; geometry = { size: 1, left: 0, top: 0 }; gesture = new Gesture(); effects = 0; debug = { indices: false, legal: false, selection: true, geometry: false, bounds: false }; debugNodes: Phaser.GameObjects.Text[] = [];
+  constructor() { super(REACTOR_SCENE_KEY); }
   create() {
-    const grid = this.add.graphics();
-    for (let i = 0; i < 30; i++) { const { x, y } = this.position(i); grid.fillStyle(0x152735); grid.fillRoundedRect(x - 36, y - 36, 72, 72, 7); grid.lineStyle(1, 0x263f4d); grid.strokeRoundedRect(x - 36, y - 36, 72, 72, 7); }
-    this.selection = this.add.graphics().setDepth(10);
-    this.controller.phase = 'MENU';
-    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => { if (this.controller.phase === 'PLAYING') this.gesture.begin(cellAt(p.x,p.y,0,0,80), p.id); });
-    this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.release(p));
-    this.input.on('pointerupoutside', () => { this.gesture.reset(); this.highlight(); });
-    const cancel = () => { this.gesture.reset(); this.highlight(); };
-    this.game.events.on(Phaser.Core.Events.BLUR, cancel);
-    this.events.once('shutdown', () => this.game.events.off(Phaser.Core.Events.BLUR, cancel));
-    el('start').onclick = () => { tone('move'); this.start(); };
-    el('restart').onclick = () => this.start();
-    el('menu').onclick = () => { this.clean(); this.controller.phase = 'MENU'; this.showMenu(); };
-    el('audio').onclick = () => { muted = !muted; el('audio').textContent = muted ? 'SOUND OFF' : 'SOUND ON'; el('audio').setAttribute('aria-pressed', String(!muted)); };
-    this.hud();
+    this.grid = this.add.graphics(); this.selection = this.add.graphics().setDepth(10);
+    this.scale.on('resize', () => { this.layoutBoard(); this.render(); this.highlight(); });
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => { if (controller.phase === 'PLAYING') this.gesture.begin(this.hit(pointer), pointer.id); });
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => this.release(pointer));
+    this.input.on('pointerupoutside', () => this.clearGesture()); this.game.events.on(Phaser.Core.Events.BLUR, () => this.clearGesture());
+    this.layoutBoard(); controller.setMenu(); this.render(); this.hud();
   }
-  position(i: number) { return { x: i % 5 * 80 + 40, y: Math.floor(i / 5) * 80 + 40 }; }
-  clean() { this.tweens.killAll(); this.time.removeAllEvents(); this.gesture.reset(); this.selection.clear(); this.cameras.main.resetFX(); this.children.list.filter(o => o.getData('effect')).forEach(o => o.destroy()); }
-  start() {
-    this.clean(); this.controller.start();
-    // Explicit development-only fixtures let browser QA exercise terminal feedback
-    // through real pointer actions. Vite removes this block from production.
-    if (import.meta.env.DEV) {
-      const qa = new URLSearchParams(location.search).get('qa');
-      const state = this.controller.state;
-      if (qa === 'win' || qa === 'heat' || qa === 'tiers') {
-        state.board.fill(0);
-        if (qa === 'win') { state.board[0] = state.board[1] = 4; state.stability = 76; }
-        if (qa === 'heat') { state.board[0] = 1; state.heat = 96; }
-        if (qa === 'tiers') { state.board.splice(0, 5, 1, 2, 3, 4, 5); }
-      }
-    }
-    el('overlay').hidden = true; this.render(); this.hud(); el('hint').textContent = 'Tap a cell, then a neighbor. Match equal tiers to merge.';
-  }
-  showMenu() { el('overlay').classList.remove('failed'); el('overlay').hidden = false; el('kicker').textContent = 'CONTAINMENT PROTOCOL / 002'; el('title').innerHTML = 'REACTOR<br>STACK'; el('description').innerHTML = 'A damaged reactor. Thirty containment slots.<br>Combine energy cells before the core overheats.'; el('start').textContent = 'INITIALIZE REACTOR →'; }
-  cell(index: number, tier: number) {
-    const { x, y } = this.position(index), color = c.tierDefinitions[tier - 1].color;
-    const node = this.add.container(x, y), g = this.add.graphics();
-    g.fillStyle(color, .085); g.fillRoundedRect(-33,-33,66,66,6); g.lineStyle(1.5,color,.8);
-    const polygon = (radius: number, points: number, rotation = 0) => { const pts = Array.from({length:points},(_,i)=>new Phaser.Math.Vector2(Math.cos(i/points*Math.PI*2+rotation)*radius,Math.sin(i/points*Math.PI*2+rotation)*radius-4)); g.strokePoints(pts,true); };
-    if (tier === 1) g.strokeCircle(0,-4,15);
-    if (tier === 2) { g.strokeCircle(0,-4,20); polygon(12,4); }
-    if (tier === 3) { polygon(23,6,Math.PI/6); g.strokeCircle(0,-4,15); polygon(8,3,-Math.PI/2); }
-    if (tier === 4) { polygon(24,6); polygon(22,3,-Math.PI/2); polygon(22,3,Math.PI/2); g.strokeCircle(0,-4,10); }
-    if (tier === 5) { polygon(26,8,Math.PI/8); polygon(20,4); polygon(20,4,Math.PI/4); g.lineStyle(3,color); g.strokeCircle(0,-4,11); }
-    g.fillStyle(color); g.fillCircle(0,-4,tier === 5 ? 7 : 3);
-    const label = this.add.text(0,25,['','I','II','III','IV','V'][tier],{fontFamily:'Arial',fontSize:'10px',color:Phaser.Display.Color.IntegerToColor(color).rgba}).setOrigin(.5);
-    node.add([g,label]); this.cells.set(index,node); return node;
-  }
-  render() { this.cells.forEach(n=>n.destroy()); this.cells.clear(); this.controller.state.board.forEach((tier,i)=>{if(tier)this.cell(i,tier);}); }
-  highlight() { this.selection.clear(); const i = this.gesture.selected; if(i !== null && this.controller.state.board[i]) { const p=this.position(i); this.selection.lineStyle(2,0xc8f9ff);this.selection.strokeRoundedRect(p.x-36,p.y-36,72,72,7); } else this.gesture.selected=null; }
-  release(p: Phaser.Input.Pointer) {
-    if(this.controller.phase !== 'PLAYING') return;
-    const action=this.gesture.end(cellAt(p.x,p.y,0,0,80),p.id); this.highlight();
-    if(!action) return;
-    const turn=this.controller.act(...action);
-    if(!turn) { el('hint').textContent='Choose an empty neighbor or the same tier. No diagonals.'; return; }
-    this.hud();
-    el('hint').textContent=turn.merged ? `${c.tierDefinitions[turn.tier-1].name} formed · +${c.stabilityRewardByTier[turn.tier]} stability` : 'Cell repositioned · +4 heat';
-    tone(turn.merged?'merge':'move',turn.tier);
-    const source=this.cells.get(turn.from)!, target=this.position(turn.to);
-    this.tweens.add({targets:source,x:target.x,y:target.y,scale:turn.merged?.65:1,duration:c.moveDuration,onComplete:()=>{
-      this.render(); const dest=this.cells.get(turn.to)!;
-      if(turn.merged) { dest.setScale(.65);this.tweens.add({targets:dest,scale:1,duration:c.mergeDuration,ease:'Back.Out'});this.pulse(target.x,target.y,c.tierDefinitions[turn.tier-1].color,turn.tier); }
-      if(turn.spawned!==null){const spawn=this.cells.get(turn.spawned)!;spawn.setScale(.1).setAlpha(0);this.tweens.add({targets:spawn,scale:1,alpha:1,duration:c.spawnDuration});}
-      this.time.delayedCall(Math.max(c.mergeDuration,c.spawnDuration),()=>{this.controller.finish();if(this.controller.phase==='RESULT')this.result();});
-    }});
-    if(this.controller.state.heat>=80)tone('warning');
-  }
-  pulse(x:number,y:number,color:number,tier:number) {
-    const ring=this.add.circle(x,y,12).setStrokeStyle(2,color).setData('effect',true);
-    this.tweens.add({targets:ring,scale:2.2,alpha:0,duration:250,onComplete:()=>ring.destroy()});
-    for(let i=0;i<Math.min(8,tier+3);i++){const angle=i*Math.PI*2/(tier+3),spark=this.add.circle(x,y,1.5,color).setData('effect',true);this.tweens.add({targets:spark,x:x+Math.cos(angle)*33,y:y+Math.sin(angle)*33,alpha:0,duration:220,onComplete:()=>spark.destroy()});}
-  }
-  hud() { const s=this.controller.state; this.best=saveBest(s.score,this.best);el('score').textContent=String(s.score).padStart(4,'0');el('stability').textContent=`${s.stability} / 100`;el('stability-bar').style.width=`${s.stability}%`;el('heat').textContent=`${s.heat}%`;el('heat-bar').style.width=`${s.heat}%`;el('heat-label').textContent=s.heat>=80?'⚠ CRITICAL TEMPERATURE':'CORE TEMPERATURE';el('turn').textContent=`TURN ${String(s.turns).padStart(2,'0')}`;el('best').textContent=`BEST ${this.best}`;el('board').classList.toggle('danger',s.heat>=80); }
-  result() {
-    const win=this.controller.state.result==='WIN'; tone(win?'win':'fail');
-    if(win){const ring=this.add.circle(200,240,20).setStrokeStyle(4,0xa5f5fa).setData('effect',true);this.tweens.add({targets:ring,scale:12,alpha:0,duration:650,onComplete:()=>ring.destroy()});}
-    else{this.cameras.main.shake(250,.012);this.cameras.main.flash(250,255,70,60);this.pulse(200,240,0xff625e,5);}
-    this.time.delayedCall(700,()=>{el('overlay').classList.toggle('failed',!win);el('overlay').hidden=false;el('kicker').textContent=win?'CONTAINMENT SECURED':'CONTAINMENT FAILURE';el('title').innerHTML=win?'REACTOR<br>STABLE':'CORE<br>OVERLOAD';el('description').textContent=`${this.controller.state.reason}. Output ${this.controller.state.score} · ${this.controller.state.turns} turns · Best ${this.best}`;el('start').textContent='REINITIALIZE →';});
-  }
+  layoutBoard() { const cfg = controller.activeConfig; const padding = Math.max(5, Math.min(this.scale.width, this.scale.height) * .018); const size = Math.max(1, Math.min((this.scale.width - padding * 2) / cfg.gridWidth, (this.scale.height - padding * 2) / cfg.gridHeight)); this.geometry = { size, left: (this.scale.width - size * cfg.gridWidth) / 2, top: (this.scale.height - size * cfg.gridHeight) / 2 }; this.grid.clear(); this.debugNodes.forEach(node=>node.destroy()); this.debugNodes=[]; for (let index = 0; index < cfg.gridWidth * cfg.gridHeight; index++) { const p = this.position(index); const half = size * .455; this.grid.fillStyle(0x122432); this.grid.fillRoundedRect(p.x-half, p.y-half, half*2, half*2, Math.max(4, size*.09)); this.grid.lineStyle(Math.max(1, size*.015), 0x294756); this.grid.strokeRoundedRect(p.x-half,p.y-half,half*2,half*2,Math.max(4,size*.09)); if(this.debug.indices)this.debugNodes.push(this.add.text(p.x-half+3,p.y-half+2,String(index),{fontFamily:'Arial',fontSize:`${Math.max(8,size*.13)}px`,color:'#7eeef2'}).setDepth(20)); } if(this.debug.geometry){this.grid.lineStyle(2,0xffd166);this.grid.strokeRect(this.geometry.left,this.geometry.top,size*cfg.gridWidth,size*cfg.gridHeight);} if(this.debug.bounds){this.grid.lineStyle(2,0xf37bd7);this.grid.strokeRect(0,0,this.scale.width,this.scale.height);} }
+  position(index: number) { const cfg = controller.activeConfig; return { x: this.geometry.left + (index % cfg.gridWidth + .5) * this.geometry.size, y: this.geometry.top + (Math.floor(index / cfg.gridWidth) + .5) * this.geometry.size }; }
+  hit(pointer: Phaser.Input.Pointer) { return cellAt(pointer.x, pointer.y, this.geometry.left, this.geometry.top, this.geometry.size, controller.activeConfig); }
+  startRun() { this.clean(); controller.start(); runStartedAt = performance.now(); completedRecorded = false; upgradeArmed = false; el('menu-overlay').classList.remove('failed'); el('menu-overlay').hidden = true; this.layoutBoard(); this.render(); this.hud(); this.message('Select a cell, then a neighbor.'); }
+  clean() { this.tweens.killAll(); this.time.removeAllEvents(); this.clearGesture(); this.cameras.main.resetFX(); this.children.list.filter(item => item.getData('effect')).forEach(item => item.destroy()); this.effects = 0; }
+  clearGesture() { this.gesture.reset(); this.selection?.clear(); }
+  render() { this.cells.forEach(cell => cell.destroy()); this.cells.clear(); controller.state.board.forEach((tier, index) => { if (tier) this.cell(index, tier); }); }
+  cell(index: number, tier: number) { const { x, y } = this.position(index), size = this.geometry.size, color = controller.activeConfig.tierDefinitions[tier - 1].color, node = this.add.container(x, y), graphics = this.add.graphics(); const r = size * .29; graphics.fillStyle(color, .07); graphics.fillCircle(0, 0, r * 1.25); graphics.lineStyle(Math.max(1.2, size*.025), color, .92); const octagon = (radius: number, rotation = Math.PI / 8) => { const points = Array.from({length:8}, (_, i) => new Phaser.Math.Vector2(Math.cos(i*Math.PI/4+rotation)*radius, Math.sin(i*Math.PI/4+rotation)*radius)); graphics.strokePoints(points, true); };
+    octagon(r); if (tier >= 2) octagon(r*.72); if (tier >= 3) { graphics.strokeCircle(0,0,r*.45); octagon(r*.28,0); } if (tier >= 4) { octagon(r*.9,0); graphics.lineBetween(-r*.62,0,r*.62,0); graphics.lineBetween(0,-r*.62,0,r*.62); } if (tier === 5) { graphics.lineStyle(Math.max(2, size*.04), color, .9); graphics.strokeCircle(0,0,r*.2); graphics.lineStyle(Math.max(1.2,size*.025),color,.92); octagon(r*.52,0); octagon(r*.38,Math.PI/8); } graphics.fillStyle(color); graphics.fillCircle(0,0,tier === 5 ? r*.22 : r*.13); const label = this.add.text(0,r*1.38,controller.activeConfig.tierDefinitions[tier-1].short,{fontFamily:'Arial',fontSize:`${Math.max(9,size*.15)}px`,color:'#dffcff'}).setOrigin(.5); node.add([graphics,label]); this.cells.set(index,node); return node; }
+  highlight() { this.selection.clear(); const index = this.gesture.selected; if (index === null || !controller.state.board[index]) return; const p = this.position(index), half = this.geometry.size*.455; if(this.debug.selection){this.selection.lineStyle(Math.max(1.5,this.geometry.size*.03),0xd0fbff);this.selection.strokeRoundedRect(p.x-half,p.y-half,half*2,half*2,Math.max(4,this.geometry.size*.09));} if(this.debug.legal){this.selection.lineStyle(Math.max(1,this.geometry.size*.02),0x9df6a9);for(const destination of legalDestinations(controller.state.board,index,controller.activeConfig)){const at=this.position(destination);this.selection.strokeRoundedRect(at.x-half,at.y-half,half*2,half*2,Math.max(4,this.geometry.size*.09));}} }
+  release(pointer: Phaser.Input.Pointer) { if (controller.phase !== 'PLAYING') return; const target = this.hit(pointer); if (upgradeArmed) { this.clearGesture(); if (target === null) return; const next = controller.useUpgrade(target); if (!next) { this.message('Upgrade a Tier I–IV reactor cell. Tier V is already maximum.'); return; } upgradeArmed = false; audio.play('merge', controller.state.board[target]); this.render(); this.hud(); this.message('Reactor cell upgraded. No heat or move added.'); return; } const action = this.gesture.end(target, pointer.id); this.highlight(); if (!action) return; const turn = controller.act(...action); if (!turn) { this.message('Choose an empty neighbor or the same tier. No diagonals.'); return; } (window as Window & { __reactorLastSpawn?: string }).__reactorLastSpawn = turn.spawned === null ? '—' : `${turn.spawned} / Tier ${turn.spawnTier}`; this.hud(); this.message(turn.merged ? `${controller.activeConfig.tierDefinitions[turn.tier-1].name} formed.` : 'Cell repositioned.'); audio.play(turn.merged ? 'merge' : 'move', turn.tier); const source = this.cells.get(turn.from), destination = this.position(turn.to); if (!source) { this.completeTurn(); return; } this.tweens.add({ targets: source, x: destination.x, y: destination.y, scale: turn.merged ? .66 : 1, duration: controller.activeConfig.moveDuration, onComplete: () => { this.render(); const cell = this.cells.get(turn.to); if (turn.merged && cell) { cell.setScale(.66); this.tweens.add({ targets: cell, scale: 1, duration: controller.activeConfig.mergeDuration, ease: 'Back.Out' }); this.pulse(destination.x,destination.y,controller.activeConfig.tierDefinitions[turn.tier-1].color,turn.tier); } if (turn.spawned !== null) { const spawn = this.cells.get(turn.spawned); if (spawn) { spawn.setScale(.1).setAlpha(0); this.tweens.add({ targets: spawn, scale: 1, alpha: 1, duration: controller.activeConfig.spawnDuration }); } } this.time.delayedCall(Math.max(controller.activeConfig.mergeDuration,controller.activeConfig.spawnDuration), () => this.completeTurn()); } }); if (controller.state.heat >= controller.activeConfig.heatWarningThreshold) audio.play('warning'); }
+  completeTurn() { controller.finish(); this.hud(); if (controller.phase === 'RESULT') this.showResult(); }
+  tweenCount() { return this.tweens.getTweens().length; }
+  toggleDebug(key: keyof ReactorScene['debug']) { this.debug[key] = !this.debug[key]; this.layoutBoard(); this.render(); this.highlight(); return this.debug[key]; }
+  pulse(x: number, y: number, color: number, tier: number) { const ring=this.add.circle(x,y,this.geometry.size*.16).setStrokeStyle(Math.max(1,this.geometry.size*.025),color).setData('effect',true); this.effects++; this.tweens.add({targets:ring,scale:2.1,alpha:0,duration:250,onComplete:()=>{ring.destroy();this.effects--;}}); for(let index=0;index<Math.min(8,tier+3);index++){const angle=index*Math.PI*2/(tier+3),spark=this.add.circle(x,y,Math.max(1,this.geometry.size*.025),color).setData('effect',true);this.effects++;this.tweens.add({targets:spark,x:x+Math.cos(angle)*this.geometry.size*.4,y:y+Math.sin(angle)*this.geometry.size*.4,alpha:0,duration:220,onComplete:()=>{spark.destroy();this.effects--;}});} }
+  hud() { const state=controller.state, cfg=controller.activeConfig, stability=Math.min(100,state.stability/cfg.stabilityTarget*100), heat=Math.min(100,state.heat/cfg.heatMaximum*100); el('stability').textContent=String(state.stability); el('stability-label').textContent=`${state.stability} / ${cfg.stabilityTarget}`; el('moves').textContent=String(state.moves); el('heat').textContent=`${state.heat}%`; el('heat-bar').style.width=`${heat}%`; el('heat-label').textContent=state.heat>=cfg.heatWarningThreshold?'⚠ CRITICAL HEAT':'CORE HEAT'; el('cool-count').textContent=String(state.coolCoreRemaining); el('upgrade-count').textContent=String(state.upgradeRemaining); el('portrait-cool-count').textContent=String(state.coolCoreRemaining); el('portrait-upgrade-count').textContent=String(state.upgradeRemaining); best=Math.max(best,state.score); el('best').textContent=String(best); el('game-shell').classList.toggle('danger',state.heat>=cfg.heatWarningThreshold); document.documentElement.style.setProperty('--stability',`${stability*3.6}deg`); document.documentElement.style.setProperty('--heat',`${heat}%`); }
+  message(value:string) { el('hint').textContent=value; }
+  showResult() { const win=controller.state.result==='WIN'; audio.play(win?'win':'fail'); if(win){const ring=this.add.circle(this.scale.width/2,this.scale.height/2,20).setStrokeStyle(4,0xa5f5fa).setData('effect',true);this.tweens.add({targets:ring,scale:12,alpha:0,duration:650,onComplete:()=>ring.destroy()});}else{this.cameras.main.shake(250,.012);this.cameras.main.flash(250,255,70,60);this.pulse(this.scale.width/2,this.scale.height/2,0xff625e,5);} recordCompletion(); this.time.delayedCall(600,()=>showMenuResult(win)); }
 }
-new Phaser.Game({type:Phaser.AUTO,parent:'board',width:400,height:480,backgroundColor:'#0b1722',transparent:false,antialias:true,scene:ReactorScene,scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},input:{activePointers:2},audio:{noAudio:true}});
+
+const game = new Phaser.Game({ type: Phaser.AUTO, parent: 'board', width: 600, height: 600, backgroundColor: '#09141e', antialias: true, scene: ReactorScene, scale: { mode: Phaser.Scale.RESIZE }, input: { activePointers: 2 }, audio: { noAudio: true } });
+const scene = () => game.scene.getScene(REACTOR_SCENE_KEY) as ReactorScene;
+const resizeBoard = () => { const board=el('board'), rect=board.getBoundingClientRect(); if (rect.width > 0 && rect.height > 0) game.scale.resize(Math.round(rect.width),Math.round(rect.height)); const shell=el('game-shell'), mode=layoutMode(shell.clientWidth,shell.clientHeight); shell.dataset.layout=mode; el('mode-label').textContent=mode === 'wide' ? 'REACTOR CONTAINMENT' : 'CONTAINMENT GRID'; };
+new ResizeObserver(resizeBoard).observe(el('game-shell')); window.addEventListener('resize',resizeBoard); setTimeout(resizeBoard,0);
+function message(value:string) { scene().message(value); }
+function startRun() { scene().startRun(); }
+function pause() { controller.pause(); if(controller.phase==='PAUSED') el('pause-overlay').hidden=false; }
+function resume() { controller.resume(); el('pause-overlay').hidden=true; }
+function cool() { const next=controller.useCoolCore(); if(!next){message(controller.state.coolCoreRemaining<=0?'Cool Core has been used.':'Heat is already stable.');return;} audio.play('move'); scene().hud(); message(`Cool Core reduced heat by ${controller.activeConfig.coolCoreAmount}.`); }
+function armUpgrade() { if(controller.state.upgradeRemaining<=0){message('Upgrade charge has been used.');return;} if(controller.phase!=='PLAYING')return; upgradeArmed=!upgradeArmed; message(upgradeArmed?'UPGRADE ARMED — select a Tier I–IV cell.':'Upgrade cancelled.'); }
+function recordCompletion() { const result=controller.state.result; if(completedRecorded || !result) return; completedRecorded=true; const state=controller.state; const scores=recordScore({score:state.score,moves:state.moves,result}); best=scores[0]?.score??best; sessionLog.push({result,reason:state.reason,score:state.score,moves:state.moves,duration:Math.round((performance.now()-runStartedAt)/1000),peakHeat:state.peakHeat,stability:state.stability,merges:[...state.mergeCounts],coolUsed:controller.activeConfig.coolCoreUses-state.coolCoreRemaining,upgradeUsed:controller.activeConfig.upgradeUses-state.upgradeRemaining}); }
+function showMenuResult(win:boolean) { const state=controller.state; el('menu-kicker').textContent=win?'CONTAINMENT SECURED':'CONTAINMENT FAILURE'; el('menu-title').textContent=win?'REACTOR STABLE':'CORE OVERLOAD'; el('menu-copy').textContent=`${state.reason}. Score ${state.score} · ${state.moves} moves · High score ${best}.`; el('start').textContent='REINITIALIZE REACTOR'; el('menu-overlay').hidden=false; el('menu-overlay').classList.toggle('failed',!win); }
+function showScores() { const entries=readScores(); el('score-list').innerHTML=entries.length?entries.map(entry=>`<li><b>${entry.score}</b><span>${entry.moves} MOVES · ${entry.result}</span></li>`).join(''):'<li><span>No completed runs yet.</span></li>'; el('scores-overlay').hidden=false; }
+for(const id of ['pause','portrait-pause'])el(id).onclick=pause; for(const id of ['cool','portrait-cool'])el(id).onclick=cool; for(const id of ['upgrade','portrait-upgrade'])el(id).onclick=armUpgrade; for(const id of ['scores','portrait-scores'])el(id).onclick=showScores;
+el('start').onclick=()=>{audio.play('move');startRun();}; el('resume').onclick=resume; el('sound').onclick=()=>{audio.setMuted(!audio.muted);el('sound').textContent=audio.muted?'SOUND OFF':'SOUND ON';}; el('restart').onclick=()=>{el('pause-overlay').hidden=true;startRun();}; el('main-menu').onclick=()=>{scene().clean();controller.setMenu();el('pause-overlay').hidden=true;el('menu-overlay').hidden=false;}; el('close-scores').onclick=()=>el('scores-overlay').hidden=true;
+
+if (import.meta.env.DEV) { void import('./dev-panel.ts').then(({ mountDevPanel }) => mountDevPanel({ controller, game, scene, audio, sessionLog, startRun, showScores, message, runDuration: () => runStartedAt ? Math.round((performance.now()-runStartedAt)/1000) : 0, render: () => { scene().layoutBoard(); scene().render(); scene().hud(); }, resetDefaults: () => { Object.assign(controller.runtimeConfig, copyConfig(DEFAULT_CONFIG)); clampConfig(controller.runtimeConfig); message('Runtime tuning reset. Structural changes apply on restart.'); }, recordCompletion })); }
