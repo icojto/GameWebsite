@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">OdesosGames social card</title>
+  <desc id="desc">OdesosGames. Small games, big moments. Orbit Break and Reactor Stack.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#091329"/>
+      <stop offset="1" stop-color="#1d1240"/>
+    </linearGradient>
+    <linearGradient id="accent" x2="1" y2="1">
+      <stop stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <circle cx="1020" cy="110" r="240" fill="#3b2371" opacity=".35"/>
+  <circle cx="1055" cy="412" r="168" fill="none" stroke="#22d3ee" stroke-width="5" opacity=".48"/>
+  <circle cx="1055" cy="412" r="114" fill="none" stroke="#a855f7" stroke-width="4" opacity=".54"/>
+  <circle cx="1055" cy="412" r="50" fill="url(#accent)"/>
+  <path d="M835 491 1085 208" fill="none" stroke="#7dd3fc" stroke-width="4" opacity=".65"/>
+  <circle cx="870" cy="450" r="13" fill="#fcd34d"/>
+  <rect x="75" y="76" width="82" height="82" rx="22" fill="url(#accent)"/>
+  <path d="m98 116 15 17 24-35" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"/>
+  <text x="180" y="136" fill="#f8fafc" font-family="Arial, sans-serif" font-size="46" font-weight="700">OdesosGames</text>
+  <text x="78" y="315" fill="#fff" font-family="Arial, sans-serif" font-size="74" font-weight="700">Small games.</text>
+  <text x="78" y="402" fill="#7dd3fc" font-family="Arial, sans-serif" font-size="74" font-weight="700">Big moments.</text>
+  <text x="80" y="493" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="31">Play Orbit Break and Reactor Stack in your browser.</text>
+  <rect x="78" y="553" width="740" height="2" fill="#64748b" opacity=".65"/>
+  <text x="80" y="594" fill="#a5b4fc" font-family="Arial, sans-serif" font-size="23">ODESOSGAMES.COM</text>
+</svg>
