@@ -1,0 +1,12 @@
+.reactor-why { z-index: 1100; }
+.reactor-why .dialog { max-height: calc(100dvh - 24px); overflow: auto; }
+.reactor-why p { text-align: left; line-height: 1.5; }
+#reactor-ads-dev output { overflow-wrap: anywhere; color: #9fe7ef; }
+#reactor-ads-dev button { margin: 4px 0; }
+.refill-offer::before { content: ''; background: url('../../assets/ad-badge.svg') center/contain no-repeat; width: 26px; height: 18px; display: inline-block; flex-shrink: 0; }
+.refill-offer [data-power-label] { font-size: clamp(9px, 1.7vw, 12px); }
+.refill-offer > b { display: none; }
+.refill-offer::after { content: 'One ad attempt per power-up each run'; font-size: 9px; font-weight: 400; }
+.portrait-bar .refill-offer { flex-wrap: wrap; gap: 2px; }
+.portrait-bar .refill-offer::after { width: 100%; font-size: 10px; }
+.game-shell[data-layout="compact-landscape"] .power.refill-offer [data-power-label] { font-size: 10px; letter-spacing: 0; }

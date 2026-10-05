@@ -7,7 +7,7 @@ export const AD_VERSION = 1;
 type Base = { protocol: typeof AD_PROTOCOL; version: 1; requestId: string; gameId: string };
 export type GameAdMessage = Base & (
   { type: 'game-ready'; presentationVersion?: 1 } |
-  { type: 'game-state'; state: Exclude<GameState, 'unknown'> } |
+  { type: 'game-state'; state: GameState } |
   { type: 'game-event'; event: string; placementId: string } |
   ({ type: 'ad-request' } & Omit<AdRequest, 'requestId' | 'gameId'>) |
   { type: 'reward-granted'; adRequestId: string; placementId: string } |
@@ -25,7 +25,7 @@ export function parseAdMessage(data: unknown, gameId: string): GameAdMessage | n
       if (d.presentationVersion !== undefined && d.presentationVersion !== 1) return null;
       extra = ['presentationVersion']; break;
     case 'game-state':
-      if (typeof d.state !== 'string' || !['menu', 'playing', 'paused', 'game-over'].includes(d.state)) return null;
+      if (typeof d.state !== 'string' || !['unknown', 'menu', 'playing', 'paused', 'game-over'].includes(d.state)) return null;
       extra = ['state']; break;
     case 'game-event':
       if (!id(d.event) || !id(d.placementId)) return null;

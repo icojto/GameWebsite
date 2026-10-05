@@ -16,6 +16,7 @@
     "test:portal": "node --test tests/portal.test.mjs",
     "test:ads": "node --experimental-transform-types --test tests/ads.test.mjs",
     "test:reactor": "node --experimental-transform-types --test games/reactor-stack/tests/game.test.ts",
+    "test:reactor-ads": "node --experimental-transform-types --test tests/reactor-ads.test.mjs",
     "build:games": "node scripts/build-games.mjs",
     "build": "npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs && node scripts/verify-ads-production.mjs",
     "verify:ads-production": "node scripts/verify-ads-production.mjs",
