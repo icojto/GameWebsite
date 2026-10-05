@@ -1,80 +1,101 @@
-# Odesos ad blueprint v1 — MOCK ONLY
+# Odesos Ads v1.1 architecture — MOCK ONLY
 
-PROVIDER COMPLIANCE NOT YET REVIEWED. No real ad provider or gameplay monetization is connected.
+PROVIDER COMPLIANCE NOT YET REVIEWED. No real provider or game-specific monetization is connected.
 
-## Ownership and entry points
+## Locked ownership
 
-`src/ads/runtime.ts` creates the website-owned `AdService`, binds only the current public game's iframe, and detaches listeners on route/frame changes. The website owns configuration, eligibility, provider access, concurrency, courtesy and mock dialogs, banners, event history, and session observations. Games own gameplay, pausing, rewards and their own Dev Panels. There is no general Website Dev Panel or Admin Panel.
+The website owns `AdService`, provider selection, Null/Mock provider logic, availability, eligibility, timers, cooldowns, caps, placement registry, session observations, event log, the non-modal Ad Dev Panel, website banners, iframe bridge and future provider integration.
 
-The small provider contract exposes `initialize`, `isReady`, `prepareAd`, `showAd`, banner show/hide and `destroy`. A future adapter must honor AbortSignal, call `shown` only when an ad really appears, and return an explicit result. The service applies a 30-second request deadline and catches provider failures. A real provider will require a deliberate reviewed implementation, initialization/failure handling, and provider-specific timing; it is not a configuration switch today.
+The game owns gameplay, input freezing, audio muting/pausing, rewards/revive/power-ups, game-specific ad buttons, the game-side `GameAdPlayer`, and all MOCK courtesy/fullscreen visuals.
 
-Production creates `NullAdAdapter` only: unavailable, immediate, no UI. The entire mock adapter, panel, CSS and mascot graph is behind Vite's `import.meta.env.DEV` dynamic import. Local saved settings cannot activate it in production. `npm.cmd run build` scans the finished artifact for forbidden development signatures, including copied game assets. CI also runs unit tests before the existing main-only deployment. No feature-branch deployment is added.
+The website does not render fullscreen courtesy or mock ads. The original approved chibi source is preserved at `docs/design-reference/odesos-chibi-mascot.svg` for a game integration to copy/adapt. It is not a website runtime asset. `public/ads/ad-badge.svg` remains provider-neutral shared artwork for future in-game buttons.
 
-## Rules and defaults
+Banner is the deliberate exception: `game-page-primary` stays website-rendered below the player/action bar and above game information. Null collapses it; DEV can show the obvious mock banner.
 
-- Startup: enabled in mock DEV, one attempt per page session, courtesy on. Requested/shown/completed are separate. A failed first attempt consumes once/session to avoid repeat interruptions; gameplay must start for every result.
-- Interstitial: first threshold 180 active seconds, interval 180, fullscreen cooldown 180, cap 3 shown/session. A timer only changes eligibility. A registered safe semantic event is required for an actual request. The generic DEV registry uses `run-ended`, `restart-requested`, `new-game-requested`; game integrations must explicitly register their reviewed placements/events.
-- Active time: accumulates only with a current game, reported `playing`, visible document, and no fullscreen request in progress. Menu/paused/game-over/unknown/background time does not count. It is shared across SPA game navigation. Cooldowns use monotonic wall time (including time away), separately from active-play thresholds.
-- Rewarded: explicit `userInitiated: true`, enabled, default global cooldown 0 and cap 10 shown/session. Placement enabled/cooldown/cap are independently enforced. Only `completed` after actual showing qualifies. `closed`, `failed`, `no_fill`, `timeout`, `unavailable`, `blocked` never qualify. Service never applies gameplay rewards.
-- Showing a rewarded ad resets interstitial cooldown by default, even if subsequently closed, to avoid a second interruption. This is switchable. Caps count shown ads, not preparation failures.
-- At most one fullscreen request (including preparation/courtesy) can run. Banner state is independent. Route changes, reload and teardown cancel active requests without qualification.
-- Clearing statistics does not reset startup state, caps, cooldowns, request IDs or reward receipts. Reload begins a new in-memory page session. No historical/global analytics are stored.
+Mock presentation targets the game viewport. This does **not** assume a future real SDK renders inside the iframe. A real provider may own its overlay; the game still receives pause/mute/resume lifecycle. Provider logic and presentation surface remain separate.
 
-## Versioned iframe contract
+## Service rules
 
-Use `postMessage(message, location.origin)` from the first-party iframe. No wildcard target, parent DOM access or provider logic is needed in games. `gameId` is the catalog **slug**, e.g. `orbit-break`, not `game-001`.
+- Startup is supported but fresh DEV configuration defaults **OFF**. Once/session and courtesy remain available. Migrating `odesos.dev.ads.v1` to `odesos.dev.ads.v1.1` preserves compatible values but forces startup OFF once, so the architecture correction never unexpectedly enables it.
+- Interstitial defaults remain 180 seconds first eligibility, 180 interval, 180 cooldown, maximum three shown/session. Time only creates eligibility; a registered semantic safe event creates the opportunity.
+- Active time counts only current game + `playing` + visible document + no active fullscreen lifecycle.
+- Rewarded requires explicit player opt-in and a registered placement. Only an actually shown `completed` result qualifies. The game applies any reward. Placement enabled/cooldown/session caps are supported. A placement may also declare `maxPerRun`; when it does, the game must supply a validated `runId`, and the website enforces that run-specific cap without interpreting gameplay state.
+- A shown rewarded ad resets/suppresses immediate interstitial cooldown by default.
+- One fullscreen lifecycle at a time, including pending game presentation. Provider/service deadlines and game-presentation timeouts settle safely.
+- Session observations are local to this page; only normalized DEV tuning persists. No global analytics, revenue or personal information exists.
 
-Every game message has exactly these base fields:
+Production creates only `NullAdAdapter`. DEV dynamically imports Mock/panel CSS. The production artifact scan rejects the panel, Mock adapter, mock banner, old website overlay identifiers/copy and DEV storage keys.
+
+## GAME INTEGRATION CONTRACT
+
+Protocol remains `odesos-ads`, version `1`. Messages use `postMessage(..., location.origin)` and exact payloads. IDs are 1–80 characters matching `[a-z0-9][a-z0-9._:-]*`. The website validates origin, current iframe source, protocol/version, exact keys/types, request/game/placement identity and duplicates.
+
+### Registration and state
+
+After load, the game sends:
 
 ```ts
-{ protocol: 'odesos-ads', version: 1, type, requestId, gameId }
+{ protocol:'odesos-ads', version:1, type:'game-ready', requestId, gameId, presentationVersion:1 }
 ```
 
-IDs are 1–80 characters matching `[a-z0-9][a-z0-9._:-]*` (case-insensitive). Use a fresh ID for each message, including state reports and acknowledgments. At most 2,000 messages per iframe binding and 2,000 admitted ad request IDs per page session are retained; exceeding these bounds fails closed for ads, not gameplay. Event history retains 200 records; the panel displays the latest 60.
+`presentationVersion: 1` registers a ready `GameAdPlayer`. Without it, normal bridge/state messages still work, but fullscreen Mock presentation returns `unavailable` with `game-presentation-unavailable`. The website responds `bridge-ready` and reports its supported presentation version.
 
-| Game → site type | Additional fields |
-| --- | --- |
-| `game-ready` | none; host answers `bridge-ready` |
-| `game-state` | `state`: menu / playing / paused / game-over |
-| `game-event` | `event`, `placementId`; evaluates an interstitial safe transition |
-| `ad-request` | `adType`: startup / interstitial / rewarded, `placementId`, optional boolean `userInitiated`, optional `safeEvent` |
-| `reward-granted` | `adRequestId`, `placementId`; acknowledgment only |
+The game sends fresh-ID `game-state` messages with `menu | playing | paused | game-over`. Report every meaningful transition. Send `game-event` with `event` and registered `placementId` only at reviewed safe transitions such as run-ended/restart-requested/new-game-requested. Do not map arbitrary buttons to interstitials.
 
-Origin, current iframe `event.source`, protocol/version, exact keys, primitive types, game ID and request ID are checked before dispatch. The service checks placement ownership/type/enabled state and semantic-event registration. Malformed/untrusted messages are ignored; valid but ineligible requests return `ad-blocked` and final `ad-result`. Duplicate IDs do not execute twice. A disposed bridge cannot send a late response into a new game.
+Rewarded requests use `ad-request`, `adType:'rewarded'`, registered `placementId`, and `userInitiated:true`, directly from a deliberate player choice. A future placement configured with `maxPerRun` also includes the current opaque `runId`; the game owns when that identity changes. Game code stays provider-independent.
 
-Site → game lifecycle: `ad-accepted` → prepare → `ad-will-show` → optional courtesy → `ad-shown` → `ad-result`. Preparation failures skip `ad-will-show` and courtesy. Final results include request/game/placement/type, `result`, `rewardQualified` and optional `reason`. All messages retain protocol/version and use the exact origin.
+### Website → game presentation
 
-Future game responsibilities:
+After provider preparation succeeds, the website sends `ad-will-show`, then:
 
-1. Register reviewed placements in the website integration, then send readiness/state reports from the game.
-2. Startup/interstitial: await a final result with a game-side timeout fallback and continue the transition for **every** result.
-3. Freeze input/simulation/audio appropriately on `ad-will-show`. Restore the correct game decision state on every result, including cancellation and timeout.
-4. Rewarded: request only from a deliberate player action. Grant the game-defined reward at most once for matching `completed` + `rewardQualified: true`; otherwise restore its reward-choice state. Send acknowledgment with its own ID and the completed `adRequestId`.
+```ts
+{
+  protocol:'odesos-ads', version:1, type:'ad-presentation-request',
+  requestId, gameId, placementId, adType,
+  courtesy:{ enabled, preset, durationMs, mascot, animation },
+  mock:{ durationMs, outcome }
+}
+```
 
-This is a trusted first-party bridge, not an anti-cheat or cross-origin security sandbox. `userInitiated` is a game assertion, not proof of browser user activation. A same-origin compromised script is outside this trust boundary. Games are **not wired to this contract in this patch**, so mock DEV tests do not actually pause their simulations or grant anything.
+No provider secrets or internal service state are sent. Before acknowledging presentation, the game must preserve run state, freeze simulation/input and pause/mute game audio appropriately. Underlying actions must not fire.
 
-## Website UI
+The game replies, using the same request/game/placement identity, in this lifecycle:
 
-One hidden `game-page-primary` slot sits after the player/action bar and before game information. The mock banner is responsive and never inside the iframe. Null leaves it hidden without an empty reserved ad area. Each actual mount/show counts one local mock impression.
+1. `ad-presentation-ready`
+2. Optional `ad-courtesy-started`
+3. `ad-presentation-shown`
+4. Exactly one terminal `ad-presentation-completed`, `ad-presentation-closed`, or `ad-presentation-failed`
 
-Courtesy is shown only after readiness. DEV defaults: 1,000 ms (clamped 400–2,500), all fullscreen types on, never banners. The original source-only SVG chibi has expressive eyes, blush and a sweat drop. Friendly/concise copy presets are available. Motion can be switched off and `prefers-reduced-motion: reduce` suppresses the small mascot animation. No pressure-to-support copy or provider approval claims are made.
+The website may send `ad-presentation-cancel` on route/frame/provider cancellation. The game must immediately remove its presentation and restore a safe state without granting a reward. Duplicate, stale, out-of-order, wrong-origin/source or mismatched identity messages are ignored.
 
-Native modal dialogs make underlying site/iframe input inert, trap focus, and restore sensible focus. Escape/cancel closes courtesy/mock without reward. The panel is a right overlay drawer on desktop and a near-fullscreen bottom sheet at <=600px; opening it does not change the player rectangle. `Ctrl+Shift+A` or the DEV-only `AD DEV` button opens it. Same-origin iframe keyboard forwarding is limited to this shortcut; `Ctrl+Shift+D` is untouched.
+The game presentation timeout is DEV-configurable (default 5,000 ms, bounded 500–15,000). No renderer returns `game-presentation-unavailable`; no terminal response returns `game-presentation-timeout`. Startup/interstitial integrations continue their intended transition. Rewarded returns to its decision state with no reward.
 
-Sections: Overview, Startup, Interstitial, Rewarded, Banner, Courtesy, Simulation, Events. Simulation provides explicit generic requests, state reporting, eligibility/cooldown resets and a clearly labelled force-interstitial bypass. Force cannot bypass origin validation, placement ownership, master enable, concurrency or hidden-document restrictions. No arbitrary website click triggers ads.
+### Pause/audio and final result
 
-NEXT RESULT is one-shot: Complete, Close early, Load error, No fill, Timeout, Unavailable; after consumption it resets to Complete. Mock loading delay is 0–5,000 ms, duration 500–15,000 ms. Close-early automatically ends halfway, or the tester can close/Escape sooner. Simulated Timeout resolves deterministically after the configured preparation delay; unit tests separately cover a provider that actually hangs until the deadline.
+Treat `ad-will-show` as the pre-presentation pause signal: freeze active gameplay, disable gameplay input, pause/mute game audio and preserve state. GameAdPlayer then renders courtesy (if enabled) and the obvious unbranded mock visual entirely inside the iframe.
 
-Only normalized tuning values persist using the existing safe storage helper under `odesos.dev.ads.v1`. Reset defaults restores configuration, not session safety state. Statistics/event history remain in memory and describe this page session/observation window only. The panel shows counts by ad type and placement, blocked reasons, eligibility transitions, preparation success, rewarded completion and reward acknowledgments. It knows nothing about real traffic, users, worldwide impressions or revenue. Log timestamps are ISO UTC; durations use a monotonic clock. No personal data is collected.
+After `ad-result`, the game owns the correct continuation:
 
-## Reusable badge
+- startup: begin normally for every failure/unavailable/timeout/close result;
+- interstitial: continue the safe transition/new run for every result;
+- rewarded: apply its idempotent reward only for `completed` plus `rewardQualified:true`; every other result grants nothing.
 
-`public/ads/ad-badge.svg` is original provider-neutral `▶ AD` vector artwork. Future buttons must retain visible ad wording and an accessible action label such as “Watch ad to [specific reward]”; do not rely on the icon alone. Use `alt=""` when the surrounding button already describes the ad action, or `alt="Ad"` if the icon conveys otherwise missing meaning. Keep readable sizing/contrast. Neither game uses the badge yet.
+After applying a qualified reward exactly once, send `reward-granted` with a new message `requestId`, the qualifying `adRequestId`, and `placementId`. Restore the correct game state/input/audio after the result is handled. Use a game-side timeout fallback as additional fail-open protection.
 
-## Deliberately deferred
+## Ad Dev Panel
 
-Orbit monetization integration → Prompt 3. Reactor monetization integration → Prompt 4.
+`Ctrl+Shift+A` opens a fixed non-modal `complementary` inspector. It does not use `<dialog>`, `showModal`, a backdrop, inertness or focus trapping. The drawer alone receives its normal pointer area; website and iframe remain interactive elsewhere. It overlays without changing the player rectangle. Escape closes it. At <=600px it becomes a near-full-height bottom sheet without intentionally disabling the remaining page.
 
-Not implemented: real provider/Google or other SDK, Google H5 Games Ads, AdSense, publisher IDs/API keys, CMP, TCF, consent, privacy policy, terms, cookie policy, ads.txt, tracking, real analytics, revenue reporting, backend rewards or global analytics. No third-party calls are made by this subsystem. Provider policy/compliance and production wording require a separate serious review.
+Sections remain Overview, Startup, Interstitial, Rewarded, Banner, Courtesy, Simulation and Events. Overview explicitly shows `Presentation surface: GAME`, current game and renderer readiness. Courtesy previews are disabled until a game renderer registers. Fullscreen tests exercise provider/service/bridge logic; without Prompt 3 they report `game-presentation-unavailable` and never open a website overlay.
 
-See [QA checklist](ads-qa.md) and [patch log](patches/2026-10-04-odesos-monetization-blueprint-v1.md).
+## PROMPT 3 — ORBIT INTEGRATION HANDOFF
+
+Read `src/ads/model.ts`, `src/ads/bridge.ts`, `src/ads/presentation.ts`, this **GAME INTEGRATION CONTRACT**, and `docs/ads-qa.md`. Protocol is `odesos-ads` version 1.
+
+Inside `games/orbit-break` only, implement one provider-independent `GameAdPlayer`. On game load send `game-ready` with `presentationVersion:1`; report menu/playing/paused/game-over accurately. Register/use only website-approved Orbit placements and safe semantic events. Receive `ad-presentation-request`, verify its request/game/placement/type fields, freeze Phaser simulation/input, preserve the run, and pause/mute Orbit audio. Render courtesy/chibi and the MOCK AD surface inside Orbit's iframe, respecting reduced motion. Source the approved design from `docs/design-reference/odesos-chibi-mascot.svg`.
+
+Send ready, optional courtesy-started, shown, and exactly one terminal lifecycle message. Handle cancel/result idempotently, restore audio/input/state, and fail open. For rewarded, grant the Orbit-defined reward once only after matching `completed` + `rewardQualified:true`, then acknowledge it. Close/failure/no-fill/timeout/unavailable/blocked grant nothing.
+
+Do **not** duplicate AdService, provider selection, timers, cooldowns, session caps, statistics, event logging, website banner logic or provider SDK code in Orbit. Do not add a page-level overlay. Orbit-specific revive frequency/defaults belong to Prompt 3; Reactor integration remains Prompt 4.
+
+Still deferred: every real provider/SDK, AdSense/H5 APIs, publisher IDs, CMP/TCF/consent, privacy/terms/cookies/ads.txt, tracking, real analytics and revenue reporting.

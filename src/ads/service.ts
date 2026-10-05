@@ -1,10 +1,7 @@
 import { BANNER_SLOTS, DEFAULT_CONFIG, emptyCounters, normalizeConfig } from './model.ts';
-import type { AdConfig, AdEvent, AdProvider, AdRequest, AdResponse, AdResult, AdState, AdType, Counters, GameState, Placement } from './model.ts';
+import type { AdEvent, AdProvider, AdRequest, AdResponse, AdResult, AdState, AdType, Counters, GameState, Placement } from './model.ts';
 
-type Options = {
-  development?: boolean; now?: () => number; timeoutMs?: number;
-  courtesy?: (request: AdRequest, config: AdConfig['courtesy'], signal: AbortSignal) => Promise<void>;
-};
+type Options = { development?: boolean; now?: () => number; timeoutMs?: number };
 export class AdService {
   config = structuredClone(DEFAULT_CONFIG);
   state: AdState = 'idle';
@@ -40,6 +37,7 @@ export class AdService {
   private usedIds = new Set<string>();
   private rewardReceipts = new Map<string, { gameId: string; placementId: string; acknowledged: boolean }>();
   private placementHistory = new Map<string, { shown: number; at: number }>();
+  private placementRunHistory = new Map<string, number>();
   private options: Options;
   provider: AdProvider;
 
@@ -73,7 +71,8 @@ export class AdService {
     this.tick();
   }
   register(placement: Placement): void {
-    if (!/^[a-z0-9][a-z0-9._-]{0,79}$/i.test(placement.id) || !placement.gameId || this.placements.size >= 100) throw new Error('Invalid placement registration');
+    if (!/^[a-z0-9][a-z0-9._-]{0,79}$/i.test(placement.id) || !placement.gameId || this.placements.size >= 100
+      || (placement.maxPerRun !== undefined && (!Number.isInteger(placement.maxPerRun) || placement.maxPerRun < 0 || placement.maxPerRun > 100))) throw new Error('Invalid placement registration');
     this.placements.set(placement.id, structuredClone(placement));
   }
   setContext(gameId: string | null): void {
@@ -127,6 +126,7 @@ export class AdService {
     this.emit('ad-request', request);
     const placement = this.placements.get(request.placementId);
     const history = this.placementHistory.get(request.placementId);
+    const runKey = request.runId ? `${request.placementId}:${request.runId}` : '';
     let reason = this.usedIds.has(request.requestId) ? 'duplicate-request' : this.usedIds.size >= 2000 ? 'request-limit'
       : request.gameId !== this.gameId ? 'wrong-game'
       : !placement || placement.gameId !== request.gameId || placement.adType !== request.adType ? 'unknown-placement'
@@ -134,6 +134,8 @@ export class AdService {
       : this.busy ? 'another-ad-active'
       : !this.visible ? 'document-hidden'
       : (history?.shown ?? 0) >= placement.maxPerSession ? 'placement-cap'
+      : placement.maxPerRun !== undefined && !request.runId ? 'run-context-required'
+      : placement.maxPerRun !== undefined && (this.placementRunHistory.get(runKey) ?? 0) >= placement.maxPerRun ? 'placement-run-cap'
       : history && (this.secondsSince(history.at) ?? 0) < placement.cooldownSeconds ? 'placement-cooldown' : '';
     if (reason) return this.finish(request, 'blocked', reason);
     this.usedIds.add(request.requestId);
@@ -171,23 +173,20 @@ export class AdService {
         this.emit('provider-ready', request);
         // Pause contract precedes courtesy and showing. No preparation failure pauses a game.
         this.emit('ad-will-show', request);
-        const typeCourtesy = request.adType === 'interstitial' || this.config[request.adType].courtesy;
-        if (this.options.courtesy && this.config.courtesy.enabled && this.config.courtesy[request.adType] && typeCourtesy) {
-          this.state = 'courtesy';
-          this.emit('courtesy-shown', request);
-          await abortable(this.options.courtesy(request, this.config.courtesy, controller.signal), controller.signal);
-        }
-        result = await abortable(this.provider.showAd(request, controller.signal, () => {
+        const outcome = await abortable(this.provider.showAd(request, controller.signal, () => {
           if (controller.signal.aborted || shown) return;
           shown = true;
           this.state = 'showing';
           this.count(request.adType, 'shown', request.placementId);
           this.placementHistory.set(request.placementId, { shown: (history?.shown ?? 0) + 1, at: this.now() });
+          if (runKey) this.placementRunHistory.set(runKey, (this.placementRunHistory.get(runKey) ?? 0) + 1);
           if (request.adType === 'startup') this.startup.shown = true;
           if (request.adType === 'interstitial') { this.interstitialCount++; this.lastInterstitial = this.now(); this.nextEligibleAt = this.activeSeconds + this.config.interstitial.intervalSeconds; }
           if (request.adType === 'rewarded') { this.rewardedCount++; this.lastRewarded = this.now(); }
           this.emit('ad-shown', request);
         }), controller.signal);
+        result = typeof outcome === 'string' ? outcome : outcome.result;
+        if (typeof outcome !== 'string') reason = outcome.reason ?? '';
         if (result === 'completed' && !shown) result = 'failed';
       }
     } catch (error) {
@@ -206,7 +205,7 @@ export class AdService {
     }
     if (request.adType === 'startup' && result === 'completed') this.startup.completed = true;
     this.state = result === 'completed' ? 'completed' : result === 'closed' ? 'closed' : 'failed';
-    return this.finish(request, result, controller.signal.reason === 'finished' ? undefined : String(controller.signal.reason), shown);
+    return this.finish(request, result, reason || (controller.signal.reason === 'finished' ? undefined : String(controller.signal.reason)), shown);
   }
   acknowledge(requestId: string, gameId: string, placementId: string): boolean {
     const receipt = this.rewardReceipts.get(requestId);
