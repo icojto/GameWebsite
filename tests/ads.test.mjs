@@ -4,7 +4,9 @@ import { readFile } from 'node:fs/promises';
 import { AdService } from '../src/ads/service.ts';
 import { NullAdAdapter } from '../src/ads/null-adapter.ts';
 import { createAdBridge, parseAdMessage } from '../src/ads/bridge.ts';
-import { normalizeConfig } from '../src/ads/model.ts';
+import { DEFAULT_CONFIG, normalizeConfig } from '../src/ads/model.ts';
+import { GamePresentationBroker } from '../src/ads/presentation.ts';
+import { MockAdAdapter } from '../src/ads/dev/mock-adapter.ts';
 
 let sequence = 0;
 test('banner integration is outside iframe and after the player action bar', async () => {
@@ -14,6 +16,19 @@ test('banner integration is outside iframe and after the player action bar', asy
   const slot = source.indexOf('<aside data-ad-slot="game-page-primary" hidden></aside>');
   const information = source.indexOf('<section class="game-information"');
   assert.ok(iframeEnd >= 0 && actions > iframeEnd && slot > actions && information > slot);
+});
+
+test('Ad Dev Panel is non-modal and website fullscreen overlay code is absent', async () => {
+  const panel = await readFile(new URL('../src/ads/dev/panel.ts', import.meta.url), 'utf8');
+  const styles = await readFile(new URL('../src/ads/dev/styles.css', import.meta.url), 'utf8');
+  assert.match(panel, /createElement\('aside'\)/); assert.match(panel, /role', 'complementary'/);
+  assert.ok(!panel.includes('showModal')); assert.ok(!styles.includes('::backdrop')); assert.ok(!styles.includes('odesos-ad-overlay'));
+  await assert.rejects(readFile(new URL('../src/ads/dev/overlay.ts', import.meta.url), 'utf8'));
+});
+
+test('fresh configuration keeps startup support OFF until enabled', () => {
+  assert.equal(normalizeConfig(null).startup.enabled, false);
+  assert.equal(normalizeConfig({ startup: { enabled: true } }).startup.enabled, true);
 });
 
 function harness(overrides = {}) {
@@ -26,6 +41,7 @@ function harness(overrides = {}) {
     showBanner: () => true, hideBanner() {}, destroy() {}, ...overrides,
   };
   const service = new AdService(provider, { development: true, now: () => time, timeoutMs: 25, courtesy: async () => { calls.push('courtesy'); } });
+  service.config.startup.enabled = true;
   service.setContext('test-game');
   for (const adType of ['startup', 'interstitial', 'rewarded']) service.register({ id: adType, gameId: 'test-game', adType, enabled: true, cooldownSeconds: 0, maxPerSession: 100, safeEvents: ['run-ended'] });
   const request = (adType, more = {}) => service.request({ requestId: `request-${++sequence}`, gameId: 'test-game', placementId: adType, adType, ...more });
@@ -124,9 +140,9 @@ test('rewarded showing resets the interstitial cooldown by default', async () =>
   h.advance(180);
   assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).result, 'completed');
 });
-test('courtesy follows readiness and precedes showing', async () => {
+test('website service prepares then delegates showing without rendering courtesy', async () => {
   const h = harness(); await h.request('startup');
-  assert.deepEqual(h.calls, ['prepare', 'courtesy', 'show']);
+  assert.deepEqual(h.calls, ['prepare', 'show']);
 });
 test('route cancellation settles and does not grant rewards', async () => {
   const h = harness({ showAd: async (_r, signal, shown) => { shown(); return new Promise((resolve) => signal.addEventListener('abort', () => resolve('completed'))); } });
@@ -164,6 +180,13 @@ test('zero placement cap blocks its first request', async () => {
   assert.equal((await h.request('rewarded', { userInitiated: true })).reason, 'placement-cap');
   assert.deepEqual(h.calls, []);
 });
+test('optional run identity enables a future per-run placement cap', async () => {
+  const h = harness(); const placement = h.service.placements.get('rewarded'); placement.maxPerRun = 1;
+  assert.equal((await h.request('rewarded', { userInitiated: true })).reason, 'run-context-required');
+  assert.equal((await h.request('rewarded', { userInitiated: true, runId: 'run-one' })).result, 'completed');
+  assert.equal((await h.request('rewarded', { userInitiated: true, runId: 'run-one' })).reason, 'placement-run-cap');
+  assert.equal((await h.request('rewarded', { userInitiated: true, runId: 'run-two' })).result, 'completed');
+});
 test('clearing statistics does not reset session safety limits', async () => {
   const h = harness(); h.service.config.rewarded.maxPerSession = 1;
   await h.request('rewarded', { userInitiated: true }); h.service.clearStats();
@@ -185,7 +208,54 @@ const base = { protocol: 'odesos-ads', version: 1, requestId: 'one', gameId: 'te
 test('bridge schema rejects malformed, unknown and excessive messages', () => {
   assert.equal(parseAdMessage({ ...base, type: 'game-state', state: new String('playing') }, 'test-game'), null);
   assert.equal(parseAdMessage({ ...base, type: 'ad-request', adType: ['rewarded'], placementId: 'rewarded' }, 'test-game'), null);
-  for (const data of [null, [], {}, { ...base, type: 'unknown' }, { ...base, type: 'game-state', state: 'garbage' }, { ...base, type: 'game-ready', version: 2 }, { ...base, type: 'game-ready', requestId: 'x'.repeat(81) }, { ...base, type: 'game-ready', extra: true }, { ...base, type: 'ad-request', adType: 'rewarded', placementId: 'rewarded', userInitiated: 'true' }]) assert.equal(parseAdMessage(data, 'test-game'), null);
+  assert.equal(parseAdMessage({ ...base, type: 'ad-request', adType: 'rewarded', placementId: 'rewarded', runId: ['run-one'] }, 'test-game'), null);
+  for (const data of [null, [], {}, { ...base, type: 'unknown' }, { ...base, type: 'game-state', state: 'garbage' }, { ...base, type: 'game-ready', version: 2 }, { ...base, type: 'game-ready', presentationVersion: 2 }, { ...base, type: 'game-ready', requestId: 'x'.repeat(81) }, { ...base, type: 'game-ready', extra: true }, { ...base, type: 'ad-request', adType: 'rewarded', placementId: 'rewarded', userInitiated: 'true' }, { ...base, type: 'ad-presentation-completed' }, { ...base, type: 'ad-presentation-completed', placementId: ['rewarded'] }]) assert.equal(parseAdMessage(data, 'test-game'), null);
+});
+
+test('game presentation broker sends identity/config and accepts one ordered completion', async () => {
+  const broker = new GamePresentationBroker(); const messages = []; const events = []; let shown = 0;
+  broker.setObserver((event) => events.push(event)); broker.bind('test-game', (message) => messages.push(message)); broker.ready('test-game', 1);
+  const config = structuredClone(DEFAULT_CONFIG); config.mock.presentationTimeoutMs = 100;
+  const request = { requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded', adType: 'rewarded', userInitiated: true };
+  const pending = broker.present(request, config, 'completed', new AbortController().signal, () => shown++);
+  assert.deepEqual(messages[0], { type: 'ad-presentation-request', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded', adType: 'rewarded', courtesy: { enabled: true, preset: 'friendly', durationMs: 1000, mascot: true, animation: true }, mock: { durationMs: 5000, outcome: 'completed' } });
+  assert.equal(broker.receive({ type: 'ad-presentation-ready', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
+  assert.equal(broker.receive({ type: 'ad-courtesy-started', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
+  assert.equal(broker.receive({ type: 'ad-presentation-shown', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
+  assert.equal(broker.receive({ type: 'ad-presentation-completed', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
+  assert.deepEqual(await pending, { result: 'completed' }); assert.equal(shown, 1);
+  assert.equal(broker.receive({ type: 'ad-presentation-completed', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), false);
+  assert.ok(events.includes('courtesy-started')); assert.ok(events.includes('ad-visual-started'));
+});
+
+test('renderer unavailable and renderer timeout settle safely without showing', async () => {
+  const broker = new GamePresentationBroker(); const config = structuredClone(DEFAULT_CONFIG); config.mock.presentationTimeoutMs = 5;
+  const request = { requestId: 'presentation-two', gameId: 'test-game', placementId: 'startup', adType: 'startup' };
+  assert.deepEqual(await broker.present(request, config, 'completed', new AbortController().signal, () => assert.fail()), { result: 'unavailable', reason: 'game-presentation-unavailable' });
+  broker.bind('test-game', () => {}); broker.ready('test-game', 1);
+  assert.deepEqual(await broker.present(request, config, 'completed', new AbortController().signal, () => assert.fail()), { result: 'timeout', reason: 'game-presentation-timeout' });
+});
+
+test('MockAdapter remains a DEV logical provider and delegates visuals to the game broker', async () => {
+  const broker = new GamePresentationBroker(); const sent = []; broker.bind('test-game', (message) => sent.push(message)); broker.ready('test-game', 1);
+  const config = structuredClone(DEFAULT_CONFIG); config.mock.loadingMs = 0; config.mock.presentationTimeoutMs = 100; let consumed = 0; let shown = 0;
+  const adapter = new MockAdAdapter(() => config, () => { consumed++; config.mock.nextResult = 'completed'; }, broker);
+  const request = { requestId: 'mock-one', gameId: 'test-game', placementId: 'rewarded', adType: 'rewarded', userInitiated: true };
+  assert.equal(await adapter.prepareAd(request, new AbortController().signal), 'ready');
+  const pending = adapter.showAd(request, new AbortController().signal, () => shown++);
+  broker.receive({ type: 'ad-presentation-ready', requestId: 'mock-one', gameId: 'test-game', placementId: 'rewarded' });
+  broker.receive({ type: 'ad-presentation-shown', requestId: 'mock-one', gameId: 'test-game', placementId: 'rewarded' });
+  broker.receive({ type: 'ad-presentation-completed', requestId: 'mock-one', gameId: 'test-game', placementId: 'rewarded' });
+  assert.deepEqual(await pending, { result: 'completed' }); assert.equal(consumed, 1); assert.equal(shown, 1);
+  assert.equal(sent[0].type, 'ad-presentation-request');
+});
+
+test('bridge rejects presentation lifecycle from wrong origin/source', () => {
+  const h = harness(); const source = {}; const broker = new GamePresentationBroker(); const bridge = createAdBridge(h.service, { origin: 'https://odesosgames.com', source, gameId: 'test-game', send: () => {}, presentation: broker });
+  broker.bind('test-game', () => {}); broker.ready('test-game', 1);
+  const message = { ...base, type: 'ad-presentation-completed', placementId: 'rewarded' };
+  bridge.receive({ origin: 'https://evil.example', source, data: message }); bridge.receive({ origin: 'https://odesosgames.com', source: {}, data: message });
+  assert.equal(h.service.events.some((event) => event.event === 'presentation-completed'), false); bridge.dispose();
 });
 
 test('disposed bridge does not deliver a late ad result', async () => {

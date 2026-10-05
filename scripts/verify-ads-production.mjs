@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const forbidden = [
   'ODESOS AD DEV', 'MOCK AD', 'odesos-ad-dev', 'odesos-ad-overlay',
-  'odesos-mock-banner', 'odesos.dev.ads.v1', 'Sorry for the quick pause!',
-  'ad-mascot-bob', 'MockAdAdapter',
+  'odesos-mock-banner', 'odesos.dev.ads.v1', 'odesos.dev.ads.v1.1', 'Sorry for the quick pause!',
+  'Odesos ad courtesy preview', 'Advertisement simulation', 'ad-mascot-bob', 'MockAdAdapter',
 ];
 let inspected = 0;
 for (const entry of await readdir(dist, { recursive: true, withFileTypes: true })) {

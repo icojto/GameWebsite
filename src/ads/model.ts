@@ -3,14 +3,15 @@ export type FullscreenType = Exclude<AdType, 'banner'>;
 export type AdResult = 'completed' | 'closed' | 'failed' | 'no_fill' | 'timeout' | 'unavailable' | 'blocked';
 export type AdState = 'idle' | 'requested' | 'preparing' | 'ready' | 'courtesy' | 'showing' | 'completed' | 'closed' | 'failed';
 export type GameState = 'unknown' | 'menu' | 'playing' | 'paused' | 'game-over';
+export interface ProviderOutcome { result: AdResult; reason?: string }
 export const BANNER_SLOTS = { primary: 'game-page-primary' } as const;
 export interface Placement {
   id: string; gameId: string; adType: FullscreenType; enabled: boolean;
-  cooldownSeconds: number; maxPerSession: number; safeEvents?: string[];
+  cooldownSeconds: number; maxPerSession: number; maxPerRun?: number; safeEvents?: string[];
 }
 export interface AdRequest {
   requestId: string; gameId: string; placementId: string; adType: FullscreenType;
-  userInitiated?: boolean; safeEvent?: string;
+  userInitiated?: boolean; safeEvent?: string; runId?: string;
 }
 export interface AdResponse extends AdRequest { result: AdResult; rewardQualified: boolean; reason?: string }
 export interface AdProvider {
@@ -18,19 +19,19 @@ export interface AdProvider {
   initialize(): Promise<void>;
   isReady(type: AdType): boolean;
   prepareAd(request: AdRequest, signal: AbortSignal): Promise<'ready' | AdResult>;
-  showAd(request: AdRequest, signal: AbortSignal, shown: () => void): Promise<AdResult>;
+  showAd(request: AdRequest, signal: AbortSignal, shown: () => void): Promise<AdResult | ProviderOutcome>;
   showBanner(slot: string, host: HTMLElement): boolean;
   hideBanner(host: HTMLElement): void;
   destroy(): void;
 }
 export const DEFAULT_CONFIG = {
   master: true,
-  startup: { enabled: true, oncePerSession: true, courtesy: true },
+  startup: { enabled: false, oncePerSession: true, courtesy: true },
   interstitial: { enabled: true, firstSeconds: 180, intervalSeconds: 180, cooldownSeconds: 180, maxPerSession: 3, resetAfterRewarded: true },
   rewarded: { enabled: true, cooldownSeconds: 0, maxPerSession: 10, courtesy: true },
   banner: { enabled: false },
   courtesy: { enabled: true, durationMs: 1000, startup: true, interstitial: true, rewarded: true, mascot: true, animation: true, preset: 'friendly' },
-  mock: { loadingMs: 300, durationMs: 5000, nextResult: 'completed' },
+  mock: { loadingMs: 300, durationMs: 5000, presentationTimeoutMs: 5000, nextResult: 'completed' },
 };
 export type AdConfig = typeof DEFAULT_CONFIG;
 const outcomes = ['completed', 'closed', 'failed', 'no_fill', 'timeout', 'unavailable'];
@@ -49,7 +50,7 @@ export function normalizeConfig(input: unknown): AdConfig {
       if (typeof target[key] === 'boolean' && typeof value === 'boolean') target[key] = value;
       if (typeof target[key] === 'number' && typeof value === 'number' && Number.isFinite(value)) {
         const [min, max] = section === 'courtesy' ? [400, 2500]
-          : section === 'mock' ? key === 'durationMs' ? [500, 15000] : [0, 5000]
+          : section === 'mock' ? key === 'loadingMs' ? [0, 5000] : [500, 15000]
           : key === 'maxPerSession' ? [0, 100] : [0, 86400];
         target[key] = Math.round(Math.max(min, Math.min(max, value)));
       }

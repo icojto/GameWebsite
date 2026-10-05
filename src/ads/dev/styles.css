@@ -1,7 +1,6 @@
 .odesos-ad-dev-trigger { position: fixed; z-index: 90; right: 1rem; bottom: 1rem; border: 2px solid #64e4ef; border-radius: 1rem; min-height: 44px; padding: .5rem 1rem; color: #fff; background: #192338; font-weight: 800; cursor: pointer; }
-.odesos-ad-dev { position: fixed; inset: 0 0 0 auto; width: min(460px, 100vw); height: 100dvh; max-height: none; max-width: none; margin: 0; padding: 1rem; border: 1px solid #566487; color: #eff4ff; background: #10192b; box-shadow: -10px 0 50px #0008; overflow: hidden; font: 14px/1.5 system-ui, sans-serif; }
-.odesos-ad-dev[open] { display: flex; flex-direction: column; gap: .5rem; }
-.odesos-ad-dev::backdrop { background: #030a1640; }
+.odesos-ad-dev { position: fixed; z-index: 89; inset: 0 0 0 auto; box-sizing: border-box; width: min(460px, 100vw); height: 100dvh; padding: 1rem; border: 1px solid #566487; color: #eff4ff; background: #10192b; box-shadow: -10px 0 50px #0008; overflow: hidden; font: 14px/1.5 system-ui, sans-serif; }
+.odesos-ad-dev:not([hidden]) { display: flex; flex-direction: column; gap: .5rem; }
 .odesos-ad-dev header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
 .odesos-ad-dev h2 { font-size: 1.1rem; margin: 0; }
 .odesos-ad-dev > p { margin: 0; font-size: .78rem; }
@@ -16,18 +15,9 @@
 .odesos-ad-dev input, .odesos-ad-dev select { min-width: 0; max-width: 52%; min-height: 44px; border: 1px solid #657796; border-radius: .4rem; padding: .3rem; color: #fff; background: #1e2d45; font: inherit; }
 .odesos-ad-dev input[type='number'] { width: 90px; }
 .odesos-ad-dev input[type='checkbox'] { width: 26px; accent-color: #69e3dd; }
-.odesos-ad-dev button, .odesos-ad-overlay button { min-height: 44px; margin: .3rem .3rem .3rem 0; padding: .5rem .7rem; border: 1px solid #8294b6; border-radius: .6rem; color: #f5f9ff; background: #263a57; font: 700 .8rem/1.3 system-ui, sans-serif; cursor: pointer; }
-.odesos-ad-dev :focus-visible, .odesos-ad-overlay :focus-visible { outline: 3px solid #7cecf1; outline-offset: 2px; }
-.odesos-ad-overlay { position: fixed; inset: 0; margin: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; padding: 2rem max(1rem, env(safe-area-inset-right)); border: 0; background: #111b30; color: #f6f4ff; overflow: auto; text-align: center; }
-.odesos-ad-overlay[open] { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
-.odesos-ad-overlay::backdrop { background: #111b30; }
-.odesos-ad-overlay h2 { font: 800 clamp(1.7rem, 6vw, 3.2rem)/1.1 system-ui, sans-serif; margin: 0; }
-.odesos-ad-overlay p { max-width: 42rem; margin: 0; overflow-wrap: anywhere; }
-.ad-countdown { font: 700 3rem/1.2 ui-monospace, monospace; }
-.ad-mascot { flex: 0 0 auto; }
-.ad-animation .ad-mascot { animation: ad-mascot-bob 1.5s ease-in-out infinite alternate; }
-@keyframes ad-mascot-bob { to { transform: translateY(-4px) rotate(-2deg); } }
+.odesos-ad-dev button { min-height: 44px; margin: .3rem .3rem .3rem 0; padding: .5rem .7rem; border: 1px solid #8294b6; border-radius: .6rem; color: #f5f9ff; background: #263a57; font: 700 .8rem/1.3 system-ui, sans-serif; cursor: pointer; }
+.odesos-ad-dev button:disabled { opacity: .55; cursor: not-allowed; }
+.odesos-ad-dev :focus-visible { outline: 3px solid #7cecf1; outline-offset: 2px; }
 .odesos-mock-banner { display: grid; place-items: center; width: min(100%, 970px); min-height: 100px; margin: 1.8rem auto; padding: 1rem; border: 2px dashed #8ca5c9; border-radius: .6rem; color: #d7faff; background: #172940; text-align: center; font: 800 1rem system-ui, sans-serif; }
 .odesos-mock-banner[hidden] { display: none; }
 @media (max-width: 600px) { .odesos-ad-dev { inset: auto .5rem .5rem; width: calc(100% - 1rem); height: 92dvh; border-radius: 1rem; padding: .8rem; } }
-@media (prefers-reduced-motion: reduce) { .ad-animation .ad-mascot { animation: none; } }
