@@ -112,3 +112,7 @@ Use a test browser profile. Commands above run from this isolated checkout; do n
 16. Run production build/preview. Orbit PLAY/Space/restart/pause must work with no ad wait, mock graphics, banner, DEV panel, Why Ads or revive. Reactor INITIALIZE REACTOR must still work. Confirm only two public games; hidden sources remain preserved. Inspect console and network, including the outstanding source-less browser error before claiming a clean console.
 
 Automated coverage of requested cases 1–51 is in `tests/orbit-ads.test.mjs` plus the existing service tests; cases 52–55 combine Null tests, production scanner, source review and browser smoke (traffic-audit limit above). Cases 56–60 are the four unchanged regression suites and build/Pages checks. No real-provider compliance or revenue claim is made.
+
+## Reactor v1 handoff
+Run `npm.cmd run test:reactor-ads` in addition to all shared, Orbit, portal and Reactor regression suites. The detailed 20-step human checklist, tested commands, browser-tool limitations and PC2 instructions are in [the Reactor patch log](patches/2026-10-05-reactor-monetization-v1.md).
+Automated checks include real host bridge -> mock adapter -> presentation broker -> Reactor client -> provider-independent renderer, separate refill run ceilings, start precedence, queued Pause, actual-use accounting and production exclusions. They are not rendered iframe, physical-device, screen-reader or console verification.

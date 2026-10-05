@@ -10,5 +10,13 @@ export const ORBIT_PLACEMENTS: readonly Placement[] = [
 ];
 
 export function registerGamePlacements(service: AdService): void {
-  for (const placement of ORBIT_PLACEMENTS) service.register(placement);
+  for (const placement of [...ORBIT_PLACEMENTS, ...REACTOR_PLACEMENTS]) service.register(placement);
 }
+
+export const REACTOR_PLACEMENTS: readonly Placement[] = [
+  { id: 'reactor.startup', gameId: 'reactor-stack', adType: 'startup', enabled: true, cooldownSeconds: 0, maxPerSession: 1 },
+  { id: 'reactor.start-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['start-requested'] },
+  { id: 'reactor.pause-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['pause-requested'] },
+  { id: 'reactor.cool-refill', gameId: 'reactor-stack', adType: 'rewarded', enabled: true, cooldownSeconds: 0, maxPerSession: 10, maxPerRun: 1 },
+  { id: 'reactor.upgrade-refill', gameId: 'reactor-stack', adType: 'rewarded', enabled: true, cooldownSeconds: 0, maxPerSession: 10, maxPerRun: 1 },
+];

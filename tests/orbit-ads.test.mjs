@@ -184,7 +184,7 @@ function serviceHarness() {
   return {service,calls,request,advance:ms=>{now+=ms;service.tick();}};
 }
 test('all four approved placements use website slug, exact semantic events and hard revive ceiling',()=>{
-  const h=serviceHarness();assert.equal(h.service.placements.size,4);assert.deepEqual(h.service.placements.get('orbit.play-interstitial').safeEvents,['play-requested']);
+  const h=serviceHarness();assert.equal([...h.service.placements.values()].filter(p=>p.gameId===GAME_ID).length,4);assert.deepEqual(h.service.placements.get('orbit.play-interstitial').safeEvents,['play-requested']);
   assert.deepEqual(h.service.placements.get('orbit.restart-interstitial').safeEvents,['restart-requested']);
   h.service.tunePlacement('orbit.revive',{maxPerRun:9});assert.equal(h.service.placements.get('orbit.revive').maxPerRun,1);
 });

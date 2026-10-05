@@ -7,14 +7,14 @@ import { createAdBridge, parseAdMessage } from '../src/ads/bridge.ts';
 import { DEFAULT_CONFIG, normalizeConfig } from '../src/ads/model.ts';
 import { GamePresentationBroker } from '../src/ads/presentation.ts';
 import { MockAdAdapter } from '../src/ads/dev/mock-adapter.ts';
-import { ORBIT_PLACEMENTS } from '../src/ads/placements.ts';
+import { ORBIT_PLACEMENTS, REACTOR_PLACEMENTS } from '../src/ads/placements.ts';
 import { loadDevSettings, devPlacement } from '../src/ads/dev/settings.ts';
 import { ContextHelp } from '../shared/dev/help.ts';
 import { fieldHelp, actionHelp, ACTION_HELP } from '../src/ads/dev/help.ts';
 
 let sequence = 0;
 test('every interstitial registry default crosses 100; zero finite global cap blocks',async()=>{
-  for(const original of [...ORBIT_PLACEMENTS.filter(p=>p.adType==='interstitial'),devPlacement('test-game','interstitial',['play-requested'])]){
+  for(const original of [...ORBIT_PLACEMENTS, ...REACTOR_PLACEMENTS, devPlacement('test-game','interstitial',['play-requested'])].filter(p=>p.adType==='interstitial')){
     const h=harness();h.service.setGameState('playing');h.service.register({...original,id:'interstitial',gameId:'test-game'});
     for(let i=0;i<101;i++){h.advance(180);assert.equal((await h.request('interstitial',{safeEvent:original.safeEvents[0]})).result,'completed');}
     h.service.config.interstitial.sessionLimitEnabled=true;h.service.config.interstitial.maxPerSession=0;h.advance(180);

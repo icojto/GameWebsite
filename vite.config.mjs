@@ -13,12 +13,13 @@ export default defineConfig({
       const routes = new Set(gameCatalog.map((game) => game.route));
       server.middlewares.use(async (request, response, next) => {
         const pathname = request.url?.split('?')[0].replace(/\/$/, '');
-        // Orbit's DEV graph must run inside the real host iframe. Builds still
+        // Public games' DEV graphs must run inside the real host iframe. Builds still
         // use the separately bundled, Null-provider-safe production embed.
-        if (pathname === '/games/orbit-break/embed/index.html') {
+        const devGame = ['orbit-break', 'reactor-stack'].find(slug => pathname === `/games/${slug}/embed/index.html`);
+        if (devGame) {
           try {
-            const html = (await readFile(new URL('./games/orbit-break/index.html', import.meta.url), 'utf8'))
-              .replace('src="/src/main.ts"', 'src="/games/orbit-break/src/main.ts"');
+            const html = (await readFile(new URL(`./games/${devGame}/index.html`, import.meta.url), 'utf8'))
+              .replace('src="/src/main.ts"', `src="/games/${devGame}/src/main.ts"`);
             response.setHeader('Content-Type', 'text/html');
             response.end(await server.transformIndexHtml(request.url, html));
           } catch (error) { next(error); }

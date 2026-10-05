@@ -29,3 +29,10 @@ Startup/interstitial mock countdowns cannot be player-skipped. Rewarded Skip —
 Every website editable field/action and grouped status section has contextual help; every Orbit Ads Integration entry has game-local help. Hover waits briefly; focus opens; ? taps pin/unpin; outside tap dismisses. Escape dismisses help first. Disabled controls retain a separate ? trigger. Numeric help derives defaults/ranges from configuration. Website Ctrl+Shift+A and Orbit Ctrl+Shift+D remain separate. No backdrop, player resize, focus trap or cross-frame help ownership is introduced.
 
 Prompt 4 should reuse cap semantics, status/help conventions and type-specific mock skipping, not copy Orbit's reward/run rules.
+
+## Reactor Ads Integration
+Open the full website's AD DEV (or Ctrl+Shift+A in the parent document), then Ctrl+Shift+D with Reactor focused. Its Ads Integration section uses the same ContextHelp hover/focus/tap mechanism, without resizing the game. Website placement controls populate from the registry; Start and Pause switches are independent and safe events remain read-only.
+
+Readouts: bridge/capabilities/mounted renderer, run identity/phase, pending Start/Pause/refill/presentation and queued Pause, last placement/result, both inventories, both shown-attempt flags, total granted and actual consumed charges. The host still owns all policy clocks. Starting Cool/Upgrade charge inputs edit existing runtime configuration for NEXT RUN (default 1, RAM only). Refill stays +1 and the shown-attempt ceiling stays one. RESET DEFAULTS in the existing game panel resets tuning; it does not undo website cap history.
+
+DEV deplete actions set the selected inventory to zero without fabricating consumption or an acknowledgment. Preview Why Ads opens information only. All state changes are guarded during resolution or advertising. Existing developer restart starts a genuinely fresh board/run without advertising. No local allowance-only reset is provided. Completed session JSON/CSV include actual uses and grants; duration is elapsed wall seconds, including pauses/ads, not host active-play time.

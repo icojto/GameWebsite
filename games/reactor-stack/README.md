@@ -4,17 +4,20 @@ A container-responsive reactor merge game built with TypeScript, Phaser, and Vit
 
 ## Run
 
-Use Node 24 or newer. From this folder in PowerShell:
+Use Node 24 or newer. From the GameWebsite repository root in PowerShell:
 
 ```powershell
-npm.cmd install
-npm.cmd test
+npm.cmd ci
+npm.cmd run test:reactor
+npm.cmd run test:reactor-ads
 npm.cmd run check
 npm.cmd run build
-npm.cmd run dev -- --host 127.0.0.1 --port 5174 --strictPort
+npm.cmd run dev -- --port 5174 --strictPort
 ```
 
-Development: http://127.0.0.1:5174/
+Full-site development: http://127.0.0.1:5174/games/reactor-stack
+
+Standalone (advertising unavailable): `npx.cmd vite games/reactor-stack --host 127.0.0.1 --port 5176`. The full-site command serves live DEV game code in the real iframe and provides both developer panels with one terminal.
 
 In another terminal, after building:
 
@@ -22,7 +25,7 @@ In another terminal, after building:
 npm.cmd run preview -- --host 127.0.0.1 --port 4174 --strictPort
 ```
 
-Production preview: http://127.0.0.1:4174/. Stop each server with Ctrl+C. Ports are deliberately explicit to avoid other local games.
+Production preview: http://127.0.0.1:4174/games/reactor-stack. Stop each server with Ctrl+C. Ports are deliberately explicit to avoid other local games.
 
 ## Play
 
@@ -56,17 +59,24 @@ Heat and stability clamp to 0–100. A simultaneous stability and heat threshold
 - `src/config.ts`: board, tier, reward, heat, and timing defaults.
 - `src/storage.ts`: best-score persistence with memory fallback.
 - `src/main.ts`: bootstrap, Phaser board presentation, DOM HUD, short VFX and synthesized audio.
-- `src/style.css`: bounded responsive portrait composition and scroll fallback for short viewports.
+- `src/style.css`: container-driven wide, portrait and compact landscape composition without gameplay-page scrolling.
 - `tests/game.test.ts`: renderer-independent rules, input, persistence, and controller lifecycle tests.
 
 GameObjects never determine game state. Accepted actions resolve the entire turn synchronously, including any terminal result and spawn. Animation only presents that committed turn; completion releases the input lock. Restart/menu cancel tweens, timers, effects, selections, and camera effects. Input listeners are registered once, not on each restart.
 
 ## Development QA fixtures
 
-Development server only: `/?qa=win` starts with adjacent tier-4 cells and 76 stability; merge them to exercise the victory flow. `/?qa=heat` starts with 96 heat; move the tier-1 cell to overload. `/?qa=tiers` displays all five tier motifs. Click Initialize after opening a fixture. Vite removes these fixture branches from the production bundle. Fixtures use the dev origin's ordinary best-score storage.
+Development only: focus the game and press Ctrl+Shift+D for fixtures, tuning and Ads Integration diagnostics. Developer restart bypasses advertising; player Initialize/Reinitialize/Pause-menu Restart uses the unified ad boundary. State-changing tools are locked during resolution and advertising. Tuning is RAM-only.
 
 ## QA boundary
 
 See `docs/PRODUCTION_PASS.md` for the current implementation, validation, and human QA checklist. Physical iOS/Android touch, subjective sound/merge satisfaction, 3–8 minute balance, and tab-suspension behavior remain human QA. The active game fits its allocated container without browser-page scrolling. No keyboard board navigation is supplied.
 
 Next: Aegis audit and Hristo gameplay/art QA. No Game 003 work or Factory extraction is part of this project.
+
+## Mock monetization v1
+The website owns providers, policy clocks, preparation and limits. Reactor owns start/pause boundaries, board/audio suspension and two independent optional +1 power refills. One shown attempt per power-up per run; skips consume it and pre-show failures do not. Completion must be shown, qualified and match the run/request. A refill never activates the power.
+
+Default startup is OFF. Eligible START and deliberate PAUSE are supported; Pause remains paused afterward. Ordinary play, powers, Resume, scores and automatic/internal state changes request no ads. Production Null and standalone remain playable with one free charge each and no dead ad CTAs. Mock view/courtesy, Why Ads and developer help are DEV-only. Move/Merge/Random Spawn rules and balance remain unchanged.
+
+See [integration patch and human QA](../../docs/patches/2026-10-05-reactor-monetization-v1.md). No real providers, compliance approval, merge or deployment are included.

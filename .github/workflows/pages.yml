@@ -33,6 +33,7 @@ jobs:
       - run: npm run test:orbit
       - run: npm run test:orbit-ads
       - run: npm run test:reactor
+      - run: npm run test:reactor-ads
       - run: npm run build
       - run: npm run verify:pages
       - uses: actions/configure-pages@v5
