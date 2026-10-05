@@ -25,6 +25,7 @@ export class RunState {
   collisionCount = 0;
   difficultyOverride: number | null = null;
   infiniteLives = false;
+  protectionMs = 0;
   private lastFormation: FormationId | 'none' = 'none';
   private consecutive = 0;
   private groupSequence = 0;
@@ -36,6 +37,7 @@ export class RunState {
   constructor(readonly config: GameConfig) {}
 
   start(): void {
+    this.protectionMs = 0;
     this.phase = 'playing'; this.elapsedMs = 0; this.score = 0; this.scoreOffset = 0;
     this.playerAngle = -Math.PI / 2; this.direction = 1; this.nextAttackMs = 650;
     this.projectiles.length = 0; this.groupRemaining.clear(); this.totalProjectiles = 0;
@@ -95,12 +97,19 @@ export class RunState {
     this.projectiles.length = 0; this.groupRemaining.clear();
   }
 
+  revive(protectionMs: number, attackDelayMs: number): void {
+    this.clearProjectiles(); this.phase = 'playing';
+    this.protectionMs = Math.max(0, protectionMs);
+    this.nextAttackMs = this.attackIntervalMs + Math.max(0, attackDelayMs);
+  }
+
   update(deltaMs: number, orbitRadius: number, startDistance: number, random = Math.random): RunEvents {
     const events = this.events;
     events.collision = false; events.dodged = 0; events.reachedTier = 0;
     events.survivedFormations.length = 0;
     if (this.phase !== 'playing') return events;
     const delta = Math.min(this.config.maximumDeltaMs, Math.max(0, deltaMs));
+    this.protectionMs = Math.max(0, this.protectionMs - delta);
     this.elapsedMs += delta;
     this.playerAngle += this.direction * this.config.playerAngularSpeed * delta / 1000;
     this.score = Math.max(0, Math.floor(this.elapsedMs / 1000 * this.config.scoreRate) + this.scoreOffset);
@@ -124,7 +133,7 @@ export class RunState {
       shot.distance -= shot.speed * delta / 1000;
       const dx = playerX - Math.cos(shot.angle) * shot.distance;
       const dy = playerY - Math.sin(shot.angle) * shot.distance;
-      if (!shot.hit && dx * dx + dy * dy <= radius * radius) {
+      if (!shot.hit && this.protectionMs <= 0 && dx * dx + dy * dy <= radius * radius) {
         shot.hit = true; this.collisionCount += 1; events.collision = true;
         if (!this.infiniteLives) { this.phase = 'game-over'; return events; }
       }

@@ -3,9 +3,11 @@ import { NullAdAdapter } from './null-adapter.ts';
 import { createAdBridge } from './bridge.ts';
 import { GamePresentationBroker } from './presentation.ts';
 import type { DevTools } from './dev/panel.ts';
+import { registerGamePlacements } from './placements.ts';
 
 export function createAdRuntime(): { attach: (gameId: string | null, frame: HTMLIFrameElement | null, banner: HTMLElement | null) => void } {
   let service = new AdService(new NullAdAdapter());
+  registerGamePlacements(service);
   const presentation = new GamePresentationBroker();
   let tools: DevTools | null = null;
   let current: { gameId: string | null; frame: HTMLIFrameElement | null; banner: HTMLElement | null } = { gameId: null, frame: null, banner: null };
@@ -24,8 +26,10 @@ export function createAdRuntime(): { attach: (gameId: string | null, frame: HTML
       presentation.bind(gameId, send);
       bridge = createAdBridge(service, { origin: location.origin, source: frame.contentWindow, gameId, send, presentation });
       tools?.attachFrame(frame);
+      send({ type: 'bridge-hello', gameId, requestId: crypto.randomUUID() });
     };
     window.addEventListener('message', receive); frame.addEventListener('load', reload);
+    send({ type: 'bridge-hello', gameId, requestId: crypto.randomUUID() });
     detach = () => { bridge.dispose(); window.removeEventListener('message', receive); frame.removeEventListener('load', reload); };
   };
   // Vite removes this entire import and its CSS/SVG dependency graph in production.

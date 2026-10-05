@@ -4,6 +4,9 @@ import { COLORS, createRuntimeConfig, type FormationId } from './config';
 import { ProfileStore, type ThemeId } from './profile';
 import { RunState } from './run';
 import { OrbitUI } from './ui';
+import { OrbitAdClient } from '../ads/OrbitAdClient';
+import { OrbitAdFlow } from '../ads/OrbitAdFlow';
+import { GameAdPlayer } from '../ads/GameAdPlayer';
 
 const THEME_COLORS: Record<ThemeId, number> = {
   default: COLORS.cyan, water: 0x4fc9ff, nature: 0x8be779,
@@ -35,6 +38,12 @@ export class OrbitBreakScene extends Phaser.Scene {
   private hint!: Phaser.GameObjects.Text;
   private disposeDev: (() => void) | null = null;
   private alive = true;
+  ads!: OrbitAdClient;
+  adFlow!: OrbitAdFlow;
+  private adPlayer: GameAdPlayer | null = null;
+  private adSuspended = false;
+  private priorFocus: HTMLElement | null = null;
+  private presentationInitialized = false;
 
   constructor() { super('OrbitBreak'); }
 
@@ -58,10 +67,30 @@ export class OrbitBreakScene extends Phaser.Scene {
     const parent = document.querySelector<HTMLElement>('#game');
     if (!parent) throw new Error('Orbit game root is missing.');
     this.ui = new OrbitUI(parent, this.profile, this.audio, {
+      start: () => this.startGame(), revive: () => { void this.adFlow.revive(); },
       pause: () => this.pause(), resume: () => this.resume(), mainMenu: () => this.mainMenu(),
       notify: (message, levelUp) => this.ui.notify(message, levelUp),
       profileChanged: () => this.ui.refreshProfile(),
     });
+    this.ads = new OrbitAdClient({
+      origin: location.origin, source: window.parent,
+      send: (message) => { if (window.parent !== window) window.parent.postMessage(message, location.origin); },
+      suspend: (value) => this.suspendForAd(value), changed: () => this.refreshAds(),
+      present: (payload, emit) => this.adPlayer?.play(payload, emit) ?? false,
+      cancelPresentation: () => this.adPlayer?.cancel(),
+      presentationReady: () => this.adPlayer !== null,
+    });
+    this.adFlow = new OrbitAdFlow(this.run, this.ads, {
+      started: () => this.onRunStarted(), revived: () => {
+        this.ui.setPhase('playing'); this.status.setText(''); this.hint.setText('SHIELD ACTIVE');
+        this.ads.reportState('playing'); this.audio.startMusic();
+      },
+      finalized: () => {
+        this.profile.recordFinishedRun(this.run.score); this.ui.refreshProfile();
+      }, changed: () => this.refreshAds(),
+    });
+    window.addEventListener('message', this.onAdMessage);
+    void this.mountAdPlayer(parent);
     this.input.on(Phaser.Input.Events.POINTER_DOWN, this.handleAction, this);
     window.addEventListener('keydown', this.onKeyDown);
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize, this);
@@ -76,8 +105,11 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
+    if (this.adSuspended) return;
+    this.adFlow?.tick(delta);
     if (this.run.phase === 'playing') {
       const events = this.run.update(delta, this.orbitRadius, this.hazardStartDistance());
+      if (this.run.protectionMs <= 0 && this.hint.text === 'SHIELD ACTIVE') this.hint.setText('REVERSE TO EVADE');
       const second = Math.floor(this.run.elapsedMs / 1000);
       if (second > this.lastQuestSecond) {
         const elapsed = second - this.lastQuestSecond;
@@ -108,32 +140,42 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   startGame(): void {
-    this.run.start();
+    if (this.adSuspended || !this.adFlow) return;
+    void this.audio.unlock();
+    void this.adFlow.requestStartRun();
+  }
+
+  private onRunStarted(): void {
     this.lastQuestSecond = 0; this.lastProfileSaveMs = 0; this.lastHudScore = -1;
     this.ui.updateScore(0); this.ui.setPhase('playing');
     this.status.setText(''); this.hint.setText('REVERSE TO EVADE');
     this.audio.startCue();
+    this.audio.startMusic(); this.ads.reportState('playing');
   }
 
   pause(): void {
-    if (this.run.phase !== 'playing') return;
+    if (this.run.phase !== 'playing' || this.adSuspended || this.adFlow.pending) return;
     this.run.phase = 'paused'; this.ui.setPhase('paused'); this.audio.pauseMusic(); this.audio.uiCue();
+    this.ads.reportState('paused');
   }
 
   resume(): void {
-    if (this.run.phase !== 'paused') return;
+    if (this.run.phase !== 'paused' || this.adSuspended || this.adFlow.pending) return;
     this.run.phase = 'playing'; this.ui.setPhase('playing'); this.audio.startMusic(); this.audio.uiCue();
+    this.ads.reportState('playing');
   }
 
   mainMenu(): void {
-    this.profile.save();
+    if (this.adSuspended || !this.adFlow.menu()) return;
     this.audio.pauseMusic();
-    this.run.menu(); this.ui.setPhase('menu'); this.ui.updateScore(0);
+    this.ui.setPhase('menu'); this.ui.updateScore(0);
     this.status.setText('BREAK THE PATTERN').setColor('#20e9ff');
     this.hint.setText('SPACE  /  CLICK  /  TAP');
+    this.ads.reportState('menu'); this.refreshAds();
   }
 
   forceDeath(): void {
+    if (this.adSuspended || this.adFlow.pending) return;
     if (this.run.phase !== 'playing' && this.run.phase !== 'paused') return;
     this.run.phase = 'game-over'; this.endGame();
   }
@@ -142,6 +184,7 @@ export class OrbitBreakScene extends Phaser.Scene {
 
   openPause(): void { this.pause(); this.ui.open('pause'); }
   refreshUI(): void { this.ui.refreshProfile(); this.ui.updateScore(this.run.score); }
+  previewWhyAds(): void { this.ui.open('why-ads'); }
 
   get viewport(): { width: number; height: number } {
     return { width: this.scale.width, height: this.scale.height };
@@ -150,17 +193,13 @@ export class OrbitBreakScene extends Phaser.Scene {
   private endGame(): void {
     this.audio.pauseMusic();
     this.audio.deathCue();
-    this.profile.addProgress('runs', 1);
-    this.profile.addProgress('score', this.run.score, 'max');
-    this.profile.addScore(this.run.score);
-    this.profile.save();
     this.ui.setPhase('game-over'); this.ui.refreshProfile();
-    this.status.setText(`SIGNAL LOST\n${formatScore(this.run.score)}`).setColor('#ff2caa');
-    this.hint.setText('SPACE  /  CLICK  /  TAP TO RESTART');
+    this.status.setText(''); this.hint.setText('');
+    this.adFlow.death(); this.ads.reportState('game-over');
   }
 
   private handleAction(): void {
-    if (this.ui.isPanelOpen || this.run.phase === 'paused') return;
+    if (this.adSuspended || this.adFlow.pending || this.ui.isPanelOpen || this.run.phase === 'paused') return;
     const now = this.time.now;
     if (now - this.lastActionAt < this.config.inputDebounceMs) return;
     this.lastActionAt = now;
@@ -174,11 +213,47 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
+    if (this.adSuspended || this.adFlow.pending) return;
     if (event.code !== 'Space' || event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
     if (event.target instanceof HTMLElement && event.target.closest('button, input, textarea, select')) return;
     event.preventDefault();
     this.handleAction();
   };
+
+  private onAdMessage = (event: MessageEvent): void => {
+    if (this.presentationInitialized) this.ads.receive(event);
+  };
+
+  private async mountAdPlayer(parent: HTMLElement): Promise<void> {
+    if (import.meta.env.DEV) {
+      try {
+        const { createMockAdView } = await import('../ads/dev/MockAdView');
+        if (!this.alive) return;
+        this.adPlayer = new GameAdPlayer(createMockAdView(parent));
+      } catch { /* Renderer unavailable: requests fail open through the bridge. */ }
+    }
+    if (this.alive) { this.presentationInitialized = true; this.ads.start(); }
+  }
+
+  private refreshAds(): void {
+    if (!this.alive || !this.adFlow) return;
+    this.ui.updateAds(this.ads.capabilities.fullscreenAvailable, this.adFlow.offer && this.ads.capabilities.rewardedAvailable,
+      this.adFlow.offerMs / 1000, this.adFlow.pending || this.ads.busy);
+    this.ui.setBlocked(this.adSuspended || this.adFlow.pending || this.ads.busy);
+  }
+
+  private suspendForAd(value: boolean): void {
+    this.adSuspended = value; this.audio.suspendForAd(value);
+    if (value) this.priorFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    this.input.enabled = !value;
+    for (const element of document.querySelectorAll<HTMLElement>('#game > canvas, #game > .odesos-dev-panel')) element.inert = value;
+    if (!value) {
+      if (this.run.phase === 'playing') this.audio.startMusic();
+      this.ui.setBlocked(false);
+      if (this.priorFocus?.isConnected) this.priorFocus.focus({ preventScroll: true });
+    }
+    this.refreshAds();
+  }
 
   private handleResize(gameSize: { width: number; height: number }): void {
     const width = Math.max(1, gameSize.width);
@@ -193,7 +268,7 @@ export class OrbitBreakScene extends Phaser.Scene {
       available * 0.45, this.config.maximumOrbitRadius));
     this.background.setSize(width, height);
     this.status.setPosition(this.centerX, this.centerY);
-    this.hint.setPosition(this.centerX, Math.min(height - 40, this.centerY + this.orbitRadius + 25));
+    this.hint.setPosition(this.centerX, Math.min(height - 72, this.centerY + this.orbitRadius + 25));
     this.stars.clear();
     for (let index = 0; index < 50; index += 1) {
       const x = Phaser.Math.Between(0, width);
@@ -264,6 +339,7 @@ export class OrbitBreakScene extends Phaser.Scene {
     const theme = this.profile.activeTheme('player');
     const color = THEME_COLORS[theme];
     this.player.clear();
+    if (this.run.protectionMs > 0) this.player.lineStyle(2, COLORS.cyan, 0.7).strokeCircle(x, y, this.config.playerRadius + 7);
     this.player.fillStyle(color, 0.12 + this.reverseFlashMs / 160 * 0.18)
       .fillCircle(x, y, this.config.playerRadius * (2.1 + pulse * 0.2));
     this.player.fillStyle(COLORS.white, 1).fillCircle(x, y, this.config.playerRadius);
@@ -312,6 +388,8 @@ export class OrbitBreakScene extends Phaser.Scene {
 
   private shutdown(): void {
     this.alive = false;
+    this.adFlow.destroy(); this.ads.destroy(); this.adPlayer?.destroy();
+    window.removeEventListener('message', this.onAdMessage);
     this.input.off(Phaser.Input.Events.POINTER_DOWN, this.handleAction, this);
     window.removeEventListener('keydown', this.onKeyDown);
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize, this);
@@ -320,5 +398,4 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 }
 
-function formatScore(score: number): string { return Math.max(0, Math.floor(score)).toString().padStart(6, '0'); }
 function pulseFromTime(time: number): number { return (Math.sin(time * 0.004) + 1) / 2; }

@@ -1,6 +1,7 @@
 .odesos-dev-panel { position: absolute; inset: 0; z-index: 30; pointer-events: none; font: 11px/1.4 "Segoe UI", system-ui, sans-serif; color: #d9f7ff; }
 .odesos-dev-panel button, .odesos-dev-panel input, .odesos-dev-panel textarea { font: inherit; }
 .dev-trigger { position: absolute; right: 6px; bottom: 6px; padding: 3px 6px; border: 1px solid #17849b; border-radius: 4px; color: #20e9ff; background: #05141d; pointer-events: auto; cursor: pointer; }
+@media (max-width: 480px) { .dev-trigger { bottom: 58px; min-width: 44px; min-height: 44px; } }
 .dev-drawer { position: absolute; top: 0; right: 0; bottom: 0; width: min(350px, 100%); display: grid; grid-template-rows: auto auto minmax(0, 1fr); border-left: 1px solid #2f8b9e; background: #06111beF; box-shadow: -12px 0 35px #0009; pointer-events: auto; }
 .dev-drawer[hidden] { display: none; }
 .dev-drawer > header { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid #1d4a5a; letter-spacing: .12em; }

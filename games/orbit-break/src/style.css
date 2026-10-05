@@ -127,3 +127,19 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .orbit-ui *, .orbit-ui *::before, .orbit-ui *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+.orbit-start { position: absolute; top: 57%; left: 50%; transform: translateX(-50%); pointer-events: auto; }
+.orbit-start button, .orbit-death button { min-height: 44px; padding: 9px 18px; border: 1px solid #35d5eb; border-radius: 7px; background: #0b3446; color: #ecfdff; font-weight: 700; letter-spacing: .08em; }
+.orbit-start button { min-width: 144px; }
+.orbit-death { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); width: min(330px, calc(100% - 24px)); padding: 16px; border: 1px solid #326075; border-radius: 12px; background: #071923f5; text-align: center; pointer-events: auto; box-sizing: border-box; }
+.orbit-death h2 { color: #ff5bbd; margin: 0 0 8px; letter-spacing: .15em; font-size: 18px; }
+.orbit-death p { min-height: 28px; margin: 0 0 10px; font-size: 12px; color: #b6cedb; }
+.orbit-death [data-ui="revive"] { width: 100%; font-size: 11px; margin-bottom: 8px; }
+.orbit-death img { width: 23px; height: 20px; vertical-align: middle; margin-right: 6px; }
+.death-actions { display: flex; gap: 8px; }
+.death-actions button { flex: 1; padding: 8px 4px; font-size: 11px; }
+.orbit-death button:disabled { opacity: .55; }
+.orbit-meta button { min-height: 44px; }
+.orbit-modal-card[aria-label="WHY ADS?"] > header button { width: 44px; height: 44px; flex: 0 0 44px; }
+[data-ui="why-ads"][hidden], .orbit-start[hidden], .orbit-death[hidden], [data-ui="revive"][hidden] { display: none; }
+@media (max-height: 440px) { .orbit-death { padding: 9px 12px; top: 54%; } .orbit-death h2 { font-size: 14px; margin-bottom: 4px; } .orbit-death p { min-height: 0; margin-bottom: 6px; font-size: 11px; } .orbit-death [data-ui="revive"] { margin-bottom: 5px; } }

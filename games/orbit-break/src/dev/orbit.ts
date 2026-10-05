@@ -26,6 +26,21 @@ export function mountOrbitDev(scene: OrbitBreakScene, parent: HTMLElement): () =
       (value) => writePath(scene.config, path, value), Boolean(readPath(DEFAULT_CONFIG, path)));
 
   status('Run', 'run.phase', 'Run state', () => scene.run.phase);
+  status('Ads Integration', 'ads.runId', 'Run ID', () => scene.adFlow.runId || 'not started');
+  status('Ads Integration', 'ads.used', 'Revive attempt consumed', () => String(scene.adFlow.consumed));
+  status('Ads Integration', 'ads.suspended', 'Ad suspended', () => String(scene.ads.suspended));
+  status('Ads Integration', 'ads.bridge', 'Bridge ready', () => String(scene.ads.connected));
+  status('Ads Integration', 'ads.capabilities', 'Host capabilities', () => JSON.stringify(scene.ads.capabilities));
+  status('Ads Integration', 'ads.result', 'Last ad result', () => scene.ads.lastResult);
+  numeric('Ads Integration', 'ads.offerSeconds', 'Revive offer seconds', () => scene.adFlow.settings.offerSeconds,
+    (value) => { scene.adFlow.settings.offerSeconds = Math.max(3, Math.min(20, value)); }, 3, 20, 1, 8);
+  numeric('Ads Integration', 'ads.protectionSeconds', 'Revive protection seconds', () => scene.adFlow.settings.protectionSeconds,
+    (value) => { scene.adFlow.settings.protectionSeconds = Math.max(.5, Math.min(5, value)); }, .5, 5, .1, 1.5);
+  numeric('Ads Integration', 'ads.attackDelaySeconds', 'Extra attack delay seconds', () => scene.adFlow.settings.attackDelaySeconds,
+    (value) => { scene.adFlow.settings.attackDelaySeconds = Math.max(0, Math.min(5, value)); }, 0, 5, .1, 1);
+  action('Ads Integration', 'ads.death', 'Force death', () => scene.forceDeath());
+  action('Ads Integration', 'ads.resetUsed', 'Reset local revive used (host cap unchanged)', () => { scene.adFlow.consumed = false; });
+  action('Ads Integration', 'ads.why', 'Why Ads preview (menu only)', () => scene.previewWhyAds());
   status('Run', 'run.elapsed', 'Elapsed seconds', () => (scene.run.elapsedMs / 1000).toFixed(1));
   status('Run', 'run.score', 'Score', () => scene.run.score);
   status('Run', 'run.best', 'Best score', () => scene.profile.bestScore);
@@ -44,7 +59,7 @@ export function mountOrbitDev(scene: OrbitBreakScene, parent: HTMLElement): () =
   status('Run', 'run.fps', 'FPS', () => scene.game.loop.actualFps.toFixed(0));
   action('Run', 'action.pause', 'Pause', () => scene.openPause());
   action('Run', 'action.resume', 'Resume', () => scene.resume());
-  action('Run', 'action.restart', 'Restart run', () => scene.startGame());
+  action('Run', 'action.restart', 'Restart run', () => { scene.forceDeath(); scene.startGame(); });
   action('Run', 'action.death', 'Force death', () => scene.forceDeath());
   action('Run', 'action.clear', 'Clear projectiles', () => scene.run.clearProjectiles());
   boolean('Run', 'run.infiniteLives', 'Infinite lives (session)', () => scene.run.infiniteLives,

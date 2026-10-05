@@ -2,9 +2,11 @@ import { COSMETIC_CATEGORIES, THEMES, type CosmeticCategory, type ProfileStore, 
 import type { RunPhase } from './run';
 import type { OrbitAudio } from './audio';
 
-type Panel = 'pause' | 'settings' | 'confirm-menu' | 'quests' | 'locker' | 'scores' | null;
+type Panel = 'pause' | 'settings' | 'confirm-menu' | 'quests' | 'locker' | 'scores' | 'why-ads' | null;
 
 export interface UIActions {
+  start(): void;
+  revive(): void;
   pause(): void;
   resume(): void;
   mainMenu(): void;
@@ -28,6 +30,8 @@ export class OrbitUI {
   private pauseEl: HTMLButtonElement;
   private panelEl: HTMLElement;
   private toastEl: HTMLElement;
+  private blocked = false;
+  private adsAvailable = false;
 
   constructor(parent: HTMLElement, private readonly profile: ProfileStore,
     private readonly audio: OrbitAudio, private readonly actions: UIActions) {
@@ -45,7 +49,14 @@ export class OrbitUI {
         <button type="button" data-ui="quests"><span aria-hidden="true">◇</span> QUESTS</button>
         <button type="button" data-ui="locker"><span aria-hidden="true">✦</span> LOCKER</button>
         <button type="button" data-ui="scores"><span aria-hidden="true">▤</span> SCORES</button>
+        <button type="button" data-ui="why-ads" hidden>WHY ADS?</button>
       </nav>
+      <div class="orbit-start" data-start><button type="button" data-ui="start">▶ PLAY</button></div>
+      <section class="orbit-death" data-death hidden aria-label="Run ended">
+        <h2>SIGNAL LOST</h2><p data-revive-message></p>
+        <button type="button" data-ui="revive" hidden><img src="${new URL('../assets/ad-badge.svg', import.meta.url).href}" alt="Ad"> WATCH TO REVIVE <span data-offer-time></span></button>
+        <div class="death-actions"><button type="button" data-ui="start">RESTART</button><button type="button" data-ui="main-menu">MAIN MENU</button></div>
+      </section>
       <div class="orbit-modal" data-panel hidden></div>
       <div class="orbit-toast" data-toast role="status" aria-live="polite"></div>`;
     parent.append(this.root);
@@ -68,6 +79,17 @@ export class OrbitUI {
 
   get isPanelOpen(): boolean { return this.panel !== null; }
 
+  setBlocked(value: boolean): void { this.blocked = value; this.root.inert = value; }
+
+  updateAds(available: boolean, offer: boolean, seconds: number, pending: boolean): void {
+    this.adsAvailable = available;
+    this.must<HTMLButtonElement>('[data-ui="why-ads"]').hidden = !available || this.phase !== 'menu';
+    this.must<HTMLButtonElement>('[data-ui="revive"]').hidden = !offer;
+    this.must('[data-offer-time]').textContent = `(${Math.ceil(seconds)}s)`;
+    this.must('[data-revive-message]').textContent = pending ? 'Please wait…' : offer ? 'One more chance. Finish the ad to continue this run.' : 'Your run is complete.';
+    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-ui="start"], [data-ui="revive"], [data-ui="main-menu"]')) button.disabled = pending;
+  }
+
   destroy(): void {
     this.root.removeEventListener('click', this.onClick);
     this.root.removeEventListener('input', this.onInput);
@@ -77,9 +99,15 @@ export class OrbitUI {
   }
 
   setPhase(phase: RunPhase): void {
+    if (phase !== 'paused' && ['pause', 'settings', 'confirm-menu'].includes(this.panel ?? '')) {
+      this.panel = null; this.panelEl.hidden = true; this.panelEl.replaceChildren();
+    }
     this.phase = phase;
     this.root.dataset.phase = phase;
     this.pauseEl.hidden = phase !== 'playing';
+    this.must('[data-start]').hidden = phase !== 'menu';
+    this.must('[data-death]').hidden = phase !== 'game-over';
+    this.must<HTMLButtonElement>('[data-ui="why-ads"]').hidden = phase !== 'menu' || !this.adsAvailable;
     this.metaEl.setAttribute('aria-hidden', String(phase === 'playing' || phase === 'paused'));
     for (const button of this.metaEl.querySelectorAll<HTMLButtonElement>('button')) {
       button.tabIndex = phase === 'playing' || phase === 'paused' ? -1 : 0;
@@ -103,6 +131,7 @@ export class OrbitUI {
   }
 
   open(panel: Exclude<Panel, null>): void {
+    if (this.blocked || (panel === 'why-ads' && this.phase !== 'menu')) return;
     if ((panel === 'quests' || panel === 'locker' || panel === 'scores')
       && (this.phase === 'playing' || this.phase === 'paused')) return;
     this.panel = panel;
@@ -112,6 +141,7 @@ export class OrbitUI {
   }
 
   close(): void {
+    const wasWhyAds = this.panel === 'why-ads';
     if (this.panel === 'settings' || this.panel === 'confirm-menu') { this.open('pause'); return; }
     if (this.panel === 'pause') {
       this.panel = null; this.panelEl.hidden = true; this.panelEl.innerHTML = '';
@@ -121,6 +151,7 @@ export class OrbitUI {
     this.panelEl.hidden = true;
     this.panelEl.innerHTML = '';
     this.audio.uiCue();
+    if (wasWhyAds) this.must<HTMLButtonElement>('[data-ui="why-ads"]').focus();
   }
 
   notify(message: string, levelUp = false): void {
@@ -146,6 +177,9 @@ export class OrbitUI {
     } else if (this.panel === 'confirm-menu') {
       title = 'END RUN?';
       body = '<p class="modal-lead">End the current run and return to Orbit Break menu?</p><div class="modal-actions"><button type="button" data-ui="main-menu">END RUN</button><button type="button" data-ui="back-pause">CANCEL</button></div>';
+    } else if (this.panel === 'why-ads') {
+      title = 'WHY ADS?';
+      body = '<p class="modal-lead">Ads can help keep Orbit Break free to play. Optional rewarded ads let you continue a run once; you can always choose Restart instead.</p><p class="modal-lead">This integration is in a mock testing phase. No real advertising provider is connected. Privacy and provider information will be added before real ads launch.</p>';
     } else if (this.panel === 'quests') {
       title = 'QUESTS';
       body = `<p class="modal-lead">Five repeatable missions. Claim rewards when complete.</p><div class="quest-list">${this.profile.data.quests.map((quest, index) => {
@@ -172,16 +206,19 @@ export class OrbitUI {
   }
 
   private onClick = (event: MouseEvent): void => {
+    if (this.blocked) return;
     const target = event.target;
     if (!(target instanceof Element)) return;
     const button = target.closest<HTMLButtonElement>('button[data-ui]');
     if (!button) return;
     event.stopPropagation();
     const action = button.dataset.ui;
-    if (action === 'pause') { this.actions.pause(); this.open('pause'); }
+    if (action === 'start') this.actions.start();
+    else if (action === 'revive') this.actions.revive();
+    else if (action === 'pause') { this.actions.pause(); this.open('pause'); }
     else if (action === 'resume') { this.panel = null; this.panelEl.hidden = true; this.actions.resume(); }
     else if (action === 'close') this.close();
-    else if (action === 'settings' || action === 'confirm-menu' || action === 'quests' || action === 'locker' || action === 'scores') this.open(action);
+    else if (action === 'settings' || action === 'confirm-menu' || action === 'quests' || action === 'locker' || action === 'scores' || action === 'why-ads') this.open(action);
     else if (action === 'back-pause') this.open('pause');
     else if (action === 'main-menu') { this.panel = null; this.panelEl.hidden = true; this.actions.mainMenu(); }
     else if (action === 'claim') {
@@ -218,6 +255,7 @@ export class OrbitUI {
   };
 
   private onKeyDown = (event: KeyboardEvent): void => {
+    if (this.blocked) return;
     if (event.key === 'Tab' && this.panel) {
       const focusable = [...this.panelEl.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), textarea:not(:disabled)')];
       if (focusable.length) {

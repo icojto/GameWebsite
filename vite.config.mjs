@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { readFile } from 'node:fs/promises';
 import { gameCatalog } from './src/games/catalog.mjs';
 
 // The configured Pages custom domain serves this site from its root.
@@ -10,8 +11,19 @@ export default defineConfig({
       // Source directories share portal route names. Keep exact page requests
       // in the portal; leave /embed/ and all nested asset requests untouched.
       const routes = new Set(gameCatalog.map((game) => game.route));
-      server.middlewares.use((request, _response, next) => {
+      server.middlewares.use(async (request, response, next) => {
         const pathname = request.url?.split('?')[0].replace(/\/$/, '');
+        // Orbit's DEV graph must run inside the real host iframe. Builds still
+        // use the separately bundled, Null-provider-safe production embed.
+        if (pathname === '/games/orbit-break/embed/index.html') {
+          try {
+            const html = (await readFile(new URL('./games/orbit-break/index.html', import.meta.url), 'utf8'))
+              .replace('src="/src/main.ts"', 'src="/games/orbit-break/src/main.ts"');
+            response.setHeader('Content-Type', 'text/html');
+            response.end(await server.transformIndexHtml(request.url, html));
+          } catch (error) { next(error); }
+          return;
+        }
         if (routes.has(pathname)) request.url = '/index.html';
         next();
       });
