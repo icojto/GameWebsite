@@ -8,6 +8,8 @@ const forbidden = [
   'ODESOS AD DEV', 'MOCK AD', 'odesos-ad-dev', 'odesos-ad-overlay',
   'odesos-mock-banner', 'odesos.dev.ads.v1', 'odesos.dev.ads.v1.1', 'Sorry for the quick pause!',
   'Odesos ad courtesy preview', 'Advertisement simulation', 'ad-mascot-bob', 'MockAdAdapter',
+  'ad-chibi', 'ad-mock', 'Ads Integration', 'odesos-chibi-mascot.svg',
+  'pagead2.googlesyndication.com', 'imasdk.googleapis.com', 'doubleclick.net',
 ];
 let inspected = 0;
 for (const entry of await readdir(dist, { recursive: true, withFileTypes: true })) {

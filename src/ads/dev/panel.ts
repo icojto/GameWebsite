@@ -5,6 +5,7 @@ import { DEFAULT_CONFIG, normalizeConfig } from '../model.ts';
 import type { AdRequest, FullscreenType, GameState } from '../model.ts';
 import type { GamePresentationBroker } from '../presentation.ts';
 import { MockAdAdapter } from './mock-adapter.ts';
+import { registerGamePlacements } from '../placements.ts';
 
 const STORAGE_KEY = 'odesos.dev.ads.v1.1';
 const LEGACY_KEY = 'odesos.dev.ads.v1';
@@ -16,6 +17,7 @@ export async function createDevTools(presentation: GamePresentationBroker): Prom
   const config = normalizeConfig(stored); if (migrated) config.startup.enabled = false;
   const provider = new MockAdAdapter(() => service.config, () => { service.config.mock.nextResult = 'completed'; persist(); syncInputs(); }, presentation);
   const service = new AdService(provider, { development: true }); service.configure(config); await provider.initialize();
+  registerGamePlacements(service);
   presentation.setObserver((event, request, result, reason) => service.emit(event, request, result, reason));
 
   const panel = document.createElement('aside'); panel.className = 'odesos-ad-dev'; panel.hidden = true; panel.setAttribute('role', 'complementary'); panel.setAttribute('aria-labelledby', 'odesos-ad-dev-title');
@@ -46,6 +48,39 @@ export async function createDevTools(presentation: GamePresentationBroker): Prom
   async function testAd(adType: FullscreenType, safeEvent?: string, force = false): Promise<void> { if (!service.gameId) { feedback.textContent = 'Open a public game page first.'; return; } ensurePlacements(); const request: AdRequest = { requestId: crypto.randomUUID(), gameId: service.gameId, placementId: `dev-${service.gameId}-${adType}`, adType, userInitiated: adType === 'rewarded', safeEvent }; if (safeEvent) service.emit('safe-event', request, undefined, safeEvent); const result = await service.request(request, force); feedback.textContent = `${adType}: ${result.result}${result.reason ? ` (${result.reason})` : ''}. Reward qualified: ${result.rewardQualified ? 'YES' : 'NO'}. No game reward applied.`; refresh(); }
 
   const overview = section('OVERVIEW'); field(overview, 'master', 'Ads master'); const overviewOutput = output(overview);
+  const placements = section('PLACEMENTS');
+  paragraph(placements, 'Session-only tuning. Safe events and engineering run-cap ceilings are read-only. Changes apply when no ad is active.');
+  const placementRows = new Map<string, { controls: HTMLInputElement[]; stats: HTMLPreElement }>();
+  function refreshPlacements(): void {
+    for (const placement of service.placements.values()) {
+      if (placement.gameId !== service.gameId) continue;
+      let row = placementRows.get(placement.id);
+      if (!row) {
+        const block = document.createElement('fieldset');
+        const legend = document.createElement('legend'); legend.textContent = placement.id; block.append(legend);
+        paragraph(block, `${placement.adType} · Safe events: ${placement.safeEvents?.join(', ') || 'none'}`);
+        const controls: HTMLInputElement[] = [];
+        for (const key of ['enabled', 'cooldownSeconds', 'maxPerSession', 'maxPerRun'] as const) {
+          if (key === 'maxPerRun' && placement.maxPerRun === undefined) continue;
+          const label = document.createElement('label'); label.className = 'ad-dev-field'; label.textContent = key;
+          const input = document.createElement('input'); input.dataset.placement = placement.id; input.dataset.field = key;
+          input.type = key === 'enabled' ? 'checkbox' : 'number'; input.min = '0'; input.step = '1';
+          if (key === 'maxPerRun') input.max = String(placement.maxPerRun);
+          input.addEventListener('change', () => { service.tunePlacement(placement.id, { [key]: key === 'enabled' ? input.checked : Number(input.value) }); refresh(); });
+          label.append(input); block.append(label); controls.push(input);
+        }
+        row = { controls, stats: output(block) }; placementRows.set(placement.id, row); placements.append(block);
+      }
+      for (const input of row.controls) {
+        input.disabled = service.busy;
+        if (document.activeElement === input) continue;
+        const value = placement[input.dataset.field as 'enabled' | 'cooldownSeconds' | 'maxPerSession' | 'maxPerRun'];
+        if (input.type === 'checkbox') input.checked = Boolean(value); else input.value = String(value);
+      }
+      row.stats.textContent = JSON.stringify(service.placementStats.get(placement.id) ?? { requests: 0, shown: 0 }, null, 2);
+    }
+    for (const [id, row] of placementRows) row.stats.parentElement!.hidden = service.placements.get(id)?.gameId !== service.gameId;
+  }
   const startup = section('STARTUP'); field(startup, 'startup.enabled', 'Enabled (default OFF)'); field(startup, 'startup.oncePerSession', 'Once per session'); field(startup, 'startup.courtesy', 'Courtesy enabled'); const startupOutput = output(startup); action(startup, 'TEST STARTUP', () => testAd('startup')); action(startup, 'RESET STARTUP', () => { service.devAction('startup'); refresh(); });
   const interstitial = section('INTERSTITIAL'); field(interstitial, 'interstitial.enabled', 'Enabled'); field(interstitial, 'interstitial.firstSeconds', 'First eligible after active seconds'); field(interstitial, 'interstitial.intervalSeconds', 'Eligibility interval seconds'); field(interstitial, 'interstitial.cooldownSeconds', 'Cooldown seconds'); field(interstitial, 'interstitial.maxPerSession', 'Maximum per session'); field(interstitial, 'interstitial.resetAfterRewarded', 'Reset cooldown after rewarded'); paragraph(interstitial, 'Time creates eligibility only. A registered safe semantic event is still required.'); const interstitialOutput = output(interstitial); action(interstitial, 'MAKE ELIGIBLE', () => { service.devAction('eligible'); refresh(); }); action(interstitial, 'RESET ELIGIBILITY TIMER', () => { service.devAction('timer'); refresh(); }); action(interstitial, 'RESET COOLDOWN', () => { service.devAction('cooldown'); refresh(); }); action(interstitial, 'SIMULATE SAFE EVENT (run-ended)', () => testAd('interstitial', 'run-ended')); action(interstitial, 'FORCE INTERSTITIAL — bypass eligibility', () => testAd('interstitial', undefined, true));
   const rewarded = section('REWARDED'); field(rewarded, 'rewarded.enabled', 'Rewarded master'); field(rewarded, 'rewarded.cooldownSeconds', 'Global rewarded cooldown seconds'); field(rewarded, 'rewarded.maxPerSession', 'Maximum per session'); field(rewarded, 'rewarded.courtesy', 'Courtesy enabled'); paragraph(rewarded, 'Only completed qualifies. The game owns rewards and future per-run policy.'); const rewardedOutput = output(rewarded); action(rewarded, 'TEST REWARDED GENERIC', () => testAd('rewarded'));
@@ -55,6 +90,6 @@ export async function createDevTools(presentation: GamePresentationBroker): Prom
   const events = section('EVENTS'); const statsOutput = output(events); const logOutput = output(events); action(events, 'CLEAR SESSION STATS', () => { service.clearStats(); refresh(); }); paragraph(events, 'Clears observations only. Safety state and reward receipts remain.'); action(events, 'RESET DEFAULTS', () => { service.configure(DEFAULT_CONFIG); persist(); syncInputs(); refresh(); });
 
   function refresh(): void { if (panel.hidden) return; const seconds = (value: number | null) => value === null ? 'never' : `${Math.floor(value)}s`; const renderer = presentation.rendererReady; overviewOutput.textContent = `Provider: ${service.provider.name}\nPresentation surface: GAME\nConnected renderer: ${renderer ? 'YES' : 'NO'}\nRenderer ready: ${renderer ? 'YES' : 'NO'}\nCurrent game: ${service.gameId ?? 'NONE'}\nGame state: ${service.gameState}\nDocument visible: ${service.visible ? 'YES' : 'NO'}\nSession: ${seconds(service.sessionSeconds)}\nActive gameplay: ${seconds(service.activeSeconds)}\nAd state: ${service.state}\nRequest active: ${service.busy ? 'YES' : 'NO'}\nLast type: ${service.lastRequest?.adType ?? 'none'}\nLast placement: ${service.lastRequest?.placementId ?? 'none'}\nSince fullscreen: ${seconds(service.secondsSince(service.lastFullscreen))}\nLast error: ${service.lastError ?? 'none'}`; for (const button of previewButtons) { button.disabled = !renderer; button.title = renderer ? '' : 'Game Ad Player not connected'; } startupOutput.textContent = Object.entries(service.startup).map(([key, value]) => `${key}: ${value ? 'YES' : 'NO'}`).join('\n'); const eligibility = service.interstitialEligibility(); interstitialOutput.textContent = `Eligible: ${eligibility.eligible ? 'YES' : 'NO'}\nReason: ${eligibility.reason}\nActive play: ${seconds(service.activeSeconds)}\nTime until threshold: ${seconds(eligibility.secondsRemaining)}\nSince interstitial: ${seconds(service.secondsSince(service.lastInterstitial))}\nCount/session: ${service.interstitialCount}\nSafe events: ${[...new Set([...service.placements.values()].filter((p) => p.gameId === service.gameId).flatMap((p) => p.safeEvents ?? []))].join(', ') || 'none'}`; rewardedOutput.textContent = [...service.placements.values()].filter((p) => p.adType === 'rewarded').map((p) => `${p.id}\nGame: ${p.gameId} · enabled: ${p.enabled}\nCooldown: ${p.cooldownSeconds}s · session cap: ${p.maxPerSession}\nRun cap: ${p.maxPerRun ?? 'not configured'} (validated runId when configured)`).join('\n\n') || 'No placements registered.'; const size = service.bannerHost?.getBoundingClientRect(); bannerOutput.textContent = `Visible: ${service.bannerVisible ? 'YES' : 'NO'}\nImpressions: ${service.stats.banner.shown}\nDimensions: ${Math.round(size?.width ?? 0)} × ${Math.round(size?.height ?? 0)}\nWebsite slot outside iframe`; statsOutput.textContent = `${JSON.stringify(service.stats, null, 2)}\nInterstitial eligibility events: ${service.eligibleEvents}\nBlocked reasons: ${JSON.stringify(service.blockedReasons)}\nReward acknowledgments: ${service.rewardAcknowledgments}`; logOutput.textContent = service.events.slice(-60).reverse().map((entry) => `${entry.timestamp.slice(11, 19)} ${entry.event} ${entry.adType ?? ''} ${entry.result ?? ''}\n${entry.gameId ?? 'NONE'} ${entry.placementId ?? ''} ${entry.reason ?? ''}\nactive ${Math.floor(entry.activeSeconds)}s / session ${Math.floor(entry.sessionSeconds)}s`).join('\n\n'); if (document.activeElement !== stateSelect) stateSelect.value = service.gameState; }
-  const unsubscribe = service.subscribe((event) => { if (event.event === 'game-context') ensurePlacements(); refresh(); }); const interval = window.setInterval(refresh, 500); syncInputs(); if (migrated) persist();
+  const unsubscribe = service.subscribe((event) => { if (event.event === 'game-context') ensurePlacements(); refreshPlacements(); refresh(); }); const interval = window.setInterval(() => { refreshPlacements(); refresh(); }, 500); syncInputs(); if (migrated) persist();
   return { service, attachFrame, destroy() { clearInterval(interval); unsubscribe(); attachFrame(null); window.removeEventListener('keydown', key, true); panel.remove(); trigger.remove(); presentation.setObserver(() => {}); } };
 }

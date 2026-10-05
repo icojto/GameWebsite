@@ -87,6 +87,14 @@ export class ProfileStore {
     this.save();
   }
 
+  recordFinishedRun(score: number): void {
+    this.addProgress('runs', 1);
+    this.addProgress('score', score, 'max');
+    this.addScore(score);
+    // A zero-score run still has permanent quest progress to save.
+    if (score <= 0) this.save();
+  }
+
   addProgress(kind: QuestKind, amount: number, mode: 'add' | 'max' = 'add'): boolean {
     let changed = false;
     for (const quest of this.data.quests) {

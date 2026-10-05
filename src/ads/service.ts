@@ -38,6 +38,7 @@ export class AdService {
   private rewardReceipts = new Map<string, { gameId: string; placementId: string; acknowledged: boolean }>();
   private placementHistory = new Map<string, { shown: number; at: number }>();
   private placementRunHistory = new Map<string, number>();
+  private placementRunCeilings = new Map<string, number>();
   private options: Options;
   provider: AdProvider;
 
@@ -49,6 +50,32 @@ export class AdService {
     this.nextEligibleAt = this.config.interstitial.firstSeconds;
   }
   get busy(): boolean { return this.active !== null; }
+  capabilities(gameId: string): { providerMode: 'mock' | 'null' | 'real'; fullscreenAvailable: boolean; rewardedAvailable: boolean; startupDue: boolean } {
+    const mode = this.provider.name === 'MOCK' ? 'mock' : this.provider.name === 'NULL' ? 'null' : 'real';
+    const available = this.config.master && mode !== 'null';
+    const placements = [...this.placements.values()].filter((p) => p.gameId === gameId && !p.id.startsWith('dev-') && p.enabled && p.maxPerRun !== 0 && p.maxPerSession > (this.placementHistory.get(p.id)?.shown ?? 0));
+    return {
+      providerMode: mode,
+      fullscreenAvailable: available && (this.providerReady('startup') || this.providerReady('interstitial')),
+      rewardedAvailable: available && this.config.rewarded.enabled && this.providerReady('rewarded') && this.rewardedCount < this.config.rewarded.maxPerSession && placements.some((p) => p.adType === 'rewarded'),
+      startupDue: available && this.config.startup.enabled && (!this.config.startup.oncePerSession || !this.startup.requested) && this.providerReady('startup') && placements.some((p) => p.adType === 'startup'),
+    };
+  }
+  tunePlacement(id: string, values: Partial<Pick<Placement, 'enabled' | 'cooldownSeconds' | 'maxPerSession' | 'maxPerRun'>>): void {
+    if (!this.options.development || this.busy) return;
+    const placement = this.placements.get(id);
+    if (!placement) return;
+    if (typeof values.enabled === 'boolean') placement.enabled = values.enabled;
+    for (const key of ['cooldownSeconds', 'maxPerSession', 'maxPerRun'] as const) {
+      const value = values[key];
+      if (typeof value === 'number' && Number.isFinite(value) && (key !== 'maxPerRun' || placement.maxPerRun !== undefined)) {
+        // Designer tuning cannot widen a placement's declared engineering ceiling.
+        const ceiling = key === 'cooldownSeconds' ? 86400 : key === 'maxPerRun' ? this.placementRunCeilings.get(id) ?? 0 : 100;
+        placement[key] = Math.round(Math.max(0, Math.min(ceiling, value)));
+      }
+    }
+    this.emit('placement-configured', { placementId: id });
+  }
   private providerReady(type: AdType): boolean {
     try { return this.provider.isReady(type); }
     catch { this.lastError = 'provider-readiness-failed'; return false; }
@@ -69,11 +96,13 @@ export class AdService {
     if (!this.config.master) this.cancelActive('disabled');
     if (!this.config.master || !this.config.banner.enabled) this.setBanner(false);
     this.tick();
+    this.emit('ads-configured');
   }
   register(placement: Placement): void {
     if (!/^[a-z0-9][a-z0-9._-]{0,79}$/i.test(placement.id) || !placement.gameId || this.placements.size >= 100
       || (placement.maxPerRun !== undefined && (!Number.isInteger(placement.maxPerRun) || placement.maxPerRun < 0 || placement.maxPerRun > 100))) throw new Error('Invalid placement registration');
     this.placements.set(placement.id, structuredClone(placement));
+    if (placement.maxPerRun !== undefined) this.placementRunCeilings.set(placement.id, placement.maxPerRun);
   }
   setContext(gameId: string | null): void {
     this.tick();

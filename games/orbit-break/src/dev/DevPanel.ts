@@ -1,5 +1,5 @@
 export type DevCategory = 'Run' | 'Difficulty' | 'Projectiles' | 'Telegraph' | 'Formations'
-  | 'Profile' | 'Quests' | 'XP / Economy' | 'Cosmetics' | 'Visual' | 'Audio' | 'QA';
+  | 'Profile' | 'Quests' | 'XP / Economy' | 'Cosmetics' | 'Visual' | 'Audio' | 'QA' | 'Ads Integration';
 
 export interface DevControl {
   category: DevCategory;
@@ -99,6 +99,7 @@ export class DevPanel {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
+    if (this.root.inert) return;
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyD') {
       event.preventDefault(); event.stopImmediatePropagation(); this.toggle();
     } else if (event.key === 'Escape' && this.visible) {

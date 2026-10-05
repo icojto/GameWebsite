@@ -7,6 +7,7 @@ export class OrbitAudio {
   private master: GainNode | null = null;
   private musicTimer: number | null = null;
   private beat = 0;
+  private adSuspended = false;
   settings = { master: 0.7, music: 1, sfx: 1, mute: false };
 
   constructor(private readonly config: GameConfig) {}
@@ -20,7 +21,7 @@ export class OrbitAudio {
 
       this.context = new AudioContextClass();
       this.master = this.context.createGain();
-      this.master.gain.value = this.settings.master;
+      this.applySettings();
       this.master.connect(this.context.destination);
     }
 
@@ -30,7 +31,7 @@ export class OrbitAudio {
   }
 
   startMusic(): void {
-    if (!this.context || this.musicTimer !== null) return;
+    if (!this.context || this.musicTimer !== null || this.adSuspended) return;
 
     const beatMs = (60_000 / this.config.audio.bpm) / 2;
     this.playBeat();
@@ -61,7 +62,13 @@ export class OrbitAudio {
   levelCue(): void { this.tone(330, 880, 0.3, this.config.audio.sfxVolume * this.settings.sfx * 0.58, 'triangle'); }
 
   applySettings(): void {
-    if (this.master) this.master.gain.value = this.settings.mute ? 0 : this.settings.master;
+    if (this.master) this.master.gain.value = this.settings.mute || this.adSuspended ? 0 : this.settings.master;
+  }
+
+  suspendForAd(value: boolean): void {
+    this.adSuspended = value;
+    if (value) this.pauseMusic();
+    this.applySettings();
   }
 
   destroy(): void {
@@ -92,7 +99,7 @@ export class OrbitAudio {
     volume: number,
     type: OscillatorType,
   ): void {
-    if (!this.context || !this.master || this.context.state !== 'running') return;
+    if (!this.context || !this.master || this.context.state !== 'running' || this.adSuspended) return;
 
     const now = this.context.currentTime;
     const oscillator = this.context.createOscillator();

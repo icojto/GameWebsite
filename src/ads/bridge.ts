@@ -60,9 +60,17 @@ export function createAdBridge(service: AdService, context: {
     if (alive) context.send({ protocol: AD_PROTOCOL, version: AD_VERSION, type, gameId: context.gameId, ...values });
   };
   const unsubscribe = service.subscribe((event) => {
-    if (!event.requestId || !pending.has(event.requestId) || event.gameId !== context.gameId) return;
+    if (['ads-configured', 'placement-configured', 'dev-reset-startup', 'ad-result', 'ad-blocked'].includes(event.event)) {
+      send('ad-capabilities', { requestId: crypto.randomUUID(), ...service.capabilities(context.gameId) });
+    }
+    if (!event.requestId || event.gameId !== context.gameId) return;
+    const preview = !pending.has(event.requestId) && event.placementId?.startsWith(`dev-${context.gameId}-`);
+    if (!pending.has(event.requestId) && !preview) return;
     if (['ad-accepted', 'ad-blocked', 'ad-will-show', 'ad-shown'].includes(event.event)) {
-      send(event.event, { requestId: event.requestId, placementId: event.placementId, adType: event.adType, reason: event.reason });
+      send(event.event, { requestId: event.requestId, placementId: event.placementId, adType: event.adType, reason: event.reason, ...(preview ? { preview: true } : {}) });
+    }
+    if (preview && ['ad-result', 'ad-blocked'].includes(event.event)) {
+      send('ad-result', { requestId: event.requestId, placementId: event.placementId, adType: event.adType, result: event.result, rewardQualified: false, reason: event.reason, preview: true });
     }
   });
   return {
@@ -73,7 +81,7 @@ export function createAdBridge(service: AdService, context: {
       if (['ad-presentation-ready', 'ad-courtesy-started', 'ad-presentation-shown', 'ad-presentation-completed', 'ad-presentation-closed', 'ad-presentation-failed'].includes(message.type)) { context.presentation?.receive(message as PresentationMessage); return; }
       if (seen.has(message.requestId) || seen.size >= 2000) return;
       seen.add(message.requestId);
-      if (message.type === 'game-ready') { context.presentation?.ready(context.gameId, message.presentationVersion); service.emit('game-ready'); send('bridge-ready', { requestId: message.requestId, presentationVersion: 1 }); return; }
+      if (message.type === 'game-ready') { context.presentation?.ready(context.gameId, message.presentationVersion); service.emit('game-ready'); send('bridge-ready', { requestId: message.requestId, presentationVersion: 1, ...service.capabilities(context.gameId) }); return; }
       if (message.type === 'game-state') { service.setGameState(message.state); return; }
       if (message.type === 'reward-granted') {
         if (receipts.has(message.adRequestId) && service.acknowledge(message.adRequestId, context.gameId, message.placementId)) receipts.delete(message.adRequestId);

@@ -12,6 +12,7 @@
     "check": "tsc --noEmit && npm run check:games",
     "check:games": "node scripts/check-games.mjs",
     "test:orbit": "node --experimental-transform-types --test tests/orbit-v2.test.mjs",
+    "test:orbit-ads": "node --experimental-transform-types --test tests/orbit-ads.test.mjs",
     "test:portal": "node --test tests/portal.test.mjs",
     "test:ads": "node --experimental-transform-types --test tests/ads.test.mjs",
     "test:reactor": "node --experimental-transform-types --test games/reactor-stack/tests/game.test.ts",

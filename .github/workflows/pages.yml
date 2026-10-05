@@ -31,6 +31,7 @@ jobs:
       - run: npm run test:portal
       - run: npm run test:ads
       - run: npm run test:orbit
+      - run: npm run test:orbit-ads
       - run: npm run test:reactor
       - run: npm run build
       - run: npm run verify:pages

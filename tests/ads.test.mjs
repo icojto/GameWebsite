@@ -218,7 +218,7 @@ test('game presentation broker sends identity/config and accepts one ordered com
   const config = structuredClone(DEFAULT_CONFIG); config.mock.presentationTimeoutMs = 100;
   const request = { requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded', adType: 'rewarded', userInitiated: true };
   const pending = broker.present(request, config, 'completed', new AbortController().signal, () => shown++);
-  assert.deepEqual(messages[0], { type: 'ad-presentation-request', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded', adType: 'rewarded', courtesy: { enabled: true, preset: 'friendly', durationMs: 1000, mascot: true, animation: true }, mock: { durationMs: 5000, outcome: 'completed' } });
+  assert.deepEqual(messages[0], { type: 'ad-presentation-request', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded', adType: 'rewarded', courtesy: { enabled: true, preset: 'friendly', durationMs: 1000, mascot: true, animation: true }, mock: { durationMs: 5000, outcome: 'completed' }, timeoutMs: 6100 });
   assert.equal(broker.receive({ type: 'ad-presentation-ready', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
   assert.equal(broker.receive({ type: 'ad-courtesy-started', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
   assert.equal(broker.receive({ type: 'ad-presentation-shown', requestId: 'presentation-one', gameId: 'test-game', placementId: 'rewarded' }), true);
@@ -286,7 +286,7 @@ test('bridge authenticates source/origin/game and deduplicates requests and ackn
   assert.equal(h.service.stats.rewarded.requests, 0);
   bridge.receive(event); bridge.receive(event);
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual(messages.map((m) => m.type), ['ad-accepted', 'ad-will-show', 'ad-shown', 'ad-result']);
+  assert.deepEqual(messages.map((m) => m.type), ['ad-accepted', 'ad-will-show', 'ad-shown', 'ad-capabilities', 'ad-result']);
   assert.equal(messages.at(-1).rewardQualified, true);
   bridge.receive({ ...event, data: { ...base, requestId: 'wrong-ack', type: 'reward-granted', adRequestId: 'one', placementId: 'wrong-placement' } });
   assert.equal(h.service.rewardAcknowledgments, 0);

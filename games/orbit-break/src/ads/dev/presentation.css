@@ -1,0 +1,18 @@
+.orbit-ad-player { position:absolute; inset:0; z-index:10000; display:grid; place-items:center; overflow:hidden; padding:clamp(10px,3vmin,28px); background:radial-gradient(ellipse at 50% 35%,#192541,#070d19 70%); color:#eefaff; font:500 14px/1.4 "Segoe UI",sans-serif; text-align:center; touch-action:manipulation; }
+.orbit-ad-player[hidden] { display:none; }
+.orbit-ad-player:focus { outline:0; }
+.ad-courtesy,.ad-mock { display:grid; justify-items:center; gap:clamp(6px,2vh,18px); width:min(100%,440px); }
+.orbit-ad-player small { color:#a4c5d6; font-size:11px; letter-spacing:.18em; text-transform:uppercase; }
+.orbit-ad-player h2 { margin:0; font-size:clamp(18px,4vmin,30px); }
+.orbit-ad-player p { margin:0; color:#bdd0e0; }
+.ad-chibi { width:clamp(66px,23vmin,150px); height:auto; }
+.orbit-ad-player[data-animated="true"] .ad-chibi { animation:orbit-ad-bob 1.8s ease-in-out infinite; }
+.ad-loading { color:#73dbe8; letter-spacing:.4em; }
+.ad-mock { border:1px solid #7283a0; padding:clamp(12px,4vmin,30px); border-radius:16px; }
+.ad-mock h2 { letter-spacing:.18em; }
+.ad-mock output { font-size:clamp(28px,8vmin,54px); font-variant-numeric:tabular-nums; }
+.ad-mock button { min-height:44px; padding:8px 14px; color:#eefaff; border:1px solid #617f92; border-radius:7px; background:#1b3143; cursor:pointer; }
+.ad-mock button:focus-visible { outline:3px solid #73dbe8; outline-offset:3px; }
+@keyframes orbit-ad-bob { 50% { transform:translateY(-4px); } }
+@media (prefers-reduced-motion:reduce) { .orbit-ad-player * { animation:none !important; transition:none !important; } }
+@media (max-height:360px) { .ad-courtesy,.ad-mock { gap:5px; } .ad-chibi { width:65px; } .orbit-ad-player h2 { font-size:18px; } }
