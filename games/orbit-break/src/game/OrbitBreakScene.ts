@@ -268,7 +268,7 @@ export class OrbitBreakScene extends Phaser.Scene {
       available * 0.45, this.config.maximumOrbitRadius));
     this.background.setSize(width, height);
     this.status.setPosition(this.centerX, this.centerY);
-    this.hint.setPosition(this.centerX, Math.min(height - 40, this.centerY + this.orbitRadius + 25));
+    this.hint.setPosition(this.centerX, Math.min(height - 72, this.centerY + this.orbitRadius + 25));
     this.stars.clear();
     for (let index = 0; index < 50; index += 1) {
       const x = Phaser.Math.Between(0, width);
