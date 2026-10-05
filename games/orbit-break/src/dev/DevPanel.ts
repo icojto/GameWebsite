@@ -1,3 +1,6 @@
+import { ContextHelp } from '../../../../shared/dev/help.ts';
+import '../../../../shared/dev/help.css';
+import { orbitAdHelp } from './ads-help.ts';
 export type DevCategory = 'Run' | 'Difficulty' | 'Projectiles' | 'Telegraph' | 'Formations'
   | 'Profile' | 'Quests' | 'XP / Economy' | 'Cosmetics' | 'Visual' | 'Audio' | 'QA' | 'Ads Integration';
 
@@ -30,6 +33,7 @@ export class DevPanel {
   private selected = 'Run';
   private visible = false;
   private refreshTimer: number;
+  private help = new ContextHelp(document);
 
   constructor(parent: HTMLElement, private readonly controls: DevControl[], private readonly context: () => DevContext) {
     this.root.className = 'odesos-dev-panel';
@@ -44,6 +48,7 @@ export class DevPanel {
   }
 
   destroy(): void {
+    this.help.destroy();
     window.clearInterval(this.refreshTimer);
     window.removeEventListener('keydown', this.onKeyDown, true);
     this.root.removeEventListener('click', this.onClick);
@@ -55,6 +60,7 @@ export class DevPanel {
   toggle(): void { this.visible = !this.visible; this.render(); }
 
   private render(): void {
+    this.help.destroy(); this.help = new ContextHelp(document);
     const categories = [...new Set(this.controls.map((control) => control.category)), 'Session Log'];
     this.root.classList.toggle('open', this.visible);
     this.root.innerHTML = `<button class="dev-trigger" type="button" data-dev="toggle" aria-label="Toggle Odesos Dev Panel">DEV</button>
@@ -63,6 +69,13 @@ export class DevPanel {
         <nav aria-label="Development categories">${categories.map((category) => `<button type="button" data-dev="category" data-category="${escapeText(category)}" aria-current="${this.selected === category ? 'page' : 'false'}">${escapeText(category)}</button>`).join('')}</nav>
         <div class="dev-body">${this.selected === 'Session Log' ? this.renderLogger() : this.renderControls()}</div>
       </div>`;
+    if(this.selected==='Ads Integration') for(const control of this.controls.filter(c=>c.category==='Ads Integration')) {
+      const target=[...this.root.querySelectorAll<HTMLElement>('[data-control],[data-status],[data-path]')].find(e=>e.dataset.control===control.path || e.dataset.status===control.path || e.dataset.path===control.path);
+      if(!target) continue;
+      const wrapper=document.createElement('div');wrapper.className='ad-help-row';
+      const row=target.closest('label,.dev-row') ?? target;row.replaceWith(wrapper);wrapper.append(row);
+      this.help.attach(target,control.label,orbitAdHelp(control),wrapper);
+    }
   }
 
   private renderControls(): string {
@@ -99,6 +112,7 @@ export class DevPanel {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
+    if(this.help.dismissEscape(event)) return;
     if (this.root.inert) return;
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyD') {
       event.preventDefault(); event.stopImmediatePropagation(); this.toggle();

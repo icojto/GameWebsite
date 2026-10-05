@@ -19,7 +19,7 @@ export function createMockAdView(parent: HTMLElement): AdView {
   const key = (event: KeyboardEvent) => {
     if (root.hidden) return;
     if (event.key === 'Tab') { event.preventDefault(); (root.querySelector('button') ?? root).focus(); }
-    if ([' ', 'Escape', 'Tab'].includes(event.key) || (event.ctrlKey && event.shiftKey && event.code === 'KeyD')) {
+    if ([' ', 'Enter', 'Escape', 'Tab'].includes(event.key) || (event.ctrlKey && event.shiftKey && event.code === 'KeyD')) {
       event.stopImmediatePropagation();
       if (event.key === 'Escape') event.preventDefault();
     }
@@ -40,9 +40,9 @@ export function createMockAdView(parent: HTMLElement): AdView {
       root.dataset.animated = String(payload.courtesy.animation);
       root.innerHTML = `<div class="ad-courtesy"><small>ODESOSGAMES</small>${payload.courtesy.mascot ? '<img class="ad-chibi" alt="" src="' + new URL('../../assets/odesos-chibi-mascot.svg', import.meta.url).href + '">' : ''}<h2>${title}</h2><p>${subtitle}</p><span class="ad-loading" aria-label="Loading">• • •</span></div>`;
     },
-    showing(_payload: Presentation, close) {
-      open(); closeAction = close; lastSecond = -1;
-      root.innerHTML = '<div class="ad-mock"><small>Advertisement</small><h2>MOCK AD</h2><output data-ad-countdown aria-live="off"></output><p>Development only</p><button type="button" data-ad-close>Close early · no reward</button></div>';
+    showing(payload: Presentation, close) {
+      open(); closeAction = payload.adType === 'rewarded' ? close : null; lastSecond = -1;
+      root.innerHTML = '<div class="ad-mock"><small>Advertisement</small><h2>MOCK AD</h2><output data-ad-countdown aria-live="off"></output><p>Development only</p>' + (payload.adType === 'rewarded' ? '<button type="button" data-ad-close>Skip — no reward</button>' : '<p>Continues automatically when the countdown ends.</p>') + '</div>';
     },
     countdown(seconds) {
       const output = root.querySelector<HTMLOutputElement>('[data-ad-countdown]');

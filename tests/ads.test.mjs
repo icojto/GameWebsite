@@ -7,8 +7,94 @@ import { createAdBridge, parseAdMessage } from '../src/ads/bridge.ts';
 import { DEFAULT_CONFIG, normalizeConfig } from '../src/ads/model.ts';
 import { GamePresentationBroker } from '../src/ads/presentation.ts';
 import { MockAdAdapter } from '../src/ads/dev/mock-adapter.ts';
+import { ORBIT_PLACEMENTS } from '../src/ads/placements.ts';
+import { loadDevSettings, devPlacement } from '../src/ads/dev/settings.ts';
+import { ContextHelp } from '../shared/dev/help.ts';
+import { fieldHelp, actionHelp, ACTION_HELP } from '../src/ads/dev/help.ts';
 
 let sequence = 0;
+test('every interstitial registry default crosses 100; zero finite global cap blocks',async()=>{
+  for(const original of [...ORBIT_PLACEMENTS.filter(p=>p.adType==='interstitial'),devPlacement('test-game','interstitial',['play-requested'])]){
+    const h=harness();h.service.setGameState('playing');h.service.register({...original,id:'interstitial',gameId:'test-game'});
+    for(let i=0;i<101;i++){h.advance(180);assert.equal((await h.request('interstitial',{safeEvent:original.safeEvents[0]})).result,'completed');}
+    h.service.config.interstitial.sessionLimitEnabled=true;h.service.config.interstitial.maxPerSession=0;h.advance(180);
+    assert.equal((await h.request('interstitial',{safeEvent:original.safeEvents[0]})).reason,'session-cap');
+  }
+});
+test('help hover/focus/tap, Escape precedence and disposal without action side effects',async()=>{
+  class Element extends EventTarget {
+    children=[];attributes={};style={};dataset={};parentElement=null;hidden=false;isConnected=true;
+    append(...nodes){for(const n of nodes){n.parentElement=this;this.children.push(n);}}
+    replaceWith(node){const p=this.parentElement;p.children[p.children.indexOf(this)]=node;node.parentElement=p;this.parentElement=null;}
+    setAttribute(k,v){this.attributes[k]=v;} contains(n){return this===n||this.children.some(c=>c.contains(n));}
+    getBoundingClientRect(){return {left:320,top:280,bottom:316,width:340,height:100};}
+    remove(){this.isConnected=false;if(this.parentElement)this.parentElement.children=this.parentElement.children.filter(n=>n!==this);}
+  }
+  const doc=new EventTarget();doc.body=new Element();doc.createElement=()=>new Element();doc.defaultView=new EventTarget();doc.defaultView.innerWidth=360;doc.defaultView.innerHeight=360;doc.activeElement=null;
+  const control=new Element();doc.body.append(control);let actions=0;control.addEventListener('click',()=>actions++);
+  const help=new ContextHelp(doc);help.attach(control,'Disabled test control','Specific explanation',doc.body);
+  const bubble=doc.body.children.find(n=>n.attributes.role==='tooltip'),owner=doc.body.children.at(-1),button=owner.children[0];
+  owner.dispatchEvent(new Event('pointerenter'));assert.equal(bubble.hidden,true);await new Promise(r=>setTimeout(r,320));assert.equal(bubble.hidden,false);
+  button.dispatchEvent(new Event('click'));assert.equal(button.attributes['aria-expanded'],'true');assert.equal(actions,0);
+  const escape=new Event('keydown',{cancelable:true});Object.defineProperty(escape,'key',{value:'Escape'});doc.dispatchEvent(escape);
+  assert.equal(escape.defaultPrevented,true);assert.equal(bubble.hidden,true);
+  doc.activeElement=control;control.dispatchEvent(new Event('focusin'));assert.equal(bubble.hidden,false);
+  help.destroy();control.dispatchEvent(new Event('focusin'));assert.equal(bubble.isConnected,false);assert.equal(actions,0);
+});
+test('all persisted fields and test actions have specific help',()=>{
+  for(const [section,values] of Object.entries(DEFAULT_CONFIG)) {
+    if(typeof values==='boolean'){assert.ok(fieldHelp(section).length>80);continue;}
+    for(const key of Object.keys(values)) assert.ok(fieldHelp(`${section}.${key}`).includes('Saved in this browser'));
+  }
+  for(const key of Object.keys(ACTION_HELP))assert.ok(actionHelp(key).length>60);
+  assert.match(actionHelp('PREVIEW REWARDED'),/safety history/);
+});
+test('summary separates current policy, active preparation and historical result',async()=>{
+  const h=harness(); assert.equal(h.service.describe('interstitial',true).Current,'WAITING');
+  h.advance(180);h.service.setGameState('playing');h.advance(180);
+  assert.equal(h.service.describe('interstitial',true).Current,'ELIGIBLE');
+  await h.request('interstitial',{safeEvent:'run-ended'});
+  const summary=h.service.describe('interstitial',true);
+  assert.equal(summary.Current,'WAITING');assert.equal(summary['Last result'],'COMPLETED');assert.equal(summary['Active-play wait seconds'],180);assert.equal(summary['Cooldown remaining seconds'],180);
+  h.service.lastResults.rewarded={result:'closed',reason:'player-skip'};assert.equal(h.service.describe('rewarded',true)['Last result'],'SKIPPED');
+  h.service.lastResults.rewarded={result:'closed',reason:'qa-abort'};assert.equal(h.service.describe('rewarded',true)['Last result'],'CLOSED/CANCELLED');
+  assert.equal('Completed' in h.service.describe('banner',true),false);
+  h.service.clearStats();assert.equal(h.service.describe('interstitial',true)['Last result'],'NONE');assert.equal(h.service.interstitialCount,1);
+});
+test('timing shortcuts and Force keep documented independent boundaries',async()=>{
+  const h=harness();h.service.setGameState('playing');h.advance(12);h.service.interstitialCooldownAt=0;
+  h.service.devAction('eligible');assert.equal(h.service.nextEligibleAt,12);assert.equal(h.service.interstitialCooldownAt,0);
+  h.service.devAction('timer');assert.equal(h.service.nextEligibleAt,192);assert.equal(h.service.activeSeconds,12);
+  h.service.devAction('cooldown');assert.equal(h.service.interstitialCooldownAt,null);assert.equal(h.service.nextEligibleAt,192);
+  h.service.config.interstitial.enabled=false;h.service.config.interstitial.sessionLimitEnabled=true;h.service.config.interstitial.maxPerSession=0;
+  const force=()=>h.service.request({requestId:`force-${++sequence}`,gameId:'test-game',placementId:'interstitial',adType:'interstitial'},true);
+  assert.equal((await force()).result,'completed');h.service.placements.get('interstitial').enabled=false;assert.equal((await force()).reason,'disabled');
+});
+test('unlimited policy crosses both previous cap boundaries; explicit finite limits retain history', async () => {
+  const h = harness(); h.service.setGameState('playing');
+  const p = ORBIT_PLACEMENTS.find(p => p.id === 'orbit.play-interstitial');
+  h.service.register({ ...p, id: 'interstitial', gameId: 'test-game' });
+  assert.equal(h.service.config.interstitial.sessionLimitEnabled, false);
+  for (let i=0; i<105; i++) { h.advance(180); assert.equal((await h.request('interstitial', {safeEvent:'play-requested'})).result, 'completed'); }
+  const placement=h.service.placements.get('interstitial');
+  h.advance(180); h.service.config.interstitial.sessionLimitEnabled=true;
+  assert.equal((await h.request('interstitial',{safeEvent:'play-requested'})).reason,'session-cap');
+  h.service.config.interstitial.sessionLimitEnabled=false;
+  h.service.tunePlacement('interstitial',{sessionLimitEnabled:true,maxPerSession:0});
+  assert.equal((await h.request('interstitial',{safeEvent:'play-requested'})).reason,'placement-cap');
+  h.service.clearStats(); assert.equal(h.service.interstitialCount,105);
+  h.service.tunePlacement('interstitial',{sessionLimitEnabled:false});
+  assert.equal((await h.request('interstitial',{safeEvent:'play-requested'})).result,'completed');
+});
+test('legacy numeric caps ask for a choice while preserving unrelated settings', () => {
+  const saved={interstitial:{maxPerSession:7,firstSeconds:42},mock:{durationMs:7000},courtesy:{mascot:false}};
+  const before=JSON.stringify(saved); const loaded=loadDevSettings(saved);
+  assert.equal(loaded.needsChoice,true);assert.equal(loaded.config.interstitial.sessionLimitEnabled,true);
+  assert.equal(loaded.config.interstitial.maxPerSession,7);assert.equal(loaded.config.mock.durationMs,7000);
+  loaded.config.interstitial.sessionLimitEnabled=false;
+  assert.equal(loadDevSettings(JSON.parse(JSON.stringify(loaded.config))).needsChoice,false);
+  assert.equal(JSON.stringify(saved),before);assert.equal(loadDevSettings(null).config.interstitial.sessionLimitEnabled,false);
+});
 test('banner integration is outside iframe and after the player action bar', async () => {
   const source = await readFile(new URL('../src/main.ts', import.meta.url), 'utf8');
   const iframeEnd = source.indexOf('</iframe>');
@@ -97,7 +183,7 @@ test('interstitial requires time and registered semantic event', async () => {
   assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).result, 'completed');
 });
 test('interstitial interval, cooldown, and session cap work independently', async () => {
-  const h = harness(); h.service.config.interstitial.maxPerSession = 1;
+  const h = harness(); h.service.config.interstitial.sessionLimitEnabled = true; h.service.config.interstitial.maxPerSession = 1;
   h.service.devAction('eligible');
   await h.request('interstitial', { safeEvent: 'run-ended' });
   h.service.devAction('eligible');

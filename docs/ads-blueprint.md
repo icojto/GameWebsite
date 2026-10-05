@@ -17,7 +17,7 @@ Mock presentation targets the game viewport. This does **not** assume a future r
 ## Service rules
 
 - Startup is supported but fresh DEV configuration defaults **OFF**. Once/session and courtesy remain available. Migrating `odesos.dev.ads.v1` to `odesos.dev.ads.v1.1` preserves compatible values but forces startup OFF once, so the architecture correction never unexpectedly enables it.
-- Interstitial defaults remain 180 seconds first eligibility, 180 interval, 180 cooldown, maximum three shown/session. Time only creates eligibility; a registered semantic safe event creates the opportunity.
+- Interstitial defaults remain 180 seconds first eligibility, 180 interval and 180 cooldown, with Unlimited session frequency. Explicit `sessionLimitEnabled` gates numeric caps globally and on interstitial placements. Zero with the limit enabled blocks. Time only creates eligibility; a registered semantic safe event creates the opportunity.
 - Active time counts only current game + `playing` + visible document + no active fullscreen lifecycle.
 - Rewarded requires explicit player opt-in and a registered placement. Only an actually shown `completed` result qualifies. The game applies any reward. Placement enabled/cooldown/session caps are supported. A placement may also declare `maxPerRun`; when it does, the game must supply a validated `runId`, and the website enforces that run-specific cap without interpreting gameplay state.
 - A shown rewarded ad resets/suppresses immediate interstitial cooldown by default.
@@ -107,11 +107,21 @@ The wire `gameId` is **`orbit-break`**, the established host's catalog slug, not
 | Placement | Type | Enabled | Safe event | Cooldown | Session cap | Run cap |
 | --- | --- | --- | --- | --- | --- | --- |
 | `orbit.startup` | startup | true | none | 0s | 1 | none |
-| `orbit.play-interstitial` | interstitial | true | `play-requested` | 0s | 100 | none |
-| `orbit.restart-interstitial` | interstitial | true | `restart-requested` | 0s | 100 | none |
+| `orbit.play-interstitial` | interstitial | true | `play-requested` | 0s | Unlimited | none |
+| `orbit.restart-interstitial` | interstitial | true | `restart-requested` | 0s | Unlimited | none |
 | `orbit.revive` | rewarded | true | explicit opt-in | 0s | 100 | 1 shown attempt |
 
-Placement caps do not replace global caps. Interstitial remains 180/180/180 seconds, three/session; rewarded remains ten/session; global startup stays OFF by default. RESET STARTUP clears its global requested flag, not the placement's shown cap. For repeated startup QA reload the page or explicitly tune its DEV placement cap.
+Placement caps do not replace global caps. Interstitial remains 180/180/180 seconds, Unlimited/session; rewarded remains ten/session; global startup stays OFF by default. RESET STARTUP clears its global requested flag, not the placement's shown cap. For repeated startup QA reload the page or explicitly tune its DEV placement cap.
+
+## Patch 03.1 corrections
+
+Fresh/reset global settings and both real Orbit/generic DEV interstitial placements are Unlimited. Explicit finite caps retain actual shown history across toggles and Clear Stats. Legacy numeric global settings without the new flag retain their limit until a non-modal choice: **Use new default** / **Keep my existing limit**. Only the cap choice changes; timing/courtesy/mock preferences and game saves are untouched. Global settings persist in `odesos.dev.ads.v1.1`; placement tuning remains page-session-only. The existing 2,000-request/replay safety budget and 200-event ring remain bounded safeguards, not configurable ad-frequency caps; a sufficiently long QA page session may need reload.
+
+Startup/interstitial mock views have no player close/skip control and complete automatically. Rewarded alone offers **Skip — no reward**. Confirmed rewarded player skip sends optional `reason:'player-skip'` only on a shown closed lifecycle; injected close uses `external-close`. Other cancellation remains CLOSED/CANCELLED, never inferred SKIPPED. Exactly-once reward/receipt/run-cap handling is unchanged. QA abort, watchdog, master disable and navigation still recover safely. These mock rules make no assumption about a future SDK's mandatory controls.
+
+The panel separates Current/Reason from Last result/Last reason, shown/completed observations, active wait/cooldown and placement restrictions. Renderer connected is not prepared READY. Banner uses visibility/shown observations, not completion. DEV previews never count as game reward acknowledgments. Grouped readout help avoids making every changing statistic a keyboard stop; all website editable controls/actions and Orbit Ads Integration entries have specific help. The small shared help utility mounts independently inside each owner document, with delayed hover, focus, tap pin, Escape-first dismissal and viewport clamping. No cross-iframe help DOM is used.
+
+See [controls reference](ads-controls-reference.md) for exact shortcut/bypass semantics and [current QA](ads-qa.md). Prompt 4 must inherit explicit unlimited-cap support, these status/help conventions, non-skippable startup/interstitial mocks and rewarded skip-without-reward. Reactor integration is not implemented here.
 
 `bridge-ready` and additive `ad-capabilities` carry `providerMode` (`null|mock|real`), `fullscreenAvailable`, `rewardedAvailable`, and `startupDue`. Capability changes follow host configuration and results; DEV preview placements never create gameplay availability. Capabilities are UI hints, not eligibility authorization: the host rechecks every request. A `bridge-hello` after bind/reload requests a fresh handshake. In DEV Orbit advertises presentation v1 only after its view is mounted. In production the mock view is removed and the ordinary ready handshake omits presentationVersion rather than advertising a nonexistent renderer; Null cannot request one. Unsupported/malformed messages fail closed.
 
