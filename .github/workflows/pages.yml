@@ -29,6 +29,9 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run test:portal
+      - run: npm run test:ads
+      - run: npm run test:orbit
+      - run: npm run test:reactor
       - run: npm run build
       - run: npm run verify:pages
       - uses: actions/configure-pages@v5
