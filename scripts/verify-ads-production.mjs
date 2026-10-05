@@ -9,6 +9,7 @@ const forbidden = [
   'odesos-mock-banner', 'odesos.dev.ads.v1', 'odesos.dev.ads.v1.1', 'Sorry for the quick pause!',
   'Odesos ad courtesy preview', 'Advertisement simulation', 'ad-mascot-bob', 'MockAdAdapter',
   'ad-chibi', 'ad-mock', 'Ads Integration', 'odesos-chibi-mascot.svg',
+  'ad-context-help', 'ad-help-button', 'STATUS SUMMARY', 'Skip — no reward',
   'pagead2.googlesyndication.com', 'imasdk.googleapis.com', 'doubleclick.net',
 ];
 let inspected = 0;

@@ -11,7 +11,7 @@ export type GameAdMessage = Base & (
   { type: 'game-event'; event: string; placementId: string } |
   ({ type: 'ad-request' } & Omit<AdRequest, 'requestId' | 'gameId'>) |
   { type: 'reward-granted'; adRequestId: string; placementId: string } |
-  { type: PresentationEvent; placementId: string }
+  { type: PresentationEvent; placementId: string; reason?: 'player-skip' | 'external-close' }
 );
 const id = (value: unknown): value is string => typeof value === 'string' && /^[a-z0-9][a-z0-9._:-]{0,79}$/i.test(value);
 /** No wildcard origins, unknown fields, coercion, payload blobs, or DOM access. */
@@ -42,7 +42,8 @@ export function parseAdMessage(data: unknown, gameId: string): GameAdMessage | n
     case 'ad-presentation-ready': case 'ad-courtesy-started': case 'ad-presentation-shown':
     case 'ad-presentation-completed': case 'ad-presentation-closed': case 'ad-presentation-failed':
       if (!id(d.placementId)) return null;
-      extra = ['placementId']; break;
+      if (d.reason !== undefined && (d.type !== 'ad-presentation-closed' || !['player-skip', 'external-close'].includes(String(d.reason)) || typeof d.reason !== 'string')) return null;
+      extra = ['placementId', 'reason']; break;
     default: return null;
   }
   if (Object.keys(d).some((key) => !['protocol', 'version', 'type', 'requestId', 'gameId', ...extra].includes(key))) return null;

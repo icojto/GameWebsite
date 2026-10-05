@@ -1,7 +1,7 @@
 import type { AdConfig, AdRequest, AdResult, ProviderOutcome } from './model.ts';
 
 export type PresentationEvent = 'ad-presentation-ready' | 'ad-courtesy-started' | 'ad-presentation-shown' | 'ad-presentation-completed' | 'ad-presentation-closed' | 'ad-presentation-failed';
-export type PresentationMessage = { type: PresentationEvent; requestId: string; gameId: string; placementId: string };
+export type PresentationMessage = { type: PresentationEvent; requestId: string; gameId: string; placementId: string; reason?: 'player-skip' | 'external-close' };
 type Pending = { request: AdRequest; finish: (value: ProviderOutcome) => void; shown: () => void; timer: ReturnType<typeof setTimeout>; stage: 'requested' | 'ready' | 'courtesy' | 'shown'; arm: () => void };
 
 /** Routes DEV mock visuals into the bound game iframe. It never renders website UI. */
@@ -58,7 +58,10 @@ export class GamePresentationBroker {
     if (message.type === 'ad-courtesy-started' && pending.stage === 'ready') { pending.stage = 'courtesy'; this.observe('courtesy-started', request); return true; }
     if (message.type === 'ad-presentation-shown' && (pending.stage === 'ready' || pending.stage === 'courtesy')) { pending.stage = 'shown'; pending.shown(); this.observe('ad-visual-started', request); return true; }
     if (message.type === 'ad-presentation-completed' && pending.stage === 'shown') { this.observe('presentation-completed', request, 'completed'); pending.finish({ result: 'completed' }); return true; }
-    if (message.type === 'ad-presentation-closed') { this.observe('presentation-closed', request, 'closed'); pending.finish({ result: 'closed' }); return true; }
+    if (message.type === 'ad-presentation-closed') {
+      if (message.reason === 'player-skip' && (request.adType !== 'rewarded' || pending.stage !== 'shown')) return false;
+      this.observe('presentation-closed', request, 'closed', message.reason); pending.finish({ result: 'closed', ...(message.reason ? { reason: message.reason } : {}) }); return true;
+    }
     if (message.type === 'ad-presentation-failed') { this.observe('presentation-failed', request, 'failed', 'game-presentation-failed'); pending.finish({ result: 'failed', reason: 'game-presentation-failed' }); return true; }
     return false;
   }

@@ -1,9 +1,27 @@
-# Odesos Ads v1.1 / Orbit Monetization v1 QA
+# Odesos Ads / Orbit Patch 03.1 QA
+
+## Current Patch 03.1 procedure
+
+Use a test browser profile and the full portal, not standalone Orbit. The historical records below preserve earlier evidence; their old three/session caps and player-close instructions are superseded here.
+
+1. Open `/games/orbit-break/`, then AD DEV or Ctrl+Shift+A. Note the unchanged player rectangle and interactive uncovered page/game areas.
+2. Fresh settings/RESET DEFAULTS show Unlimited. If old numeric settings exist, choose Use new default or Keep my existing limit; confirm other preferences survive. Placement tuning is session-only; global tuning persists.
+3. Satisfy playtime requirement: nothing appears. Clear interstitial cooldown if needed, then actual PLAY/RESTART: eligible interstitial appears. Death alone must not show one. Repeat with finite global/placement caps; enabled zero blocks. Clear Stats must not release safety caps.
+4. Startup ON in a fresh session: PLAY shows startup only, then begins. Startup/interstitial have no close/skip. Escape, outside clicks, Space and Enter must not skip or reach underlying gameplay. Countdown continues the pending transition.
+5. On a fresh run choose revive after death. Skip — no reward grants nothing and consumes the shown attempt. Complete preserves the same run and awards once. QA abort, injected external close, failures and watchdog cancellation never reward and restore input/audio.
+6. Read Current versus Last result through wait/eligibility/preparation/courtesy/show/result. Active wait differs from cooldown; banner has no completion count; generic rewarded preview has no game acknowledgment.
+7. Hover/focus/tap help in every website section and Orbit DEV → Ads Integration. Try disabled controls. Escape first dismisses help without closing the panel/pausing/activating anything. Live counters must not interrupt typing or dismiss help.
+8. Test desktop, 360px portrait and 640×360 landscape, keyboard focus and browser zoom. Reload confirms intended saved global settings, not session-only placement edits.
+9. Build/preview production: no DEV/mock/help UI, no shortcut response, no mock banner or rewarded monetization controls; both games still play.
+
+Executed: check; Ads **47**, Orbit ads **58**, Orbit **11**, portal **4**, Reactor **15** tests (**135 PASS**); build; production scan (32 artifacts); Pages routes/assets; diff whitespace. Pages initially hit sandbox localhost EACCES, then passed with local-network permission.
+
+Browser observations: unchanged iframe rectangle, no overflow at desktop/360×800/640×360, help viewport bounds and Escape precedence, focused numeric edit retained, interstitial ignored Escape/Space/Enter and completed automatically, QA abort restored the game, generic rewarded skip returned no reward, Orbit help stayed local. Physical touch/audio, OS reduced motion, screen reader, zoom, long-session soak and full actual-trigger replays remain human QA (logic tests cover trigger/reward regressions). Existing source-less MutationObserver error remains unattributed; console-clean is NOT VERIFIED.
 
 ## Commands
 
 ```powershell
-cd C:\Users\mlgjm\Desktop\GameTests\GameWebsite-Orbit-Monetization-v1
+cd C:\Users\mlgjm\Desktop\GameWebsite
 npm.cmd ci
 npm.cmd run check
 npm.cmd run test:ads
@@ -72,7 +90,7 @@ These are browser viewport overrides, not physical devices. Website vertical scr
 
 Native fullscreen screenshots under viewport override were scaled into the desktop capture; DOM dimensions passed, but visual/native fullscreen behavior remains a human confirmation. Touch-target dimensions and pointer handlers were reviewed; **physical touch, audio listening, screen-reader behavior, OS reduced motion, background-tab transitions and long-session soak are NOT VERIFIED**. Reduced-motion CSS and animation-independent timer tests pass. The browser continues to report the prior source-less `MutationObserver.observe` TypeError in both DEV and production; no repository MutationObserver code was found, but provenance is unconfirmed, so **console-clean status is NOT VERIFIED**.
 
-## Exact Prompt 3 human procedure
+## Historical Prompt 3 human procedure (superseded by current steps above)
 
 Use a test browser profile. Commands above run from this isolated checkout; do not switch or merge the original website checkout. In host Ad Dev click RESET DEFAULTS, then reload for fresh safety caps. Number inputs commit on Tab/blur. Open Orbit DEV with its button or Ctrl+Shift+D; host Ad Dev uses Ctrl+Shift+A and stays non-modal.
 

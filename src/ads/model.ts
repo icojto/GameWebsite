@@ -7,7 +7,7 @@ export interface ProviderOutcome { result: AdResult; reason?: string }
 export const BANNER_SLOTS = { primary: 'game-page-primary' } as const;
 export interface Placement {
   id: string; gameId: string; adType: FullscreenType; enabled: boolean;
-  cooldownSeconds: number; maxPerSession: number; maxPerRun?: number; safeEvents?: string[];
+  cooldownSeconds: number; maxPerSession: number; sessionLimitEnabled?: boolean; maxPerRun?: number; safeEvents?: string[];
 }
 export interface AdRequest {
   requestId: string; gameId: string; placementId: string; adType: FullscreenType;
@@ -27,7 +27,7 @@ export interface AdProvider {
 export const DEFAULT_CONFIG = {
   master: true,
   startup: { enabled: false, oncePerSession: true, courtesy: true },
-  interstitial: { enabled: true, firstSeconds: 180, intervalSeconds: 180, cooldownSeconds: 180, maxPerSession: 3, resetAfterRewarded: true },
+  interstitial: { enabled: true, firstSeconds: 180, intervalSeconds: 180, cooldownSeconds: 180, sessionLimitEnabled: false, maxPerSession: 3, resetAfterRewarded: true },
   rewarded: { enabled: true, cooldownSeconds: 0, maxPerSession: 10, courtesy: true },
   banner: { enabled: false },
   courtesy: { enabled: true, durationMs: 1000, startup: true, interstitial: true, rewarded: true, mascot: true, animation: true, preset: 'friendly' },
@@ -35,6 +35,9 @@ export const DEFAULT_CONFIG = {
 };
 export type AdConfig = typeof DEFAULT_CONFIG;
 const outcomes = ['completed', 'closed', 'failed', 'no_fill', 'timeout', 'unavailable'];
+export function configBounds(section: string,key: string): readonly [number,number] {
+  return section==='courtesy'?[400,2500]:section==='mock'?key==='loadingMs'?[0,5000]:[500,15000]:key==='maxPerSession'?[0,100]:[0,86400];
+}
 /** Only known config keys and bounded primitives survive local storage. */
 export function normalizeConfig(input: unknown): AdConfig {
   const clean = structuredClone(DEFAULT_CONFIG);
@@ -49,9 +52,7 @@ export function normalizeConfig(input: unknown): AdConfig {
       const value = (candidate as Record<string, unknown>)[key];
       if (typeof target[key] === 'boolean' && typeof value === 'boolean') target[key] = value;
       if (typeof target[key] === 'number' && typeof value === 'number' && Number.isFinite(value)) {
-        const [min, max] = section === 'courtesy' ? [400, 2500]
-          : section === 'mock' ? key === 'loadingMs' ? [0, 5000] : [500, 15000]
-          : key === 'maxPerSession' ? [0, 100] : [0, 86400];
+        const [min, max] = configBounds(section,key);
         target[key] = Math.round(Math.max(min, Math.min(max, value)));
       }
     }

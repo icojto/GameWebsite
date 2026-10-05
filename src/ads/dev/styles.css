@@ -1,4 +1,6 @@
 .odesos-ad-dev-trigger { position: fixed; z-index: 90; right: 1rem; bottom: 1rem; border: 2px solid #64e4ef; border-radius: 1rem; min-height: 44px; padding: .5rem 1rem; color: #fff; background: #192338; font-weight: 800; cursor: pointer; }
+.ad-dev-launcher{position:fixed;z-index:90;right:1rem;bottom:1rem;display:flex;align-items:center;gap:4px}.ad-dev-launcher .odesos-ad-dev-trigger{position:static}
+.odesos-ad-dev .ad-help-row{margin:.35rem 0}.odesos-ad-dev .ad-help-row .ad-dev-field{width:100%}.odesos-ad-dev .ad-help-row button.ad-help-button{padding:4px;min-width:36px}.odesos-ad-dev h3{font-size:.9rem;margin:.7rem 0 0}.odesos-ad-dev fieldset{min-width:0}.odesos-ad-dev legend{overflow-wrap:anywhere;max-width:100%}
 .odesos-ad-dev { position: fixed; z-index: 89; inset: 0 0 0 auto; box-sizing: border-box; width: min(460px, 100vw); height: 100dvh; padding: 1rem; border: 1px solid #566487; color: #eff4ff; background: #10192b; box-shadow: -10px 0 50px #0008; overflow: hidden; font: 14px/1.5 system-ui, sans-serif; }
 .odesos-ad-dev:not([hidden]) { display: flex; flex-direction: column; gap: .5rem; }
 .odesos-ad-dev header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }

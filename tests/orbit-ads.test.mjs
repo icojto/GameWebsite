@@ -26,6 +26,21 @@ const envelope = { protocol:'odesos-ads', version:1, gameId:GAME_ID };
 const capabilities = { providerMode:'mock', fullscreenAvailable:true, rewardedAvailable:true, startupDue:false };
 const presentation = { ...envelope, type:'ad-presentation-request', requestId:'req-one', placementId:'orbit.revive', adType:'rewarded',
   courtesy:{enabled:true,preset:'friendly',durationMs:1000,mascot:true,animation:true}, mock:{durationMs:5000,outcome:'completed'}, timeoutMs:11000 };
+for(const adType of ['startup','interstitial','rewarded']) test(`${adType} player skip policy and terminal race`,()=>{
+  const time=fakeClock(), events=[];let skip;
+  const player=new GameAdPlayer({courtesy(){},showing(_p,close){skip=close;},countdown(){},clear(){},destroy(){}},time);
+  player.play({...presentation,adType,courtesy:{...presentation.courtesy,enabled:false}},(event,reason)=>events.push({event,reason}));
+  skip();skip();time.advance(5001);skip();
+  const terminal=events.filter(e=>['ad-presentation-completed','ad-presentation-closed'].includes(e.event));
+  assert.equal(terminal.length,1);assert.equal(terminal[0].event,adType==='rewarded'?'ad-presentation-closed':'ad-presentation-completed');
+  assert.equal(terminal[0].reason,adType==='rewarded'?'player-skip':undefined);assert.equal(time.size,0);
+});
+test('developer external close still settles a non-skippable interstitial',()=>{
+  const time=fakeClock(),events=[];
+  const player=new GameAdPlayer({courtesy(){},showing(){},countdown(){},clear(){},destroy(){}},time);
+  player.play({...presentation,adType:'interstitial',courtesy:{...presentation.courtesy,enabled:false},mock:{durationMs:500,outcome:'closed'}},(event,reason)=>events.push({event,reason}));
+  time.advance(501);assert.deepEqual(events.at(-1),{event:'ad-presentation-closed',reason:'external-close'});
+});
 function clientHarness() {
   const time = fakeClock(), sent=[], suspended=[], source={}, rendered=[];
   let emitter;
@@ -182,7 +197,7 @@ test('timer eligibility never shows, non-playing time excluded, PLAY safe event 
 for(const reason of ['not-enough-active-play','cooldown','session-cap']) test(`PLAY cannot bypass website ${reason}`,async()=>{
   const h=serviceHarness();h.service.config.interstitial.firstSeconds=0;h.service.nextEligibleAt=reason==='not-enough-active-play'?180:0;
   if(reason==='cooldown')h.service.interstitialCooldownAt=0;
-  if(reason==='session-cap')h.service.interstitialCount=3;
+  if(reason==='session-cap'){h.service.config.interstitial.sessionLimitEnabled=true;h.service.interstitialCount=3;}
   assert.equal((await h.request('orbit.play-interstitial',{safeEvent:'play-requested'})).reason,reason);assert.equal(h.calls.length,0);
 });
 test('host shown-run cap survives stats reset and rejects missing run context',async()=>{

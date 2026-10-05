@@ -7,7 +7,7 @@ interface Pending extends Identity {
 interface Options {
   origin: string; source: unknown; send(message: Record<string, unknown>): void;
   suspend(value: boolean): void; changed(): void;
-  present(payload: Presentation, emit: (event: Lifecycle) => void): boolean;
+  present(payload: Presentation, emit: (event: Lifecycle, reason?: 'player-skip' | 'external-close') => void): boolean;
   cancelPresentation(): void;
   presentationReady?(): boolean;
   time?: Clock; requestTimeoutMs?: number;
@@ -76,11 +76,11 @@ export class OrbitAdClient {
       current.stage = 'presenting';
       this.time.clear(current.timer);
       current.timer = this.time.set(() => this.timeout(), (message.timeoutMs ?? message.mock.durationMs + message.courtesy.durationMs + 5000) + 2000);
-      if (!this.options.present(message, (type) => {
+      if (!this.options.present(message, (type, reason) => {
         if (this.pending !== current || current.stage === 'terminal') return;
         if (type === 'ad-presentation-shown') current.shown = true;
         if (['ad-presentation-completed', 'ad-presentation-closed', 'ad-presentation-failed'].includes(type)) current.stage = 'terminal';
-        this.send(type, { requestId: current.requestId, placementId: current.placementId });
+        this.send(type, { requestId: current.requestId, placementId: current.placementId, ...(reason ? { reason } : {}) });
       })) { this.send('ad-presentation-failed', { requestId: current.requestId, placementId: current.placementId }); }
     } else if (message.type === 'ad-shown' && ['will-show', 'presenting', 'terminal'].includes(current.stage)) current.shown = true;
     else if (message.type === 'ad-presentation-cancel') {

@@ -23,6 +23,7 @@ export class AdService {
   bannerHost: HTMLElement | null = null;
   lastError: string | null = null;
   lastRequest: AdRequest | null = null;
+  lastResults: Partial<Record<AdType, { result: AdResult; reason?: string }>> = {};
   lastFullscreen: number | null = null;
   interstitialCooldownAt: number | null = null;
   lastInterstitial: number | null = null;
@@ -50,10 +51,37 @@ export class AdService {
     this.nextEligibleAt = this.config.interstitial.firstSeconds;
   }
   get busy(): boolean { return this.active !== null; }
+  /** Policy/readiness diagnostics, separate from historical observations. */
+  describe(type: AdType, rendererReady: boolean): Record<string,string | number> {
+    if(type==='banner') return { Current: !this.providerReady(type)?'UNAVAILABLE':this.bannerVisible?'VISIBLE':'HIDDEN', Reason:'Website slot; local display observations only', Shown:this.stats.banner.shown };
+    const last=this.lastResults[type];
+    const lastLabel=last?.result==='closed' ? last.reason==='player-skip'?'SKIPPED':'CLOSED/CANCELLED' : last?.result.toUpperCase().replace('_',' ') ?? 'NONE';
+    let current='WAITING',reason='Awaiting explicit player request';
+    const cfg=this.config[type];
+    if(this.busy && this.lastRequest?.adType===type){current=this.state.toUpperCase();reason='Active request; wait for lifecycle result';}
+    else if(!this.config.master || !cfg.enabled){current='OFF';reason='Disabled by master or type switch';}
+    else if(!this.gameId || !this.providerReady(type) || !rendererReady){current='UNAVAILABLE';reason=!this.gameId?'Open a game page':!rendererReady?'Game renderer unavailable':'Provider unavailable';}
+    else if(this.busy){reason='another-ad-active';}
+    else if(!this.visible){reason='document-hidden';}
+    else if(type==='interstitial') {const check=this.interstitialEligibility();current=check.eligible?'ELIGIBLE':'WAITING';reason=check.reason;}
+    else if(type==='startup') {reason=this.config.startup.oncePerSession && this.startup.requested?'Used this session / waiting for next session':'Awaiting applicable start request';}
+    else if(this.rewardedCount>=this.config.rewarded.maxPerSession) reason='session-cap';
+    else if(this.lastRewarded!==null && (this.secondsSince(this.lastRewarded)??0)<this.config.rewarded.cooldownSeconds) reason='rewarded-cooldown';
+    const result:Record<string,string|number>={Current:current,Reason:reason,'Last result':lastLabel,'Last reason':last?.reason??'none',Shown:this.stats[type].shown,Completed:this.stats[type].completed};
+    const placements=[...this.placements.values()].filter(p=>p.gameId===this.gameId && p.adType===type && !p.id.startsWith('dev-'));
+    result['Placement restrictions']=placements.map(p=>{
+      const history=this.placementHistory.get(p.id);
+      const blocked=!p.enabled?'disabled':p.sessionLimitEnabled!==false && (history?.shown??0)>=p.maxPerSession?'placement-cap':history && (this.secondsSince(history.at)??0)<p.cooldownSeconds?'placement-cooldown':'';
+      return blocked?`${p.id}: ${blocked}`:'';
+    }).filter(Boolean).join('; ') || 'Checked on request (including run context)';
+    if(type==='interstitial') {result['Active-play wait seconds']=Math.ceil(Math.max(0,this.nextEligibleAt-this.activeSeconds));result['Cooldown remaining seconds']=this.interstitialCooldownAt===null?0:Math.ceil(Math.max(0,this.config.interstitial.cooldownSeconds-(this.secondsSince(this.interstitialCooldownAt)??0)));result['Session cap']=this.config.interstitial.sessionLimitEnabled?this.config.interstitial.maxPerSession:'Unlimited';}
+    if(type==='rewarded') result['Rewards acknowledged']=this.rewardAcknowledgments;
+    return result;
+  }
   capabilities(gameId: string): { providerMode: 'mock' | 'null' | 'real'; fullscreenAvailable: boolean; rewardedAvailable: boolean; startupDue: boolean } {
     const mode = this.provider.name === 'MOCK' ? 'mock' : this.provider.name === 'NULL' ? 'null' : 'real';
     const available = this.config.master && mode !== 'null';
-    const placements = [...this.placements.values()].filter((p) => p.gameId === gameId && !p.id.startsWith('dev-') && p.enabled && p.maxPerRun !== 0 && p.maxPerSession > (this.placementHistory.get(p.id)?.shown ?? 0));
+    const placements = [...this.placements.values()].filter((p) => p.gameId === gameId && !p.id.startsWith('dev-') && p.enabled && p.maxPerRun !== 0 && (p.sessionLimitEnabled === false || p.maxPerSession > (this.placementHistory.get(p.id)?.shown ?? 0)));
     return {
       providerMode: mode,
       fullscreenAvailable: available && (this.providerReady('startup') || this.providerReady('interstitial')),
@@ -61,11 +89,12 @@ export class AdService {
       startupDue: available && this.config.startup.enabled && (!this.config.startup.oncePerSession || !this.startup.requested) && this.providerReady('startup') && placements.some((p) => p.adType === 'startup'),
     };
   }
-  tunePlacement(id: string, values: Partial<Pick<Placement, 'enabled' | 'cooldownSeconds' | 'maxPerSession' | 'maxPerRun'>>): void {
+  tunePlacement(id: string, values: Partial<Pick<Placement, 'enabled' | 'cooldownSeconds' | 'maxPerSession' | 'maxPerRun' | 'sessionLimitEnabled'>>): void {
     if (!this.options.development || this.busy) return;
     const placement = this.placements.get(id);
     if (!placement) return;
     if (typeof values.enabled === 'boolean') placement.enabled = values.enabled;
+    if (placement.adType === 'interstitial' && typeof values.sessionLimitEnabled === 'boolean') placement.sessionLimitEnabled = values.sessionLimitEnabled;
     for (const key of ['cooldownSeconds', 'maxPerSession', 'maxPerRun'] as const) {
       const value = values[key];
       if (typeof value === 'number' && Number.isFinite(value) && (key !== 'maxPerRun' || placement.maxPerRun !== undefined)) {
@@ -125,7 +154,7 @@ export class AdService {
     const cfg = this.config.interstitial;
     const remaining = Math.max(0, this.nextEligibleAt - this.activeSeconds);
     const reason = !this.config.master || !cfg.enabled ? 'disabled' : this.busy ? 'another-ad-active'
-      : this.interstitialCount >= cfg.maxPerSession ? 'session-cap'
+      : cfg.sessionLimitEnabled && this.interstitialCount >= cfg.maxPerSession ? 'session-cap'
       : remaining > 0 ? 'not-enough-active-play'
       : this.interstitialCooldownAt !== null && (this.secondsSince(this.interstitialCooldownAt) ?? 0) < cfg.cooldownSeconds ? 'cooldown'
       : !this.providerReady('interstitial') ? 'provider-unavailable'
@@ -141,6 +170,7 @@ export class AdService {
     }
   }
   private finish(request: AdRequest, result: AdResult, reason?: string, shown = false): AdResponse {
+    this.lastResults[request.adType] = { result, reason };
     this.count(request.adType, result, request.placementId);
     if (result === 'blocked' && request.adType === 'interstitial') this.blockedReasons[reason ?? 'unknown'] = (this.blockedReasons[reason ?? 'unknown'] ?? 0) + 1;
     if (result === 'failed' || result === 'timeout') this.lastError = reason ?? result;
@@ -162,7 +192,7 @@ export class AdService {
       : !this.config.master || !placement.enabled ? 'disabled'
       : this.busy ? 'another-ad-active'
       : !this.visible ? 'document-hidden'
-      : (history?.shown ?? 0) >= placement.maxPerSession ? 'placement-cap'
+      : placement.sessionLimitEnabled !== false && (history?.shown ?? 0) >= placement.maxPerSession ? 'placement-cap'
       : placement.maxPerRun !== undefined && !request.runId ? 'run-context-required'
       : placement.maxPerRun !== undefined && (this.placementRunHistory.get(runKey) ?? 0) >= placement.maxPerRun ? 'placement-run-cap'
       : history && (this.secondsSince(history.at) ?? 0) < placement.cooldownSeconds ? 'placement-cooldown' : '';
@@ -272,6 +302,7 @@ export class AdService {
     this.emit(`dev-reset-${action}`);
   }
   clearStats(): void {
+    this.lastResults = {};
     for (const type of Object.keys(this.stats) as AdType[]) this.stats[type] = emptyCounters();
     this.placementStats.clear(); this.events = []; this.blockedReasons = {}; this.eligibleEvents = 0; this.rewardAcknowledgments = 0;
     this.emit('stats-cleared', undefined, undefined, 'Eligibility, caps and reward receipts are retained');
