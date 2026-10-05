@@ -30,6 +30,9 @@ Open the local URL printed by Vite, normally <http://127.0.0.1:5173/>. The dev c
 cd GameWebsite
 npm.cmd run check
 npm.cmd run test:portal
+npm.cmd run test:ads
+npm.cmd run test:orbit
+npm.cmd run test:reactor
 npm.cmd run build
 npm.cmd run verify:pages
 npm.cmd run preview
@@ -80,3 +83,11 @@ The verifier serves `dist` locally from `/` and checks public routes and embeds,
 The workflow at `.github/workflows/pages.yml` runs only for pushes to `main`; it installs with `npm ci`, checks, tests, builds, verifies, uploads `dist`, and deploys to the `github-pages` environment. GitHub Pages must remain configured with **GitHub Actions** as its source and `odesosgames.com` as its custom domain in repository Settings → Pages. For a workflow-published site, GitHub ignores a repository `CNAME` file; the Pages setting is authoritative. To publish a fix, review and merge its PR into `main`, confirm the **Deploy GitHub Pages** workflow succeeds in the Actions tab, and open the site URL above. The repository and Pages site are currently public; verify that publication is intended before merging.
 
 The Contact page does not publish a contact address because no approved public channel is in this repository. A human must supply one before a later compliance submission. No legal policies, consent system, ads, accounts, analytics, or backend are implemented by this website pass. See [website release checklist](docs/website-release-checklist.md) for the human QA gate.
+
+## Mock-only monetization blueprint
+
+The shared website ad service has no real provider and neither game is connected to ads yet. Production always uses the unavailable Null adapter: no ad panel, mock overlays, courtesy screen or mock banners. The production build runs an artifact guard automatically; rerun it with `npm.cmd run verify:ads-production`.
+
+For local mock QA, run `npm.cmd run dev`, open `/games/orbit-break/` or `/games/reactor-stack/`, and press **Ctrl+Shift+A** (or use **AD DEV**). This website-level panel is outside the iframe; game Dev Panels remain separate. Tuning persists locally, while statistics are only for this page session. `npm.cmd run preview` is production behavior and deliberately has no Ad Dev Panel.
+
+See [architecture and bridge contract](docs/ads-blueprint.md), [precise human QA checklist](docs/ads-qa.md), and [implementation patch log](docs/patches/2026-10-04-odesos-monetization-blueprint-v1.md). PROVIDER COMPLIANCE NOT YET REVIEWED. Orbit monetization is deferred to Prompt 3; Reactor monetization to Prompt 4.

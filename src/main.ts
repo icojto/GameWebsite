@@ -2,10 +2,12 @@ import './styles.css';
 import { publicGameCatalog } from './games/catalog.mjs';
 import { publicPages, siteOrigin, socialImagePath } from './site/pages.mjs';
 import { readThemePreference, siteStorage } from './site/storage.mjs';
+import { createAdRuntime } from './ads/runtime.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Portal root is missing.');
 let disposeGameFrame = () => {};
+const adRuntime = createAdRuntime();
 
 type Theme = 'light' | 'dark';
 type CatalogGame = (typeof publicGameCatalog)[number];
@@ -54,6 +56,7 @@ function renderRoute(manageFocus = false): void {
   else if (path === '/about') renderAbout();
   else if (path === '/contact') renderContact();
   else renderNotFound();
+  adRuntime.attach(game?.slug ?? null, document.querySelector<HTMLIFrameElement>('.game-frame'), document.querySelector<HTMLElement>('[data-ad-slot="game-page-primary"]'));
   syncRouteMetadata(path);
 
   if (manageFocus) {
@@ -211,6 +214,7 @@ function renderGame(game: CatalogGame): void {
             </div>
           </section>
         </section>
+        <aside data-ad-slot="game-page-primary" hidden></aside>
         <section class="game-information" aria-labelledby="game-title">
           <div>
             <p class="eyebrow"><span></span>${escapeHtml(game.eyebrow)}</p>

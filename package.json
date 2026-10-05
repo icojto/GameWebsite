@@ -13,8 +13,11 @@
     "check:games": "node scripts/check-games.mjs",
     "test:orbit": "node --experimental-transform-types --test tests/orbit-v2.test.mjs",
     "test:portal": "node --test tests/portal.test.mjs",
+    "test:ads": "node --experimental-transform-types --test tests/ads.test.mjs",
+    "test:reactor": "node --experimental-transform-types --test games/reactor-stack/tests/game.test.ts",
     "build:games": "node scripts/build-games.mjs",
-    "build": "npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs",
+    "build": "npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs && node scripts/verify-ads-production.mjs",
+    "verify:ads-production": "node scripts/verify-ads-production.mjs",
     "verify:pages": "node scripts/verify-pages.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
