@@ -245,7 +245,7 @@ export class OrbitUI {
     const target = event.target;
     if (!(target instanceof HTMLInputElement) || !target.dataset.audio) return;
     const key = target.dataset.audio;
-    if (key === 'mute') this.audio.settings.mute = target.checked;
+    if (key === 'mute') this.audio.setMuted(target.checked);
     else if (key === 'master' || key === 'music' || key === 'sfx') {
       this.audio.settings[key] = Number(target.value);
       const output = target.nextElementSibling;
