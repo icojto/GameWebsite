@@ -1,0 +1,10 @@
+
+> studio-game-portal@0.1.0 verify:pages
+> node scripts/verify-pages.mjs
+
+Orbit Break: direct page, embed, 2 assets OK
+Reactor Stack: direct page, embed, 2 assets OK
+Last Relay: on-hold source build, 2 embed assets OK
+Station Quartermaster: on-hold source build, 3 embed assets OK
+Signal Below: on-hold source build, 2 embed assets OK
+Public metadata, sitemap, robots, social image, 404, structural smoke, and four Signal Below scene assets OK

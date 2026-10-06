@@ -1,0 +1,25 @@
+
+> studio-game-portal@0.1.0 test:orbit
+> node --experimental-transform-types --test tests/orbit-v2.test.mjs
+
+(node:27024) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy best migrates into versioned profile without losing top score (1.6458ms)
+✔ corrupt profile falls back safely while retaining legacy best (0.2441ms)
+✔ quest claim is manual, replaces one slot, and preserves reward and progress across reload (0.9086ms)
+✔ XP carries overflow to the next level and stops level at 10 (0.2192ms)
+✔ personal scores sort and cap at ten; cosmetic unlocks and equipment persist (0.3861ms)
+✔ run score, pause and difficulty ramp stay within configured limits (0.7032ms)
+✔ formation tiers, disabled entries, and bombardment angular spacing are bounded (0.4729ms)
+✔ collision ends a run, while infinite lives records it and continues (0.1539ms)
+✔ one-action reverse, restart, and single-only opening remain playable (0.219ms)
+✔ all five formation families produce their configured patterns and telegraphs (0.3229ms)
+✔ developer unlock-all and artificial scores are session-only (0.231ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 139.3834

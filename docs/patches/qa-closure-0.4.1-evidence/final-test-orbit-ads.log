@@ -1,0 +1,72 @@
+
+> studio-game-portal@0.1.0 test:orbit-ads
+> node --experimental-transform-types --test tests/orbit-ads.test.mjs
+
+(node:18840) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ startup player skip policy and terminal race (1.4757ms)
+✔ interstitial player skip policy and terminal race (0.1083ms)
+✔ rewarded player skip policy and terminal race (0.0751ms)
+✔ developer external close still settles a non-skippable interstitial (0.5378ms)
+✔ ready handshake advertises presentation v1 and state reports only transitions (2.3629ms)
+✔ host schema rejects malformed presentation payloads, wrong identity and unknown fields (0.2871ms)
+✔ client authenticates origin/source, ignores unsolicited and out-of-order presentation (0.7524ms)
+✔ cancel and game watchdog settle safely without reward (0.2487ms)
+✔ presentation order, courtesy skip, one terminal and cleanup do not depend on animation (0.2353ms)
+✔ preview lifecycle never qualifies a game reward (0.2163ms)
+✔ startup completed starts exactly one run without a second fullscreen opportunity (0.3986ms)
+✔ restart completed finalizes once then uses restart-requested and a fresh run identity (0.195ms)
+✔ startup closed starts exactly one run without a second fullscreen opportunity (0.1186ms)
+✔ restart closed finalizes once then uses restart-requested and a fresh run identity (0.0838ms)
+✔ startup failed starts exactly one run without a second fullscreen opportunity (0.063ms)
+✔ restart failed finalizes once then uses restart-requested and a fresh run identity (0.0737ms)
+✔ startup no_fill starts exactly one run without a second fullscreen opportunity (0.0776ms)
+✔ restart no_fill finalizes once then uses restart-requested and a fresh run identity (0.0674ms)
+✔ startup timeout starts exactly one run without a second fullscreen opportunity (0.0734ms)
+✔ restart timeout finalizes once then uses restart-requested and a fresh run identity (0.0791ms)
+✔ startup unavailable starts exactly one run without a second fullscreen opportunity (0.0516ms)
+✔ restart unavailable finalizes once then uses restart-requested and a fresh run identity (0.0502ms)
+✔ startup OFF uses PLAY semantic opportunity; Null skips ads and still plays (0.1291ms)
+✔ startup not-applicable rejection can fall through, without two shown ads (0.123ms)
+✔ rapid input locks the entire asynchronous start; disposal prevents late start (0.1167ms)
+✔ death offers eight seconds with no ad; expiration/menu/restart accounting is once only (0.1919ms)
+✔ revive closed, shown=false: no reward, correct attempt and grace policy (0.1734ms)
+✔ revive closed, shown=true: no reward, correct attempt and grace policy (0.0775ms)
+✔ revive failed, shown=false: no reward, correct attempt and grace policy (0.0476ms)
+✔ revive failed, shown=true: no reward, correct attempt and grace policy (0.0434ms)
+✔ revive no_fill, shown=false: no reward, correct attempt and grace policy (0.0448ms)
+✔ revive no_fill, shown=true: no reward, correct attempt and grace policy (0.0391ms)
+✔ revive timeout, shown=false: no reward, correct attempt and grace policy (0.0592ms)
+✔ revive timeout, shown=true: no reward, correct attempt and grace policy (0.0703ms)
+✔ revive unavailable, shown=false: no reward, correct attempt and grace policy (0.0494ms)
+✔ revive unavailable, shown=true: no reward, correct attempt and grace policy (0.0663ms)
+✔ revive blocked, shown=false: no reward, correct attempt and grace policy (0.0551ms)
+✔ revive blocked, shown=true: no reward, correct attempt and grace policy (0.0408ms)
+✔ unqualified completion never revives, even after showing (0.0836ms)
+✔ qualified revive preserves identity, score, time, direction and difficulty without finalization (0.3513ms)
+✔ pending revive freezes offer and rejects duplicate opt-in/restart/menu (0.1033ms)
+✔ revive protection prevents collision and additional attack delay prevents a new formation (0.1836ms)
+✔ all four approved placements use website slug, exact semantic events and hard revive ceiling (1.1889ms)
+✔ timer eligibility never shows, non-playing time excluded, PLAY safe event required (0.7767ms)
+✔ PLAY cannot bypass website not-enough-active-play (0.1428ms)
+✔ PLAY cannot bypass website cooldown (0.1126ms)
+✔ PLAY cannot bypass website session-cap (0.0966ms)
+✔ host shown-run cap survives stats reset and rejects missing run context (0.3913ms)
+✔ Null capabilities are honest; placement and global rewarded controls update availability (0.8745ms)
+✔ real host bridge -> mock provider -> broker -> game client -> renderer completes and acknowledges once (58.395ms)
+✔ profile accounting persists one finished score and one runs quest update, including zero score (0.799ms)
+✔ audio ad suspension mutes existing sound and blocks music without changing settings (0.6178ms)
+✔ ad lifecycle wiring blocks Phaser input and ordinary UI, with DEV shortcut respecting inert (1.9509ms)
+✔ stale, wrong-run and duplicate result cannot release or reward a newer request (0.176ms)
+✔ capability changes cannot be widened by generic DEV preview placements (0.1466ms)
+✔ renderer failures emit one failure; cancellation removes countdown callbacks (0.0904ms)
+✔ production renderer absence does not falsely advertise presentation support (0.0606ms)
+✔ broker completion deadline includes the visual duration after readiness (42.7098ms)
+ℹ tests 58
+ℹ suites 0
+ℹ pass 58
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 296.0741

@@ -1,0 +1,94 @@
+
+> studio-game-portal@0.1.0 build
+> npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs && node scripts/verify-ads-production.mjs
+
+
+> studio-game-portal@0.1.0 build:games
+> node scripts/build-games.mjs
+
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 21 modules transformed.
+rendering chunks...
+computing gzip size...
+../../public/games/orbit-break/embed/index.html                     0.82 kB │ gzip:   0.47 kB
+../../public/games/orbit-break/embed/assets/index-Dcd_zQ6K.css      8.55 kB │ gzip:   2.75 kB
+../../public/games/orbit-break/embed/assets/index-Gu2nUy7D.js   1,428.28 kB │ gzip: 374.43 kB
+
+✓ built in 1.30s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 21 modules transformed.
+rendering chunks...
+computing gzip size...
+../../public/games/reactor-stack/embed/index.html                     0.78 kB │ gzip:   0.47 kB
+../../public/games/reactor-stack/embed/assets/index-CJUaBTmV.css     11.08 kB │ gzip:   2.93 kB
+../../public/games/reactor-stack/embed/assets/index-D92_tcRj.js   1,410.57 kB │ gzip: 369.37 kB
+
+✓ built in 411ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 9 modules transformed.
+rendering chunks...
+computing gzip size...
+../../public/games/last-relay/embed/index.html                     3.21 kB │ gzip:   1.49 kB
+../../public/games/last-relay/embed/assets/index-BxfkZn2O.css      9.55 kB │ gzip:   2.91 kB
+../../public/games/last-relay/embed/assets/index-BLVft_gD.js   1,388.74 kB │ gzip: 363.10 kB
+
+✓ built in 400ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 11 modules transformed.
+rendering chunks...
+computing gzip size...
+../../public/games/station-quartermaster/embed/index.html                     0.91 kB │ gzip:   0.50 kB
+../../public/games/station-quartermaster/embed/assets/index-CIopzAxq.css     17.39 kB │ gzip:   4.92 kB
+../../public/games/station-quartermaster/embed/assets/index--U0Xn8oV.js   1,400.28 kB │ gzip: 367.51 kB
+
+✓ built in 407ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 12 modules transformed.
+rendering chunks...
+computing gzip size...
+../../public/games/signal-below/embed/index.html                     0.89 kB │ gzip:   0.54 kB
+../../public/games/signal-below/embed/assets/index-DDiELLxQ.css     19.59 kB │ gzip:   5.29 kB
+../../public/games/signal-below/embed/assets/index-CPIJxqhR.js   1,420.06 kB │ gzip: 375.08 kB
+
+✓ built in 416ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 19 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.99 kB │ gzip:  0.55 kB
+dist/assets/index-BCIOtW_Z.css  21.56 kB │ gzip:  5.76 kB
+dist/assets/index-CoadmtMZ.js   48.26 kB │ gzip: 14.38 kB
+
+✓ built in 79ms
+Ad production boundary PASS: 34 artifacts checked; Null provider present; mock UI, panel, courtesy and DEV config absent.
