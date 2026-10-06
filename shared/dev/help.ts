@@ -42,6 +42,7 @@ export class ContextHelp {
     target.setAttribute('aria-describedby', this.bubble.id); button.setAttribute('aria-describedby',this.bubble.id);
   }
   dismissEscape(event: KeyboardEvent): boolean {
+    if(this.doc.querySelector('dialog[open]')) { this.hide(); return false; }
     if(event.key!=='Escape' || !this.active) return false;
     event.preventDefault(); event.stopImmediatePropagation(); this.hide(); return true;
   }

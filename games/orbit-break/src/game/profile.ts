@@ -56,7 +56,7 @@ export class ProfileStore {
   preview: Partial<Record<CosmeticCategory, ThemeId>> = {};
   private storageAvailable = true;
 
-  constructor(readonly config: GameConfig) {
+  constructor(readonly config: GameConfig, private readonly storage = gameStorage) {
     this.data = this.load();
     this.ensureFiveQuests();
     this.save();
@@ -70,13 +70,13 @@ export class ProfileStore {
 
   save(): void {
     try {
-      gameStorage.setItem(PROFILE_KEY, JSON.stringify(this.data));
-      gameStorage.setItem(LEGACY_BEST_KEY, String(this.bestScore));
+      this.storage.setItem(PROFILE_KEY, JSON.stringify(this.data));
+      this.storage.setItem(LEGACY_BEST_KEY, String(this.bestScore));
       this.storageAvailable = true;
     } catch { this.storageAvailable = false; }
   }
 
-  get hasStorage(): boolean { return this.storageAvailable && gameStorage.available; }
+  get hasStorage(): boolean { return this.storageAvailable && this.storage.available; }
 
   addScore(score: number): void {
     const safe = Math.max(0, Math.floor(score));
@@ -220,7 +220,7 @@ export class ProfileStore {
   private load(): Profile {
     const legacy = this.legacyBest();
     try {
-      const raw = gameStorage.getItem(PROFILE_KEY);
+      const raw = this.storage.getItem(PROFILE_KEY);
       if (!raw) return freshProfile(legacy);
       const parsed: unknown = JSON.parse(raw);
       if (!isRecord(parsed) || parsed.version !== 2 || !Number.isSafeInteger(parsed.xp)
@@ -243,7 +243,7 @@ export class ProfileStore {
   }
 
   private legacyBest(): number {
-    try { return validNonnegative(Number(gameStorage.getItem(LEGACY_BEST_KEY))); }
+    try { return validNonnegative(Number(this.storage.getItem(LEGACY_BEST_KEY))); }
     catch { this.storageAvailable = false; return 0; }
   }
 

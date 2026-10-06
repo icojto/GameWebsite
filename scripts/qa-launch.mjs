@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, execFile } from 'node:child_process';
 import { mkdir, writeFile, appendFile, readFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import { randomUUID } from 'node:crypto';
@@ -16,13 +16,18 @@ const url=`http://127.0.0.1:${port}/games/reactor-stack/${session?'?qa='+session
 const manifest={schema:1,instance:randomUUID(),...meta,session,command:process.argv.join(' '),cwd:root,port,url,pid:null,stages:{process:'pending',http:'pending',routes:'pending',browser:'BROWSER_NOT_VERIFIED',game:'NOT_VERIFIED'},failure:null,nextStep:'Open the URL in the browser and compare build identity, mounted canvas and actual bridge/renderer capability.'};
 const save=()=>Promise.all([writeFile(path.join(out,'latest.json'),JSON.stringify(manifest,null,2)),writeFile(path.join(out,manifest.instance+'.json'),JSON.stringify(manifest,null,2))]);
 let child=null,closing=false;
-const stop=()=>{closing=true;child?.kill('SIGINT')};process.on('SIGINT',stop);process.on('SIGTERM',stop);
+const stop=()=>{closing=true;if(!child||child.exitCode!==null)return;
+ // Only the process tree started by this launcher is owned. Never use a port or image name to kill processes.
+ if(process.platform==='win32')execFile('taskkill',['/PID',String(child.pid),'/T','/F'],{windowsHide:true},()=>{});
+ else child.kill('SIGINT');
+};process.on('SIGINT',stop);process.on('SIGTERM',stop);
 async function run(command,argv){return new Promise((resolve,reject)=>{child=spawn(command,argv,{cwd:root,env:{...process.env,ODESOS_BUILD_META:JSON.stringify(meta),VITE_QA_SESSION:session??''},stdio:['inherit','pipe','pipe']});manifest.pid=child.pid;child.stdout.on('data',b=>{process.stdout.write(b);void appendFile(path.join(out,manifest.instance+'.log'),b)});child.stderr.on('data',b=>{process.stderr.write(b);void appendFile(path.join(out,manifest.instance+'.log'),b)});child.once('error',reject);child.once('exit',code=>code===0||closing?resolve():reject(Error('Owned process exited '+code)))});}
 try{
  await new Promise((resolve,reject)=>{const probe=createServer();probe.once('error',()=>reject(Error('port-conflict')));probe.listen(port,'127.0.0.1',()=>probe.close(resolve))});
  manifest.stages.process='building';await save();
+ const buildDeadline=setTimeout(()=>{manifest.failure='build-process-timeout';stop();},120000);
  await run(process.execPath,mode==='dev'?[path.join(root,'scripts/build-games.mjs')]:[process.env.npm_execpath,'run','build']);
- if(closing)process.exit(130);
+ clearTimeout(buildDeadline);if(closing){if(manifest.failure)throw Error(manifest.failure);await save();process.exit(130);}
  manifest.stages.process='started';
  const server=run(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),...(mode==='preview'?['preview']:[]),'--host','127.0.0.1','--port',String(port),'--strictPort']);
  let processFailure=null;server.catch(error=>{processFailure=error});

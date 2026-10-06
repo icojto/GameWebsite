@@ -9,6 +9,7 @@ export class Confirmation {
   async ask(title: string, detail: string, trigger: HTMLElement | null = this.doc.activeElement as HTMLElement): Promise<boolean> {
     if (!this.alive || this.cancel || !this.safe()) return false;
     const context=this.scope(), dialog=this.doc.createElement('dialog');dialog.className='qa-confirmation';dialog.dataset.testid='qa-confirmation';
+    this.doc.querySelectorAll<HTMLElement>('.ad-context-help').forEach(node=>node.hidden=true);
     const heading=this.doc.createElement('h2');heading.id='qa-confirmation-title';heading.textContent=title;dialog.setAttribute('aria-labelledby',heading.id);
     const description=this.doc.createElement('p');description.textContent=detail+' Storage scope: '+context+'.';
     const cancel=this.doc.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.dataset.testid='qa-cancel';
