@@ -42,7 +42,7 @@ class ReactorScene extends Phaser.Scene {
   constructor() { super(REACTOR_SCENE_KEY); }
   create() {
     this.grid = this.add.graphics(); this.selection = this.add.graphics().setDepth(10);
-    this.scale.on('resize', () => { this.layoutBoard(); this.render(); this.highlight(); });
+    this.scale.on('resize', () => { this.layoutBoard(); if(controller.phase!=='RESOLVING')this.render(); this.highlight(); });
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => { if (controller.phase === 'PLAYING' && !ads?.flow.locked) this.gesture.begin(this.hit(pointer), pointer.id); });
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => this.release(pointer));
     this.input.on('pointerupoutside', () => this.clearGesture()); this.game.events.on(Phaser.Core.Events.BLUR, () => this.clearGesture());
@@ -70,8 +70,19 @@ class ReactorScene extends Phaser.Scene {
 
 const game = new Phaser.Game({ type: Phaser.AUTO, parent: 'board', width: 600, height: 600, backgroundColor: '#09141e', antialias: true, scene: ReactorScene, scale: { mode: Phaser.Scale.RESIZE }, input: { activePointers: 2 }, audio: { noAudio: true } });
 const scene = () => game.scene.getScene(REACTOR_SCENE_KEY) as ReactorScene;
-const resizeBoard = () => { const board=el('board'), rect=board.getBoundingClientRect(); if (rect.width > 0 && rect.height > 0) game.scale.resize(Math.round(rect.width),Math.round(rect.height)); const shell=el('game-shell'), mode=layoutMode(shell.clientWidth,shell.clientHeight); shell.dataset.layout=mode; el('mode-label').textContent=mode === 'wide' ? 'REACTOR CONTAINMENT' : 'CONTAINMENT GRID'; };
-new ResizeObserver(resizeBoard).observe(el('game-shell')); window.addEventListener('resize',resizeBoard); setTimeout(resizeBoard,0);
+const resizeBoard = () => {
+  const shell=el('game-shell'), mode=layoutMode(shell.clientWidth,shell.clientHeight);
+  if(shell.dataset.layout!==mode)shell.dataset.layout=mode;
+  el('mode-label').textContent=mode==='wide'?'REACTOR CONTAINMENT':'CONTAINMENT GRID';
+  const rect=el('board').getBoundingClientRect(),width=Math.round(rect.width),height=Math.round(rect.height);
+  if(width>0&&height>0&&(game.scale.width!==width||game.scale.height!==height))game.scale.resize(width,height);
+};
+let resizeFrame=0;
+const scheduleResize=()=>{if(!resizeFrame)resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;resizeBoard();});};
+const resizeObserver=new ResizeObserver(scheduleResize);resizeObserver.observe(el('game-shell'));
+window.addEventListener('resize',scheduleResize);scheduleResize();
+window.addEventListener('pagehide',()=>{resizeObserver.disconnect();cancelAnimationFrame(resizeFrame);window.removeEventListener('resize',scheduleResize);},{once:true});
+
 function message(value:string) { scene().message(value); }
 function startRun() { if(controller.phase !== 'RESOLVING') ads?.flow.freshRun(); }
 function pause() { ads?.flow.pause(); }
