@@ -1,3 +1,6 @@
+import { gameStorage, qaSession } from '../../../../shared/storage.mjs';
+import { Confirmation } from '../../../../shared/dev/confirmation.ts';
+import { PROFILE_KEY, LEGACY_BEST_KEY } from '../game/profile';
 import './dev.css';
 import { DEFAULT_CONFIG, FORMATIONS, type FormationId } from '../game/config';
 import type { OrbitBreakScene } from '../game/OrbitBreakScene';
@@ -5,6 +8,9 @@ import { COSMETIC_CATEGORIES, QUEST_TEMPLATES, THEMES, type ThemeId } from '../g
 import { DevPanel, type DevCategory, type DevControl } from './DevPanel';
 
 export function mountOrbitDev(scene: OrbitBreakScene, parent: HTMLElement): () => void {
+  const safe=()=>!scene.ads.suspended&&!scene.adFlow.pending&&!document.querySelector('dialog[open]');
+  const confirmation=new Confirmation(document,()=>gameStorage.scope,safe);
+  const reset=(title:string,detail:string,mutate:()=>void)=>{if(!safe())return;const resume=scene.run.phase==='playing';if(resume)scene.pause();void confirmation.ask(title,detail).then(accepted=>{if(accepted){mutate();scene.refreshUI();}if(resume&&scene.run.phase==='paused'&&!scene.ads.suspended&&!scene.adFlow.pending)scene.resume();});};
   const controls: DevControl[] = [];
   const status = (category: DevCategory, path: string, label: string, get: () => string | number) =>
     controls.push({ category, path, label, type: 'status', get });
@@ -131,14 +137,13 @@ export function mountOrbitDev(scene: OrbitBreakScene, parent: HTMLElement): () =
   action('Profile', 'action.manyScores', 'Generate test scores (session)', () => { scene.profile.devScores = [250, 420, 700, 810, 1200]; scene.refreshUI(); });
   action('Profile', 'action.clearDevScores', 'Clear artificial scores', () => { scene.profile.devScores = []; scene.refreshUI(); });
   action('Profile', 'action.resetScores', 'Reset persistent scores…', () => {
-    if (!window.confirm('Delete local personal scores and best score?')) return;
+    reset('Reset Orbit scores','Delete personal scores and legacy best. XP, Stars, quests, cosmetics and mute remain.',()=>{
     scene.profile.data.scores = []; scene.profile.data.bestScore = 0;
-    try { window.localStorage.removeItem('orbitBreak.bestScore'); } catch { /* storage unavailable */ }
-    scene.profile.save(); scene.refreshUI();
+    try { gameStorage.removeItem(LEGACY_BEST_KEY); } catch { /* storage unavailable */ }
+    scene.profile.save(); scene.refreshUI();});
   });
   action('Profile', 'action.resetProfile', 'Reset profile…', () => {
-    if (!window.confirm('Reset local XP, Stars, quests, cosmetics and equipped themes? Best score is preserved.')) return;
-    scene.profile.reset(); scene.refreshUI();
+    reset('Reset Orbit profile','Reset XP, Stars, quests, cosmetics and equipment. Best score and mute are preserved.',()=>{scene.profile.reset(); scene.refreshUI();});
   });
 
   for (let index = 0; index < 5; index += 1) {
@@ -223,13 +228,20 @@ export function mountOrbitDev(scene: OrbitBreakScene, parent: HTMLElement): () =
   action('QA', 'qa.forceDeath', 'Force death', () => scene.forceDeath());
   action('QA', 'qa.fireBombardment', 'Test bombardment', () => scene.fireFormation('bombardment'));
 
+  action('QA','qa.fresh','Fresh Run',()=>{scene.mainMenu();scene.startGame();});
+  if(qaSession){
+    action('QA','qa.legacy','Load fixed legacy fixture…',()=>reset('Load QA legacy fixture','Replace QA Orbit profile and legacy best with missing profile and best 420. Reload to run actual migration.',()=>{gameStorage.removeItem(PROFILE_KEY);gameStorage.setItem(LEGACY_BEST_KEY,'420');}));
+    action('QA','qa.corrupt','Load fixed corrupt fixture…',()=>reset('Load QA corrupt fixture','Replace QA Orbit profile with invalid JSON and legacy best 420. Reload to run actual recovery.',()=>{gameStorage.setItem(PROFILE_KEY,'{invalid');gameStorage.setItem(LEGACY_BEST_KEY,'420');}));
+    action('QA','qa.questReady','Quest ready (no claim)',()=>{const quest=scene.profile.data.quests[0];if(quest){quest.progress=quest.target;scene.profile.save();scene.refreshUI();}});
+  }
+  for(const control of controls){const run=control.action,set=control.set;if(run)control.action=()=>{if(safe())run()};if(set)control.set=value=>{if(safe())set(value)};}
   const panel = new DevPanel(parent, controls, () => ({
     runTime: Number((scene.run.elapsedMs / 1000).toFixed(1)),
     difficulty: Number(scene.run.difficulty.toFixed(2)), score: scene.run.score,
     formation: scene.run.currentFormation, viewport: `${scene.viewport.width}x${scene.viewport.height}`,
     fps: Math.round(scene.game.loop.actualFps),
-  }));
-  return () => panel.destroy();
+  }),{safe,state:()=>({phase:scene.run.phase,runId:scene.adFlow.runId,pendingTransition:scene.adFlow.pending,adSuspended:scene.ads.suspended,bridgeConnected:scene.ads.connected,capabilities:{...scene.ads.capabilities},error:scene.ads.lastResult,direction:scene.run.direction,angleRadians:scene.run.playerAngle,elapsedMs:scene.run.elapsedMs,score:scene.run.score,tier:scene.run.tier,difficulty:scene.run.difficulty,projectileCount:scene.run.activeProjectiles,revive:{consumed:scene.adFlow.consumed,offerMs:scene.adFlow.offerMs,finalized:scene.adFlow.finalized},userMute:scene.audio.settings.mute,effectiveSuspension:scene.audio.effectiveSuspension}),config:()=>scene.config});
+  return () => {confirmation.destroy();panel.destroy();};
 }
 
 function readPath(root: object, path: string): unknown {

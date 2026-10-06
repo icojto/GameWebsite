@@ -38,7 +38,7 @@ document.addEventListener('click', (event) => {
   const destination = new URL(routeLink.href, window.location.href);
   if (destination.origin !== window.location.origin) return;
   event.preventDefault();
-  window.history.pushState({}, '', destination.pathname + destination.hash);
+  window.history.pushState({}, '', scopedUrl(destination.pathname + destination.search + destination.hash));
   window.scrollTo(0, 0);
   renderRoute(true);
 });

@@ -14,7 +14,7 @@ if(mode==='doctor'){console.log(await readFile(path.join(out,'latest.json'),'utf
 const meta=identity(mode==='dev'?'development':'production');const session=mode==='dev'?randomUUID():null;
 const url=`http://127.0.0.1:${port}/games/reactor-stack/${session?'?qa='+session:''}`;
 const manifest={schema:1,instance:randomUUID(),...meta,session,command:process.argv.join(' '),cwd:root,port,url,pid:null,stages:{process:'pending',http:'pending',routes:'pending',browser:'BROWSER_NOT_VERIFIED',game:'NOT_VERIFIED'},failure:null,nextStep:'Open the URL in the browser and compare build identity, mounted canvas and actual bridge/renderer capability.'};
-const save=()=>writeFile(path.join(out,'latest.json'),JSON.stringify(manifest,null,2));
+const save=()=>Promise.all([writeFile(path.join(out,'latest.json'),JSON.stringify(manifest,null,2)),writeFile(path.join(out,manifest.instance+'.json'),JSON.stringify(manifest,null,2))]);
 let child=null,closing=false;
 const stop=()=>{closing=true;child?.kill('SIGINT')};process.on('SIGINT',stop);process.on('SIGTERM',stop);
 async function run(command,argv){return new Promise((resolve,reject)=>{child=spawn(command,argv,{cwd:root,env:{...process.env,ODESOS_BUILD_META:JSON.stringify(meta),VITE_QA_SESSION:session??''},stdio:['inherit','pipe','pipe']});manifest.pid=child.pid;child.stdout.on('data',b=>{process.stdout.write(b);void appendFile(path.join(out,manifest.instance+'.log'),b)});child.stderr.on('data',b=>{process.stderr.write(b);void appendFile(path.join(out,manifest.instance+'.log'),b)});child.once('error',reject);child.once('exit',code=>code===0||closing?resolve():reject(Error('Owned process exited '+code)))});}

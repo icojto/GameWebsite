@@ -1,3 +1,5 @@
+import { mountInspection } from '../../../../shared/dev/inspection.ts';
+import { qaSession } from '../../../../shared/storage.mjs';
 import { ContextHelp } from '../../../../shared/dev/help.ts';
 import '../../../../shared/dev/help.css';
 import { orbitAdHelp } from './ads-help.ts';
@@ -33,9 +35,10 @@ export class DevPanel {
   private selected = 'Run';
   private visible = false;
   private refreshTimer: number;
+  private inspection: ReturnType<typeof mountInspection> | null = null;
   private help = new ContextHelp(document);
 
-  constructor(parent: HTMLElement, private readonly controls: DevControl[], private readonly context: () => DevContext) {
+  constructor(parent: HTMLElement, private readonly controls: DevControl[], private readonly context: () => DevContext, private readonly qa?: {state:()=>object;config:()=>unknown;safe:()=>boolean}) {
     this.root.className = 'odesos-dev-panel';
     this.root.setAttribute('aria-label', 'Odesos development panel');
     parent.append(this.root);
@@ -48,6 +51,7 @@ export class DevPanel {
   }
 
   destroy(): void {
+    this.inspection?.destroy();
     this.help.destroy();
     window.clearInterval(this.refreshTimer);
     window.removeEventListener('keydown', this.onKeyDown, true);
@@ -60,21 +64,23 @@ export class DevPanel {
   toggle(): void { this.visible = !this.visible; this.render(); }
 
   private render(): void {
+    this.inspection?.destroy();
     this.help.destroy(); this.help = new ContextHelp(document);
     const categories = [...new Set(this.controls.map((control) => control.category)), 'Session Log'];
     this.root.classList.toggle('open', this.visible);
-    this.root.innerHTML = `<button class="dev-trigger" type="button" data-dev="toggle" aria-label="Toggle Odesos Dev Panel">DEV</button>
+    this.root.innerHTML = `<button class="dev-trigger" type="button" data-dev="toggle" data-testid="orbit-open-dev" aria-label="${qaSession?'Open Game DEV':'Toggle Odesos Dev Panel'}">${qaSession?'Open Game DEV':'DEV'}</button>
       <div class="dev-drawer" ${this.visible ? '' : 'hidden'}>
         <header><strong>ODESOS <span>DEV / v1</span></strong><button type="button" data-dev="toggle" aria-label="Close Dev Panel">×</button></header>
         <nav aria-label="Development categories">${categories.map((category) => `<button type="button" data-dev="category" data-category="${escapeText(category)}" aria-current="${this.selected === category ? 'page' : 'false'}">${escapeText(category)}</button>`).join('')}</nav>
         <div class="dev-body">${this.selected === 'Session Log' ? this.renderLogger() : this.renderControls()}</div>
       </div>`;
-    if(this.selected==='Ads Integration') for(const control of this.controls.filter(c=>c.category==='Ads Integration')) {
+    if(this.qa)this.inspection=mountInspection(this.root.querySelector('.dev-body')!,'orbit-break',this.qa.state,this.qa.config,this.qa.safe);
+    if(this.selected==='Ads Integration'||this.selected==='QA') for(const control of this.controls.filter(c=>c.category===this.selected)) {
       const target=[...this.root.querySelectorAll<HTMLElement>('[data-control],[data-status],[data-path]')].find(e=>e.dataset.control===control.path || e.dataset.status===control.path || e.dataset.path===control.path);
       if(!target) continue;
       const wrapper=document.createElement('div');wrapper.className='ad-help-row';
       const row=target.closest('label,.dev-row') ?? target;row.replaceWith(wrapper);wrapper.append(row);
-      this.help.attach(target,control.label,orbitAdHelp(control),wrapper);
+      this.help.attach(target,control.label,this.selected==='QA'?'Read-only diagnostics or named prerequisite fixture. No automatic reward claim. State changes are blocked during ads, pending transitions and confirmations.':orbitAdHelp(control),wrapper);
     }
   }
 
@@ -83,8 +89,8 @@ export class DevPanel {
       const value = control.get();
       const label = escapeText(control.label);
       const path = escapeText(control.path);
-      if (control.type === 'status') return `<div class="dev-row dev-status"><span>${label}</span><output data-status="${path}">${escapeText(String(value))}</output></div>`;
-      if (control.type === 'action') return `<button class="dev-action" type="button" data-dev="action" data-path="${path}">${label}</button>`;
+      if (control.type === 'status') return `<div class="dev-row dev-status"><span>${label}</span><output data-testid="orbit-${path}" data-status="${path}">${escapeText(String(value))}</output></div>`;
+      if (control.type === 'action') return `<button class="dev-action" type="button" data-dev="action" data-testid="orbit-${path}" data-path="${path}">${label}</button>`;
       if (control.type === 'boolean') return `<label class="dev-row"><span>${label}</span><input type="checkbox" data-control="${path}" ${value ? 'checked' : ''}></label>`;
       return `<label class="dev-row"><span>${label}</span><input type="number" data-control="${path}" value="${value}" min="${control.min ?? -999999}" max="${control.max ?? 999999}" step="${control.step ?? 1}"></label>`;
     }).join('');
@@ -112,6 +118,7 @@ export class DevPanel {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
+    if(document.querySelector('dialog[open]'))return;
     if(this.help.dismissEscape(event)) return;
     if (this.root.inert) return;
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyD') {
@@ -162,6 +169,7 @@ export class DevPanel {
     const name = this.root.querySelector<HTMLInputElement>('[data-test-name]')?.value.trim() ?? '';
     if (!name) { this.root.querySelector<HTMLInputElement>('[data-test-name]')?.focus(); return; }
     const notes = this.root.querySelector<HTMLTextAreaElement>('[data-test-notes]')?.value.trim() ?? '';
+    if(this.snapshots.length>=100)this.snapshots.shift();
     this.snapshots.push({ name, notes, timestamp: new Date().toISOString(),
       changes: [...this.changes.values()].map((change) => ({ ...change })), context: this.context() });
     this.render();

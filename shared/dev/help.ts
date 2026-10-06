@@ -49,7 +49,10 @@ export class ContextHelp {
   private scheduleHide(): void { clearTimeout(this.timer); if(!this.pinned) this.timer=setTimeout(()=>{const entry=this.active?this.entries.get(this.active):null;if(entry && (this.doc.activeElement===entry.target || this.doc.activeElement===entry.button))return;this.hide();},350); }
   private show(owner: HTMLElement,pinned: boolean): void {
     clearTimeout(this.timer); if(!owner.isConnected) return; this.hide();this.active=owner;this.pinned=pinned;
-    const entry=this.entries.get(owner)!;this.bubble.textContent=entry.text;this.bubble.hidden=false;entry.button.setAttribute('aria-expanded','true');this.position();
+    const entry=this.entries.get(owner)!;this.bubble.textContent=entry.text;this.bubble.hidden=false;
+    // Passive hover/focus help must never intercept the underlying pointer action.
+    this.bubble.style.pointerEvents=pinned?'auto':'none';
+    entry.button.setAttribute('aria-expanded','true');this.position();
   }
   private position(): void {
     if(!this.active) return; if(!this.active.isConnected){this.hide();return;}
