@@ -10,7 +10,12 @@ const mode=process.argv[2];const args=process.argv.slice(3);
 const port=Number(args[args.indexOf('--port')+1] ?? (mode==='dev'?5191:5192));
 if(!['dev','preview','doctor'].includes(mode)||!Number.isInteger(port)||port<1024||port>65535)throw Error('Use qa:dev/qa:preview/qa:doctor -- --port 5191');
 const out=path.join(root,'outputs','qa-launch');await mkdir(out,{recursive:true});
-if(mode==='doctor'){console.log(await readFile(path.join(out,'latest.json'),'utf8'));process.exit(0)}
+if(mode==='doctor'){
+ const prior=JSON.parse(await readFile(path.join(out,'latest.json'),'utf8')),current=identity(prior.mode);
+ prior.sourceStatus=prior.revision===current.revision&&prior.dirty===current.dirty?'SOURCE_MATCH_AT_CHECK':'STALE_SOURCE';
+ if(prior.sourceStatus==='STALE_SOURCE')prior.nextStep='Restart qa:dev or rebuild/restart qa:preview from this checkout. HMR does not restamp the process-start build identity.';
+ console.log(JSON.stringify(prior,null,2));process.exit(0)
+}
 const meta=identity(mode==='dev'?'development':'production');const session=mode==='dev'?randomUUID():null;
 const url=`http://127.0.0.1:${port}/games/reactor-stack/${session?'?qa='+session:''}`;
 const manifest={schema:1,instance:randomUUID(),...meta,session,command:process.argv.join(' '),cwd:root,port,url,pid:null,stages:{process:'pending',http:'pending',routes:'pending',browser:'BROWSER_NOT_VERIFIED',game:'NOT_VERIFIED'},failure:null,nextStep:'Open the URL in the browser and compare build identity, mounted canvas and actual bridge/renderer capability.'};
