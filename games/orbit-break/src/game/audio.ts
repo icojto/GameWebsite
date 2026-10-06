@@ -1,4 +1,6 @@
 import type { GameConfig } from './config';
+import { gameStorage } from '../../../../shared/storage.mjs';
+import { loadMute, saveMute } from './mute.ts';
 
 type AudioContextConstructor = new () => AudioContext;
 
@@ -10,7 +12,10 @@ export class OrbitAudio {
   private adSuspended = false;
   settings = { master: 0.7, music: 1, sfx: 1, mute: false };
 
-  constructor(private readonly config: GameConfig) {}
+  constructor(private readonly config: GameConfig) { this.settings.mute = loadMute(gameStorage); }
+
+  setMuted(value: boolean): void { this.settings.mute = value; saveMute(gameStorage, value); this.applySettings(); }
+  get effectiveSuspension(): boolean { return this.adSuspended; }
 
   async unlock(): Promise<void> {
     if (!this.context) {

@@ -1,0 +1,61 @@
+
+> studio-game-portal@0.1.0 test:ads
+> node --experimental-transform-types --test tests/ads.test.mjs
+
+(node:24052) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ every interstitial registry default crosses 100; zero finite global cap blocks (22.6685ms)
+✔ help hover/focus/tap, Escape precedence and disposal without action side effects (334.6319ms)
+✔ all persisted fields and test actions have specific help (0.4794ms)
+✔ summary separates current policy, active preparation and historical result (0.7542ms)
+✔ timing shortcuts and Force keep documented independent boundaries (0.4056ms)
+✔ unlimited policy crosses both previous cap boundaries; explicit finite limits retain history (4.5254ms)
+✔ legacy numeric caps ask for a choice while preserving unrelated settings (0.2798ms)
+✔ banner integration is outside iframe and after the player action bar (3.1183ms)
+✔ Ad Dev Panel is non-modal and website fullscreen overlay code is absent (2.4702ms)
+✔ fresh configuration keeps startup support OFF until enabled (0.1865ms)
+✔ Null adapter settles unavailable and cannot display anything (0.6915ms)
+✔ startup is attempted once per session and can reset in dev (0.3085ms)
+✔ startup failed settles fail-open without courtesy or show (0.1234ms)
+✔ startup no_fill settles fail-open without courtesy or show (0.074ms)
+✔ startup timeout settles fail-open without courtesy or show (0.0608ms)
+✔ startup unavailable settles fail-open without courtesy or show (0.0486ms)
+✔ only visible playing time counts; eligibility never shows an ad (0.1218ms)
+✔ interstitial requires time and registered semantic event (0.1517ms)
+✔ interstitial interval, cooldown, and session cap work independently (0.2016ms)
+✔ rewarded requires explicit opt-in (0.0674ms)
+✔ reward result completed qualifies only completed (0.1499ms)
+✔ reward result closed qualifies only completed (0.0685ms)
+✔ reward result failed qualifies only completed (0.0612ms)
+✔ reward result no_fill qualifies only completed (0.0555ms)
+✔ reward result timeout qualifies only completed (0.0641ms)
+✔ reward result unavailable qualifies only completed (0.0605ms)
+✔ reward result blocked qualifies only completed (0.2176ms)
+✔ reward completion without actual showing cannot qualify (0.1377ms)
+✔ one fullscreen request at a time; deadline settles broken provider (31.9683ms)
+✔ rewarded showing resets the interstitial cooldown by default (0.3431ms)
+✔ website service prepares then delegates showing without rendering courtesy (0.1312ms)
+✔ route cancellation settles and does not grant rewards (0.4994ms)
+✔ config clamps values, drops unknown keys and cannot persist mock garbage (0.122ms)
+✔ readiness exceptions and show timeouts settle without rewards (29.8139ms)
+✔ placement enabled, cooldown and cap are enforced (0.3803ms)
+✔ zero placement cap blocks its first request (0.1012ms)
+✔ optional run identity enables a future per-run placement cap (0.2848ms)
+✔ clearing statistics does not reset session safety limits (0.1258ms)
+✔ banner visibility is independent and counts one impression per mount/show (0.149ms)
+✔ bridge schema rejects malformed, unknown and excessive messages (0.2975ms)
+✔ game presentation broker sends identity/config and accepts one ordered completion (0.4417ms)
+✔ renderer unavailable and renderer timeout settle safely without showing (13.4088ms)
+✔ MockAdapter remains a DEV logical provider and delegates visuals to the game broker (15.7211ms)
+✔ bridge rejects presentation lifecycle from wrong origin/source (0.4224ms)
+✔ disposed bridge does not deliver a late ad result (0.5626ms)
+✔ banner cleanup failure cannot break route cleanup (0.2023ms)
+✔ bridge authenticates source/origin/game and deduplicates requests and acknowledgments (2.5127ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 634.117

@@ -1,9 +1,14 @@
-import { access, mkdir, realpath, rm } from 'node:fs/promises';
+import { access, mkdir, realpath, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
+import { buildMetadata } from './build-identity.mjs';
 import { gameBuilds, gameCatalog } from '../src/games/catalog.mjs';
 
+const metadata = process.env.ODESOS_BUILD_META ? JSON.parse(process.env.ODESOS_BUILD_META) : buildMetadata('build');
+metadata.mode = 'production';
+process.env.ODESOS_BUILD_META = JSON.stringify(metadata);
+await writeFile(new URL('../.qa-build-identity.json',import.meta.url),JSON.stringify(metadata));
 const portalRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const gamesOutputRoot = path.join(portalRoot, 'public', 'games');
 const viteBin = path.join(portalRoot, 'node_modules', 'vite', 'bin', 'vite.js');
@@ -29,6 +34,7 @@ for (const game of gameCatalog) {
   await run(process.execPath, [
     viteBin,
     'build',
+    '--config', path.join(portalRoot,'scripts/game-vite.config.mjs'),
     '--base',
     game.embedBase,
     '--outDir',

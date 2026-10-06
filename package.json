@@ -7,6 +7,10 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "qa:dev": "node scripts/qa-launch.mjs dev",
+    "qa:preview": "node scripts/qa-launch.mjs preview",
+    "qa:doctor": "node scripts/qa-launch.mjs doctor",
+    "test:qa-contract": "node --experimental-transform-types --test tests/qa-contract.test.mjs",
     "dev": "npm run build:games && vite --host 127.0.0.1",
     "dev:orbit": "vite games/orbit-break --host 127.0.0.1",
     "check": "tsc --noEmit && npm run check:games",

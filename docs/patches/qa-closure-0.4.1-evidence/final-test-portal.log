@@ -1,0 +1,16 @@
+
+> studio-game-portal@0.1.0 test:portal
+> node --test tests/portal.test.mjs
+
+✔ only Games 001 and 002 are public (0.8183ms)
+✔ route metadata follows the public catalog (0.1612ms)
+✔ site storage fails open when storage is restricted (0.135ms)
+✔ legacy theme migrates once without deleting unrelated data (0.1045ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 74.9329

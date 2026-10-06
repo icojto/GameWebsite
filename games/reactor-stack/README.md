@@ -80,3 +80,9 @@ The website owns providers, policy clocks, preparation and limits. Reactor owns 
 Default startup is OFF. Eligible START and deliberate PAUSE are supported; Pause remains paused afterward. Ordinary play, powers, Resume, scores and automatic/internal state changes request no ads. Production Null and standalone remain playable with one free charge each and no dead ad CTAs. Mock view/courtesy, Why Ads and developer help are DEV-only. Move/Merge/Random Spawn rules and balance remain unchanged.
 
 See [integration patch and human QA](../../docs/patches/2026-10-05-reactor-monetization-v1.md). No real providers, compliance approval, merge or deployment are included.
+
+## QA patch 0.4.1
+
+Constrained embeds retain goal/moves, heat, Pause, Cool and Upgrade with 44px power targets. Heat text and bar share normalized heat/capacity percent. Fresh Run uses real initialized board/inventories and a new UUID; isolated QA Force Win/Fail goes through RESULT and records once. Resize preserves pending animation callbacks and run identity.
+
+From the portal root use `npm.cmd run qa:dev` and its exact session URL. **Open Game DEV** exposes guarded named fixtures, scoped HTML confirmations and read-only JSON View/Download. Clear Scores retains the RAM completion log; the separate scores+log reset clears it. Neither resets tuning, audio or board. See [QA contract](../../docs/qa-contract-0.4.1.md) for fields, selectors, scopes and verification limits.

@@ -1,0 +1,5 @@
+
+> studio-game-portal@0.1.0 verify:ads-production
+> node scripts/verify-ads-production.mjs
+
+Ad production boundary PASS: 34 artifacts checked; Null provider present; mock UI, panel, courtesy and DEV config absent.

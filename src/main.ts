@@ -1,3 +1,4 @@
+import { scopedUrl } from '../shared/storage.mjs';
 import './styles.css';
 import { publicGameCatalog } from './games/catalog.mjs';
 import { publicPages, siteOrigin, socialImagePath } from './site/pages.mjs';
@@ -37,7 +38,7 @@ document.addEventListener('click', (event) => {
   const destination = new URL(routeLink.href, window.location.href);
   if (destination.origin !== window.location.origin) return;
   event.preventDefault();
-  window.history.pushState({}, '', destination.pathname + destination.hash);
+  window.history.pushState({}, '', scopedUrl(destination.pathname + destination.search + destination.hash));
   window.scrollTo(0, 0);
   renderRoute(true);
 });
@@ -197,7 +198,7 @@ function renderGame(game: CatalogGame): void {
               <iframe
                 class="game-frame"
                 title="${escapeHtml(game.title)} — playable game"
-                src="${sitePath(game.embedPath)}"
+                src="${scopedUrl(sitePath(game.embedPath))}"
                 allow="autoplay"
                 loading="eager"
                 tabindex="0"
@@ -432,7 +433,7 @@ function bindGameFrame(game: CatalogGame): void {
     errorState.hidden = true;
     loadingState.hidden = false;
     gameFrame.classList.remove('is-ready');
-    gameFrame.src = `${sitePath(game.embedPath)}?reload=${Date.now()}`;
+    gameFrame.src = scopedUrl(`${sitePath(game.embedPath)}?reload=${Date.now()}`);
     timeout = window.setTimeout(showError, 10_000);
   }
 

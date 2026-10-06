@@ -1,0 +1,400 @@
+{
+  "schemaVersion": 1,
+  "patch": "0.4.1",
+  "date": "2026-10-06",
+  "repository": "icojto/GameWebsite",
+  "branch": "codex/qa-closure-04-1",
+  "baseRevision": "42e8b2007980756a21d17f0e5c0bbd9c8d13d325",
+  "validationRevision": "2b9a2ff",
+  "finalHeadResolution": "git rev-parse HEAD on the feature branch / Draft PR head; documentation commit follows validation",
+  "workbookUnchangedSHA256": "4edc08cece97f2a53f5013d3688257eab79fda78d2d8978b92c4bf4bd564d4de",
+  "workbookRowsReclassified": 0,
+  "fullWorkbookRerun": false,
+  "bugs": [
+    {
+      "id": "V2-004",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [
+        "REA-022",
+        "MOB-001",
+        "MOB-002",
+        "MOB-006",
+        "MOB-007",
+        "MOB-008",
+        "MOB-014",
+        "MOB-015",
+        "MOB-019",
+        "MOB-020",
+        "MOB-021",
+        "PROD-012"
+      ],
+      "files": [
+        "games/reactor-stack/src/style.css",
+        "games/reactor-stack/src/main.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:reactor-ads",
+      "actualEvidence": "Five DEV/production desktop-emulated viewports; actual constrained rectangles and 44px centered hit targets, no game-document scroll. Production Pause/Resume, arm/cancel and Cool no-op. Real DEV move resized while RESOLVING, same UUID and completed PLAYING callbacks. Standalone DEV/production 1280x720 wide geometry.",
+      "verificationLayer": "rendered browser + authoritative snapshots",
+      "remaining4B": "Physical touch/orientation/fullscreen; full compound row assertions; actual wide host handshake"
+    },
+    {
+      "id": "V2-001",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [
+        "DEV-047"
+      ],
+      "files": [
+        "games/reactor-stack/src/dev-panel.ts",
+        "games/reactor-stack/src/dev-fixtures.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:qa-contract",
+      "actualEvidence": "Actual fixture initialization test and browser Fresh Run: six cells, legal action, zero heat/moves, PLAYING/new UUID; no ad requested.",
+      "verificationLayer": "real fixture/controller + browser snapshot",
+      "remaining4B": "Full default inventory/score/stability assertions across new sessions; ordinary restart regressions"
+    },
+    {
+      "id": "V2-002",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [
+        "DEV-053"
+      ],
+      "files": [
+        "games/reactor-stack/src/main.ts",
+        "games/reactor-stack/src/dev-panel.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:qa-contract; npm.cmd run test:reactor-ads",
+      "actualEvidence": "Guarded real fixture lifecycle reaches RESULT and records once; browser Force Win/Fail snapshot same UUID, completion/log1, opposite command disabled. Real animation remains intact under resize.",
+      "verificationLayer": "controller/lifecycle tests + rendered control/snapshot",
+      "remaining4B": "Delayed result-menu presentation and hidden-input/late-callback races in rendered iframe; natural threshold UI"
+    },
+    {
+      "id": "V2-003",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [
+        "PROD-008"
+      ],
+      "files": [
+        "games/orbit-break/src/game/mute.ts",
+        "games/orbit-break/src/game/audio.ts",
+        "games/orbit-break/src/game/ui.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:qa-contract; npm.cmd run test:orbit-ads",
+      "actualEvidence": "Explicit browser MUTE retained after reload/new run. Actual AudioManager temporary suspension test preserves saved preference. Missing/corrupt/denied preference tests.",
+      "verificationLayer": "browser QA + actual audio/storage tests",
+      "remaining4B": "Production persistence in disposable browser; subjective audible quality; background/OS/device audio"
+    },
+    {
+      "id": "V2-005",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [
+        "DEV-040"
+      ],
+      "files": [
+        "games/reactor-stack/src/hud.ts",
+        "games/reactor-stack/src/main.ts",
+        "games/reactor-stack/src/dev-panel.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:qa-contract",
+      "actualEvidence": "Heat helper covers 25/50,50/50,4/4,invalid/clamping. Browser max50: raw50 text/bar100; actual Cool raw25 text/bar50; actual move raw29 text/bar58. Numeric input applies valid input while preserving focus.",
+      "verificationLayer": "unit/controller + rendered HUD",
+      "remaining4B": "Default and other maxima in full tuning row; threshold/win-priority compound assertions"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "launch/readiness/build-identity",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [],
+      "files": [
+        "scripts/qa-launch.mjs",
+        "scripts/build-identity.mjs",
+        "vite.config.mjs",
+        "scripts/game-vite.config.mjs"
+      ],
+      "regressionCommand": "npm.cmd run qa:dev; npm.cmd run qa:preview; npm.cmd run qa:doctor",
+      "actualEvidence": "Strict-port conflict rejected; owned launches/HTTP/module paths and matching portal/embed metadata; mounted iframe and connected mock snapshot. Doctor detects HMR/revision STALE_SOURCE, requires restart.",
+      "verificationLayer": "shell + actual browser",
+      "remaining4B": "Repeat on PC2 exact checkout; browser stages remain separate from launcher stages; no LIVE verification"
+    },
+    {
+      "id": "isolated-session/storage/migration",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [],
+      "files": [
+        "shared/storage-scope.mjs",
+        "shared/storage.mjs",
+        "src/site/storage.mjs",
+        "games/orbit-break/src/game/profile.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:qa-contract; npm.cmd run test:portal",
+      "actualEvidence": "Actual ProfileStore injected adapter exercises migration/corruption/reset/reload with ordinary and other-session sentinels unchanged; denied QA storage never accesses real keys. Browser host/iframe navigation retains session.",
+      "verificationLayer": "actual storage/profile tests + browser URL",
+      "remaining4B": "Browser legacy/corrupt reload and sentinel verification independently; production destructive tests blocked without disposable profile"
+    },
+    {
+      "id": "owner-document-confirmation",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [],
+      "files": [
+        "shared/dev/confirmation.ts",
+        "shared/dev/help.ts",
+        "games/orbit-break/src/dev/orbit.ts",
+        "games/reactor-stack/src/dev-panel.ts"
+      ],
+      "regressionCommand": "npm.cmd run test:ads",
+      "actualEvidence": "Browser Cancel focus, Escape, returned trigger focus, unchanged score then exact confirmed scores deletion with RAM log retained. Help test checks modal Escape precedence. One pending/once guard and scope/disposal validation implemented.",
+      "verificationLayer": "browser + help regression + source review",
+      "remaining4B": "Rendered Tab wrap, double Enter/click, namespace/disposal race and active-ad/resolution cancellation across both games"
+    },
+    {
+      "id": "visible-controls/snapshots/config-view",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [],
+      "files": [
+        "shared/dev/inspection.ts",
+        "games/orbit-break/src/dev/DevPanel.ts",
+        "games/reactor-stack/src/dev-panel.ts",
+        "src/ads/dev/panel.ts"
+      ],
+      "regressionCommand": "npm.cmd run check; npm.cmd run test:qa-contract",
+      "actualEvidence": "Open Game DEV, scoped selectors, Refresh/View actual snapshots and config DOM JSON used for terminal, heat, inventories and resolving evidence. Histories bounded, explicit refresh, no hidden snapshot poll.",
+      "verificationLayer": "browser + source/type checks",
+      "remaining4B": "Independent read-only RNG/clock checks and disposal/performance soak; direction rendering/timing requires visual verification"
+    },
+    {
+      "id": "config/snapshot-download-parity",
+      "status": "implemented-not-verified",
+      "linkedCases": [],
+      "files": [
+        "shared/dev/inspection.ts"
+      ],
+      "regressionCommand": "npm.cmd run check",
+      "actualEvidence": "View/Download share serializer; actual browser download observation timed out, one bounded retry also timed out. Saved bytes NOT VERIFIED.",
+      "verificationLayer": "source/type checks; external download capability unavailable",
+      "remaining4B": "Human download both JSON types; compare semantic config values to View/Copy ignoring diagnostic sampling metadata. Clipboard-specific case remains separate"
+    },
+    {
+      "id": "named-fixtures/QA-RNG",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [],
+      "files": [
+        "games/reactor-stack/src/dev-fixtures.ts",
+        "games/orbit-break/src/dev/orbit.ts",
+        "shared/seeded-random.mjs",
+        "tests/qa-contract.test.mjs"
+      ],
+      "regressionCommand": "npm.cmd run test:qa-contract; npm.cmd run test:orbit-ads; npm.cmd run test:reactor-ads",
+      "actualEvidence": "Real fixtures/once finalization/depleted inventories/actual resolving callback tests; seed repeatability. Browser depleted Upgrade actual host/client completion grants +1 without use/same UUID.",
+      "verificationLayer": "actual fixtures/tests + browser reward/resolving evidence",
+      "remaining4B": "Orbit rendered death/quest claim and near-threshold rendered result assertions; fixtures do not pass rows"
+    },
+    {
+      "id": "production-separation/bundle",
+      "status": "fixed-and-locally-verified",
+      "linkedCases": [],
+      "files": [
+        "scripts/verify-ads-production.mjs",
+        "shared/storage.mjs"
+      ],
+      "regressionCommand": "npm.cmd run build; npm.cmd run verify:ads-production; npm.cmd run verify:pages",
+      "actualEvidence": "All34 emitted artifacts scanned; Null present, DEV/QA tokens absent; exact safe metadata keys and common identity. Browser production ?qa=1 lacks QA/DEV nodes and remains playable. No dependencies/lockfile changed.",
+      "verificationLayer": "all-artifact guard + production browser",
+      "remaining4B": "Disposable production profile persistence/reset tests; traffic and clean-console certification not established"
+    },
+    {
+      "id": "historical-QA-001-through-004",
+      "status": "not-reproduced",
+      "linkedCases": [
+        "QA-001",
+        "QA-002",
+        "QA-003",
+        "QA-004"
+      ],
+      "files": [],
+      "regressionCommand": "not rerun",
+      "actualEvidence": "Historical findings are not revived or reclassified by this bounded patch.",
+      "verificationLayer": "historical record only",
+      "remaining4B": "Reproduce independently if Prompt4B evidence warrants"
+    },
+    {
+      "id": "LIVE/hardware/environment",
+      "status": "blocked",
+      "linkedCases": [],
+      "files": [],
+      "regressionCommand": "human testing required",
+      "actualEvidence": "No merge/deploy, physical hardware, assistive tech, OS/background soak, disposable production profile or actual saved download bytes available for certification. Source-less MutationObserver error remains unattributed.",
+      "verificationLayer": "not verified",
+      "remaining4B": "Human-only/LIVE groups; do not mark all65 environment-blocked cases solved"
+    }
+  ],
+  "validation": {
+    "baselineTests": 201,
+    "finalEffectiveTests": 211,
+    "initialFinalRun": [
+      {
+        "script": "check",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-check.log"
+      },
+      {
+        "script": "test:ads",
+        "exitCode": 1,
+        "log": "qa-closure-0.4.1-evidence/final-test-ads.log"
+      },
+      {
+        "script": "test:portal",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-test-portal.log"
+      },
+      {
+        "script": "test:orbit",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-test-orbit.log"
+      },
+      {
+        "script": "test:orbit-ads",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-test-orbit-ads.log"
+      },
+      {
+        "script": "test:reactor",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-test-reactor.log"
+      },
+      {
+        "script": "test:reactor-ads",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-test-reactor-ads.log"
+      },
+      {
+        "script": "test:qa-contract",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-test-qa-contract.log"
+      },
+      {
+        "script": "build",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-build.log"
+      },
+      {
+        "script": "verify:ads-production",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-verify-ads-production.log"
+      },
+      {
+        "script": "verify:pages",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-verify-pages.log"
+      },
+      {
+        "script": "git diff --check",
+        "exitCode": 0,
+        "log": "qa-closure-0.4.1-evidence/final-diff.log"
+      }
+    ],
+    "repair": {
+      "script": "test:ads",
+      "exitCode": 0,
+      "tests": 47,
+      "log": "qa-closure-0.4.1-evidence/repaired-test-ads.log",
+      "reason": "DOM test double lacked querySelector after modal precedence change; model owner-document dialog and assert Escape is not intercepted"
+    },
+    "productionArtifactsScanned": 34,
+    "bundleComparison": [
+      {
+        "surface": "last-relay.css",
+        "baselineBytes": 9551,
+        "finalBytes": 9551,
+        "deltaBytes": 0
+      },
+      {
+        "surface": "last-relay.js",
+        "baselineBytes": 1388621,
+        "finalBytes": 1388740,
+        "deltaBytes": 119
+      },
+      {
+        "surface": "orbit-break.css",
+        "baselineBytes": 8551,
+        "finalBytes": 8551,
+        "deltaBytes": 0
+      },
+      {
+        "surface": "orbit-break.js",
+        "baselineBytes": 1427563,
+        "finalBytes": 1428281,
+        "deltaBytes": 718
+      },
+      {
+        "surface": "portal.css",
+        "baselineBytes": 21560,
+        "finalBytes": 21560,
+        "deltaBytes": 0
+      },
+      {
+        "surface": "portal.js",
+        "baselineBytes": 48002,
+        "finalBytes": 48269,
+        "deltaBytes": 267
+      },
+      {
+        "surface": "reactor-stack.css",
+        "baselineBytes": 10524,
+        "finalBytes": 11088,
+        "deltaBytes": 564
+      },
+      {
+        "surface": "reactor-stack.js",
+        "baselineBytes": 1409700,
+        "finalBytes": 1410571,
+        "deltaBytes": 871
+      },
+      {
+        "surface": "signal-below.css",
+        "baselineBytes": 19595,
+        "finalBytes": 19595,
+        "deltaBytes": 0
+      },
+      {
+        "surface": "signal-below.js",
+        "baselineBytes": 1420065,
+        "finalBytes": 1420065,
+        "deltaBytes": 0
+      },
+      {
+        "surface": "station-quartermaster.css",
+        "baselineBytes": 17398,
+        "finalBytes": 17398,
+        "deltaBytes": 0
+      },
+      {
+        "surface": "station-quartermaster.js",
+        "baselineBytes": 1400285,
+        "finalBytes": 1400285,
+        "deltaBytes": 0
+      }
+    ],
+    "dependenciesChanged": false
+  },
+  "browserEvidence": [
+    "qa-closure-0.4.1-evidence/browser-targeted.json",
+    "qa-closure-0.4.1-evidence/reactor-constrained-dev.jpg"
+  ],
+  "pc2": {
+    "existingCheckout": "C:\\Users\\mlgjm\\OneDrive\\Desktop\\GameWebsite",
+    "patchCheckout": "C:\\Users\\mlgjm\\.codex\\worktrees\\qa-closure-04-1\\GameWebsite",
+    "commands": [
+      "git fetch origin",
+      "git switch codex/qa-closure-04-1",
+      "git log -1 --oneline",
+      "npm.cmd run qa:dev",
+      "npm.cmd run qa:doctor",
+      "npm.cmd run qa:preview"
+    ],
+    "ports": {
+      "dev": 5191,
+      "production": 5192
+    },
+    "instruction": "Preserve dirty files/use clean worktree. Exact session URL printed by qa:dev. Restart older server after switching source. Separate shells; strict ports. No automatic merge/deploy."
+  }
+}

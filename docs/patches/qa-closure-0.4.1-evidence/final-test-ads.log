@@ -1,0 +1,81 @@
+
+> studio-game-portal@0.1.0 test:ads
+> node --experimental-transform-types --test tests/ads.test.mjs
+
+(node:17196) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ every interstitial registry default crosses 100; zero finite global cap blocks (23.3209ms)
+✖ help hover/focus/tap, Escape precedence and disposal without action side effects (334.8383ms)
+✔ all persisted fields and test actions have specific help (0.6682ms)
+✔ summary separates current policy, active preparation and historical result (1.0728ms)
+✔ timing shortcuts and Force keep documented independent boundaries (0.3427ms)
+✔ unlimited policy crosses both previous cap boundaries; explicit finite limits retain history (4.002ms)
+✔ legacy numeric caps ask for a choice while preserving unrelated settings (0.3027ms)
+✔ banner integration is outside iframe and after the player action bar (2.4848ms)
+✔ Ad Dev Panel is non-modal and website fullscreen overlay code is absent (2.2322ms)
+✔ fresh configuration keeps startup support OFF until enabled (0.2002ms)
+✔ Null adapter settles unavailable and cannot display anything (0.5627ms)
+✔ startup is attempted once per session and can reset in dev (0.2839ms)
+✔ startup failed settles fail-open without courtesy or show (0.1107ms)
+✔ startup no_fill settles fail-open without courtesy or show (0.199ms)
+✔ startup timeout settles fail-open without courtesy or show (0.0831ms)
+✔ startup unavailable settles fail-open without courtesy or show (0.0627ms)
+✔ only visible playing time counts; eligibility never shows an ad (0.1353ms)
+✔ interstitial requires time and registered semantic event (0.1456ms)
+✔ interstitial interval, cooldown, and session cap work independently (0.1746ms)
+✔ rewarded requires explicit opt-in (0.0824ms)
+✔ reward result completed qualifies only completed (0.1857ms)
+✔ reward result closed qualifies only completed (0.083ms)
+✔ reward result failed qualifies only completed (0.0724ms)
+✔ reward result no_fill qualifies only completed (0.0708ms)
+✔ reward result timeout qualifies only completed (0.0694ms)
+✔ reward result unavailable qualifies only completed (0.0657ms)
+✔ reward result blocked qualifies only completed (0.0613ms)
+✔ reward completion without actual showing cannot qualify (0.135ms)
+✔ one fullscreen request at a time; deadline settles broken provider (31.7883ms)
+✔ rewarded showing resets the interstitial cooldown by default (0.3361ms)
+✔ website service prepares then delegates showing without rendering courtesy (0.1291ms)
+✔ route cancellation settles and does not grant rewards (0.9956ms)
+✔ config clamps values, drops unknown keys and cannot persist mock garbage (0.2086ms)
+✔ readiness exceptions and show timeouts settle without rewards (30.1081ms)
+✔ placement enabled, cooldown and cap are enforced (0.3156ms)
+✔ zero placement cap blocks its first request (0.1006ms)
+✔ optional run identity enables a future per-run placement cap (0.2405ms)
+✔ clearing statistics does not reset session safety limits (0.129ms)
+✔ banner visibility is independent and counts one impression per mount/show (0.1428ms)
+✔ bridge schema rejects malformed, unknown and excessive messages (0.2357ms)
+✔ game presentation broker sends identity/config and accepts one ordered completion (0.4023ms)
+✔ renderer unavailable and renderer timeout settle safely without showing (14.4607ms)
+✔ MockAdapter remains a DEV logical provider and delegates visuals to the game broker (0.5287ms)
+✔ bridge rejects presentation lifecycle from wrong origin/source (0.3561ms)
+✔ disposed bridge does not deliver a late ad result (0.4983ms)
+✔ banner cleanup failure cannot break route cleanup (0.2437ms)
+✔ bridge authenticates source/origin/game and deduplicates requests and acknowledgments (2.4911ms)
+ℹ Error: Test "help hover/focus/tap, Escape precedence and disposal without action side effects" at tests\ads.test.mjs:24:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: this.doc.querySelector is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ tests 47
+ℹ suites 0
+ℹ pass 46
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 616.6721
+
+✖ failing tests:
+
+test at tests\ads.test.mjs:24:1
+✖ help hover/focus/tap, Escape precedence and disposal without action side effects (334.8383ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (file:///C:/Users/mlgjm/.codex/worktrees/qa-closure-04-1/GameWebsite/tests/ads.test.mjs:40:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

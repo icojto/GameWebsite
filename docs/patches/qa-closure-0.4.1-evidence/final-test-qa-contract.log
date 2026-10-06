@@ -1,0 +1,24 @@
+
+> studio-game-portal@0.1.0 test:qa-contract
+> node --experimental-transform-types --test tests/qa-contract.test.mjs
+
+(node:12240) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ heat text/bar normalization includes tuned capacity and invalid input (0.6416ms)
+✔ normal fresh initialization is playable and terminal re-evaluation is once (0.3861ms)
+✔ explicit mute reload, corruption and denied storage (0.2681ms)
+✔ QA resets, legacy/corrupt entries and reload preserve real and other session sentinels (0.2698ms)
+✔ failed QA storage uses namespaced memory without real fallback (0.3031ms)
+✔ actual named fixtures initialize fresh state and finalize one active run without advertising (0.3781ms)
+✔ fixture setup respects transition lock and real resolving callbacks (0.3065ms)
+✔ QA seeded stream is reproducible without changing production randomness (0.0965ms)
+✔ actual audio ad suspension never writes the saved user mute preference (0.219ms)
+✔ actual profile migration, corruption, reset and reload through QA adapter preserve real profile sentinel (0.9257ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 161.796

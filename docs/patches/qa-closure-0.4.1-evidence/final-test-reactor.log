@@ -1,0 +1,29 @@
+
+> studio-game-portal@0.1.0 test:reactor
+> node --experimental-transform-types --test games/reactor-stack/tests/game.test.ts
+
+(node:6060) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ production geometry is a deterministic 6 × 6 board (1.2025ms)
+✔ menu start initializes one clean 6 × 6 PLAYING run (0.1692ms)
+✔ coordinates and weighted spawn stay in configured bounds (0.2804ms)
+✔ full board cannot spawn and no full-board action is invented (0.0749ms)
+✔ empty orthogonal move increments Moves exactly once and spawns (0.1044ms)
+✔ invalid neighbor, unequal merge, and diagonal action are free (0.0724ms)
+✔ same tiers merge with preserved rewards and Tier V does not merge (0.2371ms)
+✔ win has precedence over same-turn heat failure and avoids spawning (0.087ms)
+✔ heat and deadlock failures resolve with no legal action (0.1903ms)
+✔ Cool Core uses one charge, clamps heat and leaves other systems unchanged (0.1815ms)
+✔ Upgrade advances Tier I–IV only, consumes only valid target and has no turn rewards (0.14ms)
+✔ controller locks input while resolving and pauses without losing board state (0.2055ms)
+✔ tap and drag share selection rules (0.1351ms)
+✔ Top 10 score storage orders score then fewer moves, persists outcomes and survives malformed data (0.3653ms)
+✔ layout calculations are presentation-only and never mutate an active game state (0.1122ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 146.2524

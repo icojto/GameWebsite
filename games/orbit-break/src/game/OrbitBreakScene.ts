@@ -1,3 +1,4 @@
+import { gameRandom } from '../../../../shared/storage.mjs';
 import Phaser from 'phaser';
 import { OrbitAudio } from './audio';
 import { COLORS, createRuntimeConfig, type FormationId } from './config';
@@ -108,7 +109,7 @@ export class OrbitBreakScene extends Phaser.Scene {
     if (this.adSuspended) return;
     this.adFlow?.tick(delta);
     if (this.run.phase === 'playing') {
-      const events = this.run.update(delta, this.orbitRadius, this.hazardStartDistance());
+      const events = this.run.update(delta, this.orbitRadius, this.hazardStartDistance(), gameRandom);
       if (this.run.protectionMs <= 0 && this.hint.text === 'SHIELD ACTIVE') this.hint.setText('REVERSE TO EVADE');
       const second = Math.floor(this.run.elapsedMs / 1000);
       if (second > this.lastQuestSecond) {
@@ -180,7 +181,7 @@ export class OrbitBreakScene extends Phaser.Scene {
     this.run.phase = 'game-over'; this.endGame();
   }
 
-  fireFormation(id: FormationId): boolean { return this.run.fire(id, this.hazardStartDistance()); }
+  fireFormation(id: FormationId): boolean { return this.run.fire(id, this.hazardStartDistance(), gameRandom); }
 
   openPause(): void { this.pause(); this.ui.open('pause'); }
   refreshUI(): void { this.ui.refreshProfile(); this.ui.updateScore(this.run.score); }
@@ -199,7 +200,7 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   private handleAction(): void {
-    if (this.adSuspended || this.adFlow.pending || this.ui.isPanelOpen || this.run.phase === 'paused') return;
+    if (document.querySelector('dialog[open]') || this.adSuspended || this.adFlow.pending || this.ui.isPanelOpen || this.run.phase === 'paused') return;
     const now = this.time.now;
     if (now - this.lastActionAt < this.config.inputDebounceMs) return;
     this.lastActionAt = now;
