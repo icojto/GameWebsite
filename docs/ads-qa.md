@@ -116,3 +116,7 @@ Automated coverage of requested cases 1–51 is in `tests/orbit-ads.test.mjs` pl
 ## Reactor v1 handoff
 Run `npm.cmd run test:reactor-ads` in addition to all shared, Orbit, portal and Reactor regression suites. The detailed 20-step human checklist, tested commands, browser-tool limitations and PC2 instructions are in [the Reactor patch log](patches/2026-10-05-reactor-monetization-v1.md).
 Automated checks include real host bridge -> mock adapter -> presentation broker -> Reactor client -> provider-independent renderer, separate refill run ceilings, start precedence, queued Pause, actual-use accounting and production exclusions. They are not rendered iframe, physical-device, screen-reader or console verification.
+
+## QA closure 0.4.1 / Prompt 4B
+
+Use the new [QA contract](qa-contract-0.4.1.md) and [dated targeted handoff](patches/2026-10-06-qa-closure-0.4.1.md). `qa:dev` prints an isolated session URL; `qa:preview` is actual production Null. Existing checklists remain historical/compound requirements, with no automatic reclassification. Config View is locally verified; saved download bytes and clipboard-specific assertions still require human verification. QA reset never clears host safety history. Restart/rebuild after changing checkout; older running servers do not acquire a new build identity automatically.

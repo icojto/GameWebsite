@@ -31,6 +31,7 @@ test('help hover/focus/tap, Escape precedence and disposal without action side e
     remove(){this.isConnected=false;if(this.parentElement)this.parentElement.children=this.parentElement.children.filter(n=>n!==this);}
   }
   const doc=new EventTarget();doc.body=new Element();doc.createElement=()=>new Element();doc.defaultView=new EventTarget();doc.defaultView.innerWidth=360;doc.defaultView.innerHeight=360;doc.activeElement=null;
+  let dialogOpen=false;doc.querySelector=(selector)=>selector==='dialog[open]'&&dialogOpen?{}:null;
   const control=new Element();doc.body.append(control);let actions=0;control.addEventListener('click',()=>actions++);
   const help=new ContextHelp(doc);help.attach(control,'Disabled test control','Specific explanation',doc.body);
   const bubble=doc.body.children.find(n=>n.attributes.role==='tooltip'),owner=doc.body.children.at(-1),button=owner.children[0];
@@ -39,6 +40,8 @@ test('help hover/focus/tap, Escape precedence and disposal without action side e
   const escape=new Event('keydown',{cancelable:true});Object.defineProperty(escape,'key',{value:'Escape'});doc.dispatchEvent(escape);
   assert.equal(escape.defaultPrevented,true);assert.equal(bubble.hidden,true);
   doc.activeElement=control;control.dispatchEvent(new Event('focusin'));assert.equal(bubble.hidden,false);
+  dialogOpen=true;const modalEscape=new Event('keydown',{cancelable:true});Object.defineProperty(modalEscape,'key',{value:'Escape'});doc.dispatchEvent(modalEscape);
+  assert.equal(modalEscape.defaultPrevented,false);assert.equal(bubble.hidden,true);
   help.destroy();control.dispatchEvent(new Event('focusin'));assert.equal(bubble.isConnected,false);assert.equal(actions,0);
 });
 test('all persisted fields and test actions have specific help',()=>{

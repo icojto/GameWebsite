@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "scope": "Targeted desktop viewport emulation; not physical devices",
+  "productionMatrix": [
+    {
+      "browser": {
+        "width": 320,
+        "height": 800
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 87
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 87
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 87
+        }
+      ],
+      "height": 462,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 28,
+            "height": 14,
+            "left": 13,
+            "right": 49.703125,
+            "top": 14,
+            "width": 36.703125,
+            "x": 13,
+            "y": 14
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 28.390625,
+            "height": 16.796875,
+            "left": 257.09375,
+            "right": 266,
+            "top": 11.59375,
+            "width": 8.90625,
+            "x": 257.09375,
+            "y": 11.59375
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 358,
+            "height": 269,
+            "left": 5,
+            "right": 274,
+            "top": 89,
+            "width": 269,
+            "x": 5,
+            "y": 89
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 408,
+            "height": 12,
+            "left": 258.09375,
+            "right": 274,
+            "top": 396,
+            "width": 15.90625,
+            "x": 258.09375,
+            "y": 396
+          }
+        }
+      ],
+      "mode": "constrained",
+      "noScroll": true,
+      "width": 279,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    },
+    {
+      "browser": {
+        "width": 360,
+        "height": 640
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 86.328125
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 86.328125
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 86.34375
+        }
+      ],
+      "height": 369,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 28,
+            "height": 14,
+            "left": 13,
+            "right": 49.703125,
+            "top": 14,
+            "width": 36.703125,
+            "x": 13,
+            "y": 14
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 28.390625,
+            "height": 16.796875,
+            "left": 255.09375,
+            "right": 264,
+            "top": 11.59375,
+            "width": 8.90625,
+            "x": 255.09375,
+            "y": 11.59375
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 298,
+            "height": 242,
+            "left": 17.5,
+            "right": 259.5,
+            "top": 56,
+            "width": 242,
+            "x": 17.5,
+            "y": 56
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 315,
+            "height": 12,
+            "left": 256.09375,
+            "right": 272,
+            "top": 303,
+            "width": 15.90625,
+            "x": 256.09375,
+            "y": 303
+          }
+        }
+      ],
+      "mode": "constrained",
+      "noScroll": true,
+      "width": 277,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    },
+    {
+      "browser": {
+        "width": 640,
+        "height": 360
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 73.65625
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 73.671875
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 73.65625
+        }
+      ],
+      "height": 318,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 28,
+            "height": 14,
+            "left": 13,
+            "right": 49.703125,
+            "top": 14,
+            "width": 36.703125,
+            "x": 13,
+            "y": 14
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 28.390625,
+            "height": 16.796875,
+            "left": 217.09375,
+            "right": 226,
+            "top": 11.59375,
+            "width": 8.90625,
+            "x": 217.09375,
+            "y": 11.59375
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 247,
+            "height": 191,
+            "left": 24,
+            "right": 215,
+            "top": 56,
+            "width": 191,
+            "x": 24,
+            "y": 56
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 264,
+            "height": 12,
+            "left": 218.09375,
+            "right": 234,
+            "top": 252,
+            "width": 15.90625,
+            "x": 218.09375,
+            "y": 252
+          }
+        }
+      ],
+      "mode": "constrained",
+      "noScroll": true,
+      "width": 239,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    },
+    {
+      "browser": {
+        "width": 844,
+        "height": 390
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 83.65625
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 83.671875
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 83.65625
+        }
+      ],
+      "height": 358,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 28,
+            "height": 14,
+            "left": 13,
+            "right": 49.703125,
+            "top": 14,
+            "width": 36.703125,
+            "x": 13,
+            "y": 14
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 28.390625,
+            "height": 16.796875,
+            "left": 247.09375,
+            "right": 256,
+            "top": 11.59375,
+            "width": 8.90625,
+            "x": 247.09375,
+            "y": 11.59375
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 287,
+            "height": 231,
+            "left": 19,
+            "right": 250,
+            "top": 56,
+            "width": 231,
+            "x": 19,
+            "y": 56
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 304,
+            "height": 12,
+            "left": 248.09375,
+            "right": 264,
+            "top": 292,
+            "width": 15.90625,
+            "x": 248.09375,
+            "y": 292
+          }
+        }
+      ],
+      "mode": "constrained",
+      "noScroll": true,
+      "width": 269,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    },
+    {
+      "browser": {
+        "width": 932,
+        "height": 430
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 83.65625
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 83.671875
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 83.65625
+        }
+      ],
+      "height": 358,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 28,
+            "height": 14,
+            "left": 13,
+            "right": 49.703125,
+            "top": 14,
+            "width": 36.703125,
+            "x": 13,
+            "y": 14
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 28.390625,
+            "height": 16.796875,
+            "left": 247.09375,
+            "right": 256,
+            "top": 11.59375,
+            "width": 8.90625,
+            "x": 247.09375,
+            "y": 11.59375
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 287,
+            "height": 231,
+            "left": 19,
+            "right": 250,
+            "top": 56,
+            "width": 231,
+            "x": 19,
+            "y": 56
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 304,
+            "height": 12,
+            "left": 248.09375,
+            "right": 264,
+            "top": 292,
+            "width": 15.90625,
+            "x": 248.09375,
+            "y": 292
+          }
+        }
+      ],
+      "mode": "constrained",
+      "noScroll": true,
+      "width": 269,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    },
+    {
+      "browser": {
+        "width": 321,
+        "height": 800
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 58.5625
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 64.4375
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 64.421875
+        }
+      ],
+      "height": 462,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 52,
+            "height": 34,
+            "left": 212.859375,
+            "right": 236.21875,
+            "top": 18,
+            "width": 23.359375,
+            "x": 212.859375,
+            "y": 18
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 39.046875,
+            "height": 22.046875,
+            "left": 249.3125,
+            "right": 261,
+            "top": 17,
+            "width": 11.6875,
+            "x": 249.3125,
+            "y": 17
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 368,
+            "height": 264,
+            "left": 8,
+            "right": 272,
+            "top": 104,
+            "width": 264,
+            "x": 8,
+            "y": 104
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 402,
+            "height": 11,
+            "left": 255.34375,
+            "right": 272,
+            "top": 391,
+            "width": 16.65625,
+            "x": 255.34375,
+            "y": 391
+          }
+        }
+      ],
+      "mode": "portrait",
+      "noScroll": true,
+      "width": 280,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    },
+    {
+      "browser": {
+        "width": 1366,
+        "height": 768
+      },
+      "controls": [
+        {
+          "height": 44,
+          "hit": "portrait-pause",
+          "id": "portrait-pause",
+          "width": 79.28125
+        },
+        {
+          "height": 44,
+          "hit": "portrait-cool",
+          "id": "portrait-cool",
+          "width": 87.21875
+        },
+        {
+          "height": 44,
+          "hit": "portrait-upgrade",
+          "id": "portrait-upgrade",
+          "width": 87.203125
+        }
+      ],
+      "height": 490,
+      "hud": [
+        {
+          "id": "stability-label",
+          "rect": {
+            "bottom": 34,
+            "height": 16,
+            "left": 285.484375,
+            "right": 328.3125,
+            "top": 18,
+            "width": 42.828125,
+            "x": 285.484375,
+            "y": 18
+          }
+        },
+        {
+          "id": "moves",
+          "rect": {
+            "bottom": 39.046875,
+            "height": 22.046875,
+            "left": 336.3125,
+            "right": 348,
+            "top": 17,
+            "width": 11.6875,
+            "x": 336.3125,
+            "y": 17
+          }
+        },
+        {
+          "id": "board",
+          "rect": {
+            "bottom": 414,
+            "height": 335,
+            "left": 16,
+            "right": 351,
+            "top": 79,
+            "width": 335,
+            "x": 16,
+            "y": 79
+          }
+        },
+        {
+          "id": "heat",
+          "rect": {
+            "bottom": 430,
+            "height": 11,
+            "left": 342.34375,
+            "right": 359,
+            "top": 419,
+            "width": 16.65625,
+            "x": 342.34375,
+            "y": 419
+          }
+        }
+      ],
+      "mode": "portrait",
+      "noScroll": true,
+      "width": 367,
+      "pauseResumeOperated": true,
+      "upgradeArmed": true
+    }
+  ],
+  "productionQaQuery": "?qa=1: no QA nodes; portal/embed build IDs matched",
+  "resolving": {
+    "before": {
+      "schemaVersion": 1,
+      "sequence": 1,
+      "sampledAt": "2026-10-06T17:59:45.622Z",
+      "session": "08896a6c-1501-464e-b87c-e2c62915d321",
+      "mode": "development",
+      "build": {
+        "schema": 1,
+        "id": "d3cfe4ad-4cdd-470b-9e72-94256a350f2b",
+        "revision": "0a959449f0de7d2efd2f9c471fc023cef1335f55",
+        "dirty": false,
+        "mode": "development"
+      },
+      "game": "reactor-stack",
+      "phase": "PLAYING",
+      "runId": "656fbfc3-ecf8-4741-8066-8cf030aeeae8",
+      "pendingTransition": null,
+      "adSuspended": false,
+      "bridgeConnected": true,
+      "capabilities": {
+        "providerMode": "mock",
+        "fullscreenAvailable": true,
+        "rewardedAvailable": true,
+        "startupDue": false
+      },
+      "error": "none",
+      "gridWidth": 6,
+      "gridHeight": 6,
+      "board": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "heat": 0,
+      "heatMaximum": 50,
+      "stability": 0,
+      "stabilityTarget": 100,
+      "moves": 0,
+      "score": 0,
+      "selection": null,
+      "upgradeArmed": false,
+      "resolution": false,
+      "pauseQueued": false,
+      "inventory": {
+        "cool": 1,
+        "upgrade": 1
+      },
+      "used": {
+        "cool": 0,
+        "upgrade": 0
+      },
+      "granted": {
+        "cool": 1,
+        "upgrade": 1
+      },
+      "shownAttempts": {
+        "cool": false,
+        "upgrade": false
+      },
+      "completedRecorded": false,
+      "sessionLogCount": 0
+    },
+    "during": {
+      "schemaVersion": 1,
+      "sequence": 2,
+      "sampledAt": "2026-10-06T17:59:46.590Z",
+      "session": "08896a6c-1501-464e-b87c-e2c62915d321",
+      "mode": "development",
+      "build": {
+        "schema": 1,
+        "id": "d3cfe4ad-4cdd-470b-9e72-94256a350f2b",
+        "revision": "0a959449f0de7d2efd2f9c471fc023cef1335f55",
+        "dirty": false,
+        "mode": "development"
+      },
+      "game": "reactor-stack",
+      "phase": "RESOLVING",
+      "runId": "656fbfc3-ecf8-4741-8066-8cf030aeeae8",
+      "pendingTransition": null,
+      "adSuspended": false,
+      "bridgeConnected": true,
+      "capabilities": {
+        "providerMode": "mock",
+        "fullscreenAvailable": true,
+        "rewardedAvailable": true,
+        "startupDue": false
+      },
+      "error": "none",
+      "gridWidth": 6,
+      "gridHeight": 6,
+      "board": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "heat": 4,
+      "heatMaximum": 50,
+      "stability": 0,
+      "stabilityTarget": 100,
+      "moves": 1,
+      "score": 0,
+      "selection": null,
+      "upgradeArmed": false,
+      "resolution": true,
+      "pauseQueued": false,
+      "inventory": {
+        "cool": 1,
+        "upgrade": 1
+      },
+      "used": {
+        "cool": 0,
+        "upgrade": 0
+      },
+      "granted": {
+        "cool": 1,
+        "upgrade": 1
+      },
+      "shownAttempts": {
+        "cool": false,
+        "upgrade": false
+      },
+      "completedRecorded": false,
+      "sessionLogCount": 0
+    },
+    "after": {
+      "schemaVersion": 1,
+      "sequence": 3,
+      "sampledAt": "2026-10-06T17:59:58.974Z",
+      "session": "08896a6c-1501-464e-b87c-e2c62915d321",
+      "mode": "development",
+      "build": {
+        "schema": 1,
+        "id": "d3cfe4ad-4cdd-470b-9e72-94256a350f2b",
+        "revision": "0a959449f0de7d2efd2f9c471fc023cef1335f55",
+        "dirty": false,
+        "mode": "development"
+      },
+      "game": "reactor-stack",
+      "phase": "PLAYING",
+      "runId": "656fbfc3-ecf8-4741-8066-8cf030aeeae8",
+      "pendingTransition": null,
+      "adSuspended": false,
+      "bridgeConnected": true,
+      "capabilities": {
+        "providerMode": "mock",
+        "fullscreenAvailable": true,
+        "rewardedAvailable": true,
+        "startupDue": false
+      },
+      "error": "none",
+      "gridWidth": 6,
+      "gridHeight": 6,
+      "board": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "heat": 4,
+      "heatMaximum": 50,
+      "stability": 0,
+      "stabilityTarget": 100,
+      "moves": 1,
+      "score": 0,
+      "selection": null,
+      "upgradeArmed": false,
+      "resolution": false,
+      "pauseQueued": false,
+      "inventory": {
+        "cool": 1,
+        "upgrade": 1
+      },
+      "used": {
+        "cool": 0,
+        "upgrade": 0
+      },
+      "granted": {
+        "cool": 1,
+        "upgrade": 1
+      },
+      "shownAttempts": {
+        "cool": false,
+        "upgrade": false
+      },
+      "completedRecorded": false,
+      "sessionLogCount": 0
+    }
+  },
+  "forced": {
+    "schemaVersion": 1,
+    "sequence": 1,
+    "sampledAt": "2026-10-06T17:54:40.114Z",
+    "session": "08896a6c-1501-464e-b87c-e2c62915d321",
+    "mode": "development",
+    "build": {
+      "schema": 1,
+      "id": "d3cfe4ad-4cdd-470b-9e72-94256a350f2b",
+      "revision": "0a959449f0de7d2efd2f9c471fc023cef1335f55",
+      "dirty": false,
+      "mode": "development"
+    },
+    "game": "reactor-stack",
+    "phase": "RESULT",
+    "runId": "8d8fef79-b52b-41b6-a5d2-c392f6d367ba",
+    "pendingTransition": null,
+    "adSuspended": false,
+    "bridgeConnected": true,
+    "capabilities": {
+      "providerMode": "mock",
+      "fullscreenAvailable": true,
+      "rewardedAvailable": true,
+      "startupDue": false
+    },
+    "error": "none",
+    "gridWidth": 6,
+    "gridHeight": 6,
+    "board": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      2,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "heat": 100,
+    "heatMaximum": 100,
+    "stability": 0,
+    "stabilityTarget": 100,
+    "moves": 0,
+    "score": 0,
+    "selection": null,
+    "upgradeArmed": false,
+    "resolution": false,
+    "pauseQueued": false,
+    "inventory": {
+      "cool": 1,
+      "upgrade": 1
+    },
+    "used": {
+      "cool": 0,
+      "upgrade": 0
+    },
+    "granted": {
+      "cool": 1,
+      "upgrade": 1
+    },
+    "shownAttempts": {
+      "cool": false,
+      "upgrade": false
+    },
+    "completedRecorded": true,
+    "sessionLogCount": 1
+  },
+  "download": "NOT VERIFIED: bounded browser download timeout after one targeted retry",
+  "console": "NOT VERIFIED: prior source-less MutationObserver error",
+  "productionDestructive": "NOT VERIFIED: disposable profile unavailable"
+}

@@ -34,3 +34,9 @@ npm.cmd run preview
 ```
 
 No real provider, advertising revenue, SDK/network integration, analytics, CMP or legal/compliance approval is included. Physical-device touch/audio and long-session testing remain human QA.
+
+## QA patch 0.4.1
+
+Explicit MUTE now persists in validated `orbitBreak.audio.v1`, loaded before gesture unlock. Ad suspension never saves that preference; other volume tuning remains RAM-only. Scores reset retains mute and progression; profile reset retains best and mute. DEV reset confirmations now use a scoped owner-document HTML dialog.
+
+From the portal root use `npm.cmd run qa:dev` and its exact session URL for isolated storage, visible **Open Game DEV**, real lifecycle fixtures and read-only JSON inspection. Fixed legacy/corrupt examples affect only that QA namespace. See [QA contract](../../docs/qa-contract-0.4.1.md) for reset scopes, selectors and human limits.

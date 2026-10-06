@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const forbidden = [
   'qa-confirmation', 'qa-inspection', 'qa-reset-namespace', 'odesos.qa.', 'VITE_QA_SESSION', 'Open Game DEV', 'QA FIXTURES', 'reactor-dev-', 'orbit-qa.', 'qa-game-launcher', 'seededRandom',
+  'qa-json', 'QA inspection', 'Resolving Move Setup', 'Powers Depleted', 'Load fixed corrupt fixture', 'Load fixed legacy fixture',
   'ODESOS AD DEV', 'MOCK AD', 'odesos-ad-dev', 'odesos-ad-overlay',
   'odesos-mock-banner', 'odesos.dev.ads.v1', 'odesos.dev.ads.v1.1', 'Sorry for the quick pause!',
   'Odesos ad courtesy preview', 'Advertisement simulation', 'ad-mascot-bob', 'MockAdAdapter',
