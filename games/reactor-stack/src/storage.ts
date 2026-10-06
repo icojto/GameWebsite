@@ -1,7 +1,8 @@
+import { gameStorage } from '../../../shared/storage.mjs';
 export interface Store { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem?(key: string): void }
 export type ScoreEntry = { score: number; moves: number; result: 'WIN' | 'FAIL'; timestamp: number };
 export const SCORE_KEY = 'reactor-stack-scores'; export const LEGACY_BEST_KEY = 'reactor-stack-best';
-const storeOf = (store?: Store) => store ?? localStorage;
+const storeOf = (store?: Store) => store ?? gameStorage;
 const valid = (value: unknown): value is ScoreEntry => Boolean(value && typeof value === 'object' && Number.isFinite((value as ScoreEntry).score) && Number.isFinite((value as ScoreEntry).moves) && ((value as ScoreEntry).result === 'WIN' || (value as ScoreEntry).result === 'FAIL') && Number.isFinite((value as ScoreEntry).timestamp));
 export function orderScores(entries: ScoreEntry[]): ScoreEntry[] { return entries.filter(valid).sort((a, b) => b.score - a.score || a.moves - b.moves || a.timestamp - b.timestamp).slice(0, 10); }
 export function readScores(store?: Store): ScoreEntry[] { try { const parsed = JSON.parse(storeOf(store).getItem(SCORE_KEY) ?? '[]'); return Array.isArray(parsed) ? orderScores(parsed) : []; } catch { return []; } }

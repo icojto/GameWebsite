@@ -12,3 +12,6 @@ Thumbs.db
 coverage/
 *.local
 *.log
+
+.qa-build-identity.json
+outputs/

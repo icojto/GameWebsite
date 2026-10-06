@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite';
+import { buildMetadata, identityPlugin } from './scripts/build-identity.mjs';
 import { readFile } from 'node:fs/promises';
 import { gameCatalog } from './src/games/catalog.mjs';
 
 // The configured Pages custom domain serves this site from its root.
-export default defineConfig({
+export default defineConfig(({command}) => ({
   base: '/',
-  plugins: [{
+  plugins: [identityPlugin(buildMetadata(command==='serve'?'development':'production')), {
     name: 'portal-game-routes',
     configureServer(server) {
       // Source directories share portal route names. Keep exact page requests
@@ -30,4 +31,4 @@ export default defineConfig({
       });
     },
   }],
-});
+}));

@@ -1,5 +1,6 @@
+import { gameStorage } from '../../shared/storage.mjs';
 /** Site preferences are optional. Restricted storage must never stop rendering. */
-export function createSafeStorage(getStorage = () => globalThis.localStorage) {
+export function createSafeStorage(getStorage = () => gameStorage) {
   return {
     get(key, fallback = null) {
       try { return getStorage().getItem(key) ?? fallback; }
