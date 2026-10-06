@@ -16,7 +16,7 @@ computing gzip size...
 ../../public/games/orbit-break/embed/assets/index-Gu2nUy7D.js   1,428.28 kB │ gzip: 374.43 kB
 
 ✓ built in 1.30s
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
@@ -31,7 +31,7 @@ computing gzip size...
 ../../public/games/reactor-stack/embed/assets/index-D92_tcRj.js   1,410.57 kB │ gzip: 369.37 kB
 
 ✓ built in 411ms
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
@@ -46,7 +46,7 @@ computing gzip size...
 ../../public/games/last-relay/embed/assets/index-BLVft_gD.js   1,388.74 kB │ gzip: 363.10 kB
 
 ✓ built in 400ms
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
@@ -61,7 +61,7 @@ computing gzip size...
 ../../public/games/station-quartermaster/embed/assets/index--U0Xn8oV.js   1,400.28 kB │ gzip: 367.51 kB
 
 ✓ built in 407ms
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
@@ -76,7 +76,7 @@ computing gzip size...
 ../../public/games/signal-below/embed/assets/index-CPIJxqhR.js   1,420.06 kB │ gzip: 375.08 kB
 
 ✓ built in 416ms
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting

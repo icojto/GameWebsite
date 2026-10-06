@@ -66,9 +66,9 @@
 test at tests\ads.test.mjs:24:1
 ✖ help hover/focus/tap, Escape precedence and disposal without action side effects (334.8383ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-  
+
   false !== true
-  
+
       at TestContext.<anonymous> (file:///C:/Users/mlgjm/.codex/worktrees/qa-closure-04-1/GameWebsite/tests/ads.test.mjs:40:10)
       at async Test.run (node:internal/test_runner/test:1409:7)
       at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {

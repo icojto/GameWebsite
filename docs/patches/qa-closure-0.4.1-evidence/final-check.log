@@ -5,4 +5,3 @@
 
 > studio-game-portal@0.1.0 check:games
 > node scripts/check-games.mjs
-
