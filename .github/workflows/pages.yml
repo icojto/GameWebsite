@@ -28,6 +28,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run test:monetization
       - run: npm run test:portal
       - run: npm run test:ads
       - run: npm run test:orbit

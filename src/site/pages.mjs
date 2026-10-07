@@ -18,7 +18,7 @@ const staticPages = [
   {
     path: '/contact/',
     title: 'Contact — OdesosGames',
-    description: 'Find the current contact status for OdesosGames and browse its available browser games.',
+    description: 'Contact OdesosGames at contact@odesosgames.com about its browser games.',
   },
 ];
 

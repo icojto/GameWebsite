@@ -5,6 +5,7 @@ import { publicGameCatalog } from './games/catalog.mjs';
 import { publicPages, siteOrigin, socialImagePath } from './site/pages.mjs';
 import { readThemePreference, siteStorage } from './site/storage.mjs';
 import { createAdRuntime } from './ads/runtime.ts';
+import { requestPrivacySettings } from './site/privacy-settings.mjs';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Portal root is missing.');
@@ -290,8 +291,8 @@ function renderContact(): void {
       <main id="main-content" tabindex="-1" class="simple-page">
         <p class="eyebrow"><span></span>Contact</p>
         <h1>Get in touch</h1>
-        <p>A public contact channel for OdesosGames has not been published yet. This page will be updated when one is available.</p>
-        <p>For now, you can continue exploring the current games on this site.</p>
+        <p>For questions about OdesosGames, email <a href="mailto:contact@odesosgames.com">contact@odesosgames.com</a>.</p>
+        <p>Please do not include passwords, payment details or identity documents in your message.</p>
         <a class="text-link" href="${sitePath('/')}#collection">Browse games <span aria-hidden="true">→</span></a>
       </main>
       ${renderFooter()}
@@ -304,8 +305,15 @@ function renderFooter(): string {
     <footer class="site-footer">
       <div class="footer-brand"><strong>OdesosGames</strong><span>Independent browser games · ${publicGameCatalog.length} playable games</span></div>
       <nav aria-label="Footer games"><strong>Games</strong>${publicGameCatalog.map((game) => `<a href="${sitePath(game.route)}">${escapeHtml(game.title)}</a>`).join('')}</nav>
-      <nav aria-label="Odesos information"><strong>Odesos</strong><a href="${sitePath('/about/')}">About</a><a href="${sitePath('/contact/')}">Contact</a></nav>
-    </footer>`;
+      <nav aria-label="Odesos information"><strong>Odesos</strong><a href="${sitePath('/about/')}">About</a><a href="${sitePath('/contact/')}">Contact</a><button type="button" class="privacy-settings-link" data-privacy-settings>Privacy and cookie settings</button></nav>
+    </footer>
+    <dialog class="privacy-settings-dialog" aria-labelledby="privacy-settings-title">
+      <h2 id="privacy-settings-title">Privacy and cookie settings</h2>
+      <p data-privacy-settings-status role="status"></p>
+      <p>Game progress and preferences are stored in this browser. You can remove them using your browser’s site data controls for OdesosGames. Clearing site data removes saved progress and preferences.</p>
+      <p>For privacy questions, email <a href="mailto:contact@odesosgames.com">contact@odesosgames.com</a>.</p>
+      <form method="dialog"><button type="submit">Close</button></form>
+    </dialog>`;
 }
 
 function renderHeader(active: 'home' | 'games' | 'about' | 'contact' | ''): string {
@@ -375,6 +383,18 @@ function renderOrbitVisual(className: string): string {
 }
 
 function bindSharedControls(): void {
+  const privacyButton = document.querySelector<HTMLButtonElement>('[data-privacy-settings]');
+  const privacyDialog = document.querySelector<HTMLDialogElement>('.privacy-settings-dialog');
+  privacyButton?.addEventListener('click', () => {
+    const state = requestPrivacySettings(window);
+    if (state === 'requested') return;
+    const status = privacyDialog?.querySelector<HTMLElement>('[data-privacy-settings-status]');
+    if (status) status.textContent = state === 'unavailable'
+      ? 'Advertising privacy controls are not active on this site. No advertising consent choice is being recorded here.'
+      : 'Advertising privacy controls could not open. No consent choice was changed. Please try again later.';
+    privacyDialog?.showModal();
+  });
+
   const themeToggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
   const currentTheme = getTheme();
   updateThemeControl(themeToggle, currentTheme);
