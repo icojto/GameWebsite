@@ -2,6 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { requestPrivacySettings } from '../src/site/privacy-settings.mjs';
 import { GoogleH5Adapter } from '../src/ads/google-h5-adapter.ts';
+import { NullAdAdapter } from '../src/ads/null-adapter.ts';
+
+test('AdSense ownership metadata does not activate an advertising provider', async () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const tags = html.match(/<meta\b[^>]*name="google-adsense-account"[^>]*>/g) ?? [];
+  assert.deepEqual(tags, ['<meta name="google-adsense-account" content="ca-pub-7528917701173650">']);
+  assert.equal(html.split('ca-pub-7528917701173650').length - 1, 1);
+  assert.doesNotMatch(html, /<script\b[^>]*src=["'][^"']*(?:adsbygoogle|googlesyndication|imasdk|doubleclick|playgama)/i);
+  const runtime = readFileSync(new URL('../src/ads/runtime.ts', import.meta.url), 'utf8');
+  assert.match(runtime, /new AdService\(new NullAdAdapter\(\)\)/);
+  const provider = new NullAdAdapter();
+  await provider.initialize();
+  assert.equal(provider.isReady(), false);
+  assert.equal(await provider.showAd(), 'unavailable');
+  assert.equal(provider.showBanner(), false);
+});
 
 test('privacy entry remains usable without CMP and reports provider failures without recording consent', () => {
   assert.equal(requestPrivacySettings({}), 'unavailable');

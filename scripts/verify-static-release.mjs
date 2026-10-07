@@ -74,6 +74,10 @@ try {
   const titles = new Set();
   for (const page of publicPages) {
     const html = await fetchOk(page.path);
+    const ownershipTags = html.match(/<meta\b[^>]*name="google-adsense-account"[^>]*>/g) ?? [];
+    assert.equal(ownershipTags.length, 1, `Ownership tag count for ${page.path}`);
+    assert.match(ownershipTags[0], /content="ca-pub-7528917701173650"/);
+    assert.equal(html.split('ca-pub-7528917701173650').length - 1, 1, `Publisher ID count for ${page.path}`);
     const canonical = `${siteOrigin}${page.path}`;
     assert.match(html, /<meta name="description" content="[^"]+"/);
     assert.ok(html.includes(`<title>${page.title}</title>`), `Title missing for ${page.path}`);
