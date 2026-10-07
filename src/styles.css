@@ -38,8 +38,10 @@ html { scroll-behavior: smooth; background:var(--bg); }
 /* Game navigation has one measured row, independent of portal breakpoints. */
 .game-page .topbar { grid-template-columns:minmax(0,1fr) auto auto; grid-template-areas:'brand nav theme'; gap:8px; padding:4px 0; min-height:52px; }
 .game-page .brand small { display:none; }
-.game-page .brand { min-width:0; gap:6px; }
-.game-page .brand strong { font-size:16px; }
+.game-page .brand { min-width:0; max-width:100%; gap:6px; }
+.game-page .brand-mark { flex-shrink:0; }
+.game-page .brand > span:last-child { min-width:0; }
+.game-page .brand strong { font-size:clamp(12px,3.4vw,16px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .game-page .theme-toggle { min-width:44px; min-height:44px; }
 .game-nav { grid-area:nav; position:relative; }
 .game-nav summary { min-height:44px; display:flex; align-items:center; padding:0 10px; cursor:pointer; border:1px solid var(--line); border-radius:8px; }
