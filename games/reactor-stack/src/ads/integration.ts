@@ -27,7 +27,7 @@ export function connectReactorAds(controller: TurnController, audio: ReactorAudi
       for (const id of [power, 'portrait-' + power]) {
         const button = document.getElementById(id)! as HTMLButtonElement;
         const label = button.querySelector<HTMLElement>('[data-power-label]')!;
-        label.textContent = offer ? 'Watch ad: +1 ' + (power === 'cool' ? 'Cool Core' : 'Upgrade')
+        label.textContent = offer ? (id.startsWith('portrait-') ? 'AD: +1 ' : 'Watch ad: +1 ') + (power === 'cool' ? 'Cool Core' : 'Upgrade')
           : power === 'cool' ? 'COOL CORE' : 'UPGRADE';
         button.classList.toggle('refill-offer', offer);
         button.title = offer ? 'One ad attempt per power-up each run. A completed qualified ad grants +1; skipping gives no reward.' : '';

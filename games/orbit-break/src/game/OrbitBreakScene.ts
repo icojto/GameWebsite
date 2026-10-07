@@ -6,8 +6,6 @@ import { ProfileStore, type ThemeId } from './profile';
 import { RunState } from './run';
 import { OrbitUI } from './ui';
 import { allowsBackgroundAction } from './input-policy.ts';
-import { mountViewportFallback } from '../../../../shared/game-viewport.ts';
-import '../../../../shared/game-viewport.css';
 import { OrbitAdClient } from '../ads/OrbitAdClient';
 import { OrbitAdFlow } from '../ads/OrbitAdFlow';
 import { GameAdPlayer } from '../ads/GameAdPlayer';
@@ -48,8 +46,6 @@ export class OrbitBreakScene extends Phaser.Scene {
   private adSuspended = false;
   private priorFocus: HTMLElement | null = null;
   private presentationInitialized = false;
-  private viewportSupported = true;
-  private updateViewportFallback?: ReturnType<typeof mountViewportFallback>;
 
   constructor() { super('OrbitBreak'); }
 
@@ -72,7 +68,6 @@ export class OrbitBreakScene extends Phaser.Scene {
 
     const parent = document.querySelector<HTMLElement>('#game');
     if (!parent) throw new Error('Orbit game root is missing.');
-    this.updateViewportFallback = mountViewportFallback(parent);
     this.ui = new OrbitUI(parent, this.profile, this.audio, {
       start: () => this.startGame(), revive: () => { void this.adFlow.revive(); },
       pause: () => this.pause(), resume: () => this.resume(), mainMenu: () => this.mainMenu(),
@@ -112,7 +107,7 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
-    if (this.adSuspended || !this.viewportSupported) return;
+    if (this.adSuspended) return;
     this.adFlow?.tick(delta);
     if (this.run.phase === 'playing') {
       const events = this.run.update(delta, this.orbitRadius, this.hazardStartDistance(), gameRandom);
@@ -206,7 +201,7 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   private handleAction(): void {
-    if (!allowsBackgroundAction(this.run.phase, !this.viewportSupported || !!document.querySelector('dialog[open]') || this.adSuspended || this.adFlow.pending || this.ui.isPanelOpen)) return;
+    if (!allowsBackgroundAction(this.run.phase, !!document.querySelector('dialog[open]') || this.adSuspended || this.adFlow.pending || this.ui.isPanelOpen)) return;
     const now = this.time.now;
     if (now - this.lastActionAt < this.config.inputDebounceMs) return;
     this.lastActionAt = now;
@@ -263,14 +258,12 @@ export class OrbitBreakScene extends Phaser.Scene {
   }
 
   private handleResize(gameSize: { width: number; height: number }): void {
-    const supported=this.updateViewportFallback?.(this.scale.width,this.scale.height) ?? true;
-    if(supported!==this.viewportSupported){this.viewportSupported=supported;if(!supported)this.audio.pauseMusic();else if(this.run.phase==='playing' && !this.adSuspended)this.audio.startMusic();}
 
     const width = Math.max(1, gameSize.width);
     const height = Math.max(1, gameSize.height);
     const top = Math.min(102, height * 0.29);
     const bottom = Math.min(68, height * 0.19);
-    const available = Math.max(160, height - top - bottom);
+    const available = Math.max(1, height - top - bottom);
     const previousRadius = this.orbitRadius;
     this.centerX = width / 2;
     this.centerY = top + available / 2;

@@ -8,7 +8,7 @@ export interface BoardPointerHooks {
 export function bindBoardPointer(canvas: HTMLElement, hooks: BoardPointerHooks) {
   let owner: number | null = null;
   function finishCapture(id: number) {
-    if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
+    try { if (canvas.hasPointerCapture?.(id)) canvas.releasePointerCapture(id); } catch { /* Detached canvas / already lost capture. */ }
   }
   function cancel() {
     const id = owner; owner = null;
@@ -16,11 +16,13 @@ export function bindBoardPointer(canvas: HTMLElement, hooks: BoardPointerHooks) 
     hooks.cancel();
   }
   function down(event: PointerEvent) {
-    if (owner !== null || event.button !== 0 || !hooks.enabled()) return;
+    if (owner !== null || (event.pointerType !== 'touch' && event.button !== 0) || !hooks.enabled()) return;
     owner = event.pointerId;
-    try { canvas.setPointerCapture(owner); } catch { cancel(); return; }
     event.preventDefault();
     hooks.begin(event.clientX, event.clientY, owner);
+    // Android may report unsupported/late capture. Window listeners still own
+    // this pointer until release/cancel; a capture exception cannot swallow it.
+    try { canvas.setPointerCapture?.(owner); } catch { /* Window release fallback. */ }
   }
   function move(event: PointerEvent) {
     if (event.pointerId !== owner) return;
@@ -37,17 +39,18 @@ export function bindBoardPointer(canvas: HTMLElement, hooks: BoardPointerHooks) 
   }
   function lost(event: PointerEvent) { if (event.pointerId === owner) cancel(); }
   canvas.addEventListener('pointerdown', down, { passive: false });
-  canvas.addEventListener('pointermove', move, { passive: false });
-  canvas.addEventListener('pointerup', up, { passive: false });
-  canvas.addEventListener('pointercancel', lost);
+  const surface = canvas.ownerDocument.defaultView ?? canvas;
+  surface.addEventListener('pointermove', move as EventListener, { passive: false });
+  surface.addEventListener('pointerup', up as EventListener, { passive: false });
+  surface.addEventListener('pointercancel', lost as EventListener);
   canvas.addEventListener('lostpointercapture', lost);
   canvas.ownerDocument.defaultView?.addEventListener('blur', cancel);
   return { cancel, destroy() {
     cancel();
     canvas.removeEventListener('pointerdown', down);
-    canvas.removeEventListener('pointermove', move);
-    canvas.removeEventListener('pointerup', up);
-    canvas.removeEventListener('pointercancel', lost);
+    surface.removeEventListener('pointermove', move as EventListener);
+    surface.removeEventListener('pointerup', up as EventListener);
+    surface.removeEventListener('pointercancel', lost as EventListener);
     canvas.removeEventListener('lostpointercapture', lost);
     canvas.ownerDocument.defaultView?.removeEventListener('blur', cancel);
   } };

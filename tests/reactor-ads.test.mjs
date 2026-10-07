@@ -19,6 +19,15 @@ function fakeClock() {
 }
 const envelope = { protocol:'odesos-ads', version:1, gameId:GAME_ID };
 const capabilities = { providerMode:'mock', fullscreenAvailable:true, rewardedAvailable:true, startupDue:false };
+for(const result of ['completed','closed','failed','no_fill','timeout','unavailable','blocked'])test(`Reactor resume/menu/restart resume intended action exactly once after ${result}`,async()=>{
+ const h=reactorHarness({result,deferred:true});h.flow.freshRun();const id=h.flow.runId;const state=structuredClone(h.controller.state);
+ h.controller.pause();const resume=h.flow.resume();void h.flow.resume();assert.equal(h.requests.length,1);assert.equal(h.requests[0].safeEvent,'resume-requested');h.resolve();await resume;
+ assert.equal(h.controller.phase,'PLAYING');assert.equal(h.flow.runId,id);assert.deepEqual(h.controller.state,state);
+ const menu=h.flow.menu();assert.equal(await h.flow.menu(),false);assert.equal(h.requests.length,2);assert.equal(h.requests[1].safeEvent,'main-menu-requested');h.resolve();assert.equal(await menu,true);assert.equal(h.controller.phase,'MENU');assert.equal(h.flow.runId,'');
+ await h.flow.start();assert.equal(h.requests.length,2);assert.equal(h.started,2);
+ h.controller.pause();const restart=h.flow.start(true);void h.flow.start(true);assert.equal(h.requests.length,3);assert.equal(h.requests[2].safeEvent,'restart-requested');h.resolve();await restart;
+ assert.equal(h.started,3);assert.notEqual(h.flow.runId,id);assert.equal(h.controller.state.moves,0);
+});
 const presentation = { ...envelope, type:'ad-presentation-request', requestId:'req-one', placementId:'reactor.cool-refill', adType:'rewarded',
   courtesy:{enabled:true,preset:'friendly',durationMs:1000,mascot:true,animation:true}, mock:{durationMs:5000,outcome:'completed'}, timeoutMs:11000 };
 for(const adType of ['startup','interstitial','rewarded']) test(`${adType} player skip policy and terminal race`,()=>{
@@ -77,10 +86,10 @@ test('client authenticates origin/source, ignores unsolicited and out-of-order p
 });
 test('cancel and game watchdog settle safely without reward',async()=>{
   for(const cancel of [true,false]) {
-    const h=clientHarness();const pending=h.client.request('startup','reactor.startup');const id=h.sent.at(-1).requestId;
-    h.receive({type:'ad-accepted',requestId:id,placementId:'reactor.startup',adType:'startup'});
-    h.receive({type:'ad-will-show',requestId:id,placementId:'reactor.startup',adType:'startup'});
-    if(cancel) h.receive({type:'ad-presentation-cancel',requestId:id,placementId:'reactor.startup',reason:'route-changed'});
+    const h=clientHarness();const pending=h.client.request('startup','dev-reactor-stack-startup');const id=h.sent.at(-1).requestId;
+    h.receive({type:'ad-accepted',requestId:id,placementId:'dev-reactor-stack-startup',adType:'startup'});
+    h.receive({type:'ad-will-show',requestId:id,placementId:'dev-reactor-stack-startup',adType:'startup'});
+    if(cancel) h.receive({type:'ad-presentation-cancel',requestId:id,placementId:'dev-reactor-stack-startup',reason:'route-changed'});
     else h.time.advance(101);
     assert.equal((await pending).rewardQualified,false);assert.equal(h.client.suspended,false);assert.equal(h.client.busy,false);
   }
@@ -124,12 +133,12 @@ test('audio suspension stops current cues without changing player mute or volume
  globalThis.AudioContext=class {currentTime=0;destination={};resume(){return Promise.resolve();}createGain(){return{gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}createOscillator(){return{frequency:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){},start(){starts++;},stop(){stops++;}};}};
  try{const audio=new ReactorAudio();audio.volume=.3;audio.play('move');audio.suspendForAd(true);audio.play('merge');assert.equal(starts,1);assert.equal(stops,2);assert.equal(audio.muted,false);assert.equal(audio.volume,.3);audio.suspendForAd(false);audio.play('move');assert.equal(starts,2);audio.setMuted(true);audio.suspendForAd(true);audio.suspendForAd(false);audio.play('move');assert.equal(starts,2);}finally{globalThis.AudioContext=previous;}
 });
-test('shared host separates both power-up run ceilings and suppresses immediate interstitial stacking',async()=>{
+test('shared host separates both power-up run ceilings and rewarded leaves interstitial eligibility untouched',async()=>{
  const h=serviceHarness();h.service.devAction('eligible');
  await h.request('reactor.cool-refill',{runId:'same-run',userInitiated:true});
  assert.equal((await h.request('reactor.upgrade-refill',{runId:'same-run',userInitiated:true})).rewardQualified,true);
  assert.equal((await h.request('reactor.cool-refill',{runId:'same-run',userInitiated:true})).reason,'placement-run-cap');
- assert.equal((await h.request('reactor.start-interstitial',{safeEvent:'start-requested'})).reason,'cooldown');
+ assert.equal((await h.request('reactor.restart-interstitial',{safeEvent:'restart-requested'})).result,'completed');
 });
 test('Null start initializes one 6x6 run with six cells and free inventory; no ad',async()=>{
  const h=reactorHarness({available:false});assert.equal(h.controller.phase,'MENU');await h.flow.start();
@@ -139,26 +148,23 @@ test('Null start initializes one 6x6 run with six cells and free inventory; no a
  for(const key of ['coolCoreRemaining','upgradeRemaining','coolGranted','upgradeGranted'])assert.equal(s[key],1);
 });
 for(const outcome of ['completed','closed','failed','no_fill','timeout','unavailable','blocked']){
- test('startup priority and exactly one start after '+outcome,async()=>{
-  const h=reactorHarness({startupDue:true,result:outcome,deferred:true});const a=h.flow.start();void h.flow.start();void h.flow.start();
-  assert.equal(h.requests.length,1);assert.equal(h.requests[0].placementId,'reactor.startup');h.resolve();await a;
-  assert.equal(h.started,1);assert.equal(h.rng,12);assert.equal(h.flow.locked,false);
+ test('no startup and exactly one deliberate restart after '+outcome,async()=>{
+  const h=reactorHarness({startupDue:true,result:outcome,deferred:true});h.flow.freshRun();h.controller.pause();const a=h.flow.start(true);void h.flow.start(true);void h.flow.start(true);
+  assert.equal(h.requests.length,1);assert.equal(h.requests[0].placementId,'reactor.restart-interstitial');h.resolve();await a;
+  assert.equal(h.started,2);assert.equal(h.rng,24);assert.equal(h.flow.locked,false);
  });
  test('Pause remains paused after '+outcome,async()=>{
   const h=reactorHarness({result:outcome});h.flow.freshRun();const id=h.flow.runId;h.flow.pause();await new Promise(r=>setImmediate(r));
-  assert.equal(h.controller.phase,'PAUSED');assert.equal(h.requests.length,1);h.flow.pause();h.flow.resume();
-  assert.equal(h.requests.length,1);assert.equal(h.controller.phase,'PLAYING');assert.equal(h.flow.runId,id);
+  assert.equal(h.controller.phase,'PAUSED');assert.equal(h.requests.length,1);h.flow.pause();await h.flow.resume();
+  assert.equal(h.requests.length,2);assert.equal(h.controller.phase,'PLAYING');assert.equal(h.flow.runId,id);
  });
 }
-test('startup explicitly not-applicable may fall through; all other refusals cannot chain',async()=>{
- for(const reason of ['disabled','startup-once-per-session','placement-cap','provider-failed']){
-  const h=reactorHarness({startupDue:true,result:'blocked',reason});await h.flow.start();
-  assert.equal(h.requests.length,reason==='provider-failed'?1:2);
- }
+test('initial PLAY from menu requests neither startup nor interstitial',async()=>{
+ const h=reactorHarness({startupDue:true});await h.flow.start();assert.equal(h.started,1);assert.equal(h.requests.length,0);
 });
-for(const phase of ['MENU','RESULT','PAUSED'])test('unified deliberate start from '+phase,async()=>{
+for(const phase of ['RESULT','PAUSED'])test('deliberate restart from '+phase,async()=>{
  const h=reactorHarness();h.controller.phase=phase;await h.flow.start();
- assert.equal(h.requests[0].placementId,'reactor.start-interstitial');assert.equal(h.requests[0].safeEvent,'start-requested');assert.equal(h.started,1);
+ assert.equal(h.requests[0].placementId,'reactor.restart-interstitial');assert.equal(h.requests[0].safeEvent,'restart-requested');assert.equal(h.started,1);
 });
 test('Pause queued during resolving settles committed move once with no extra RNG',async()=>{
  const h=reactorHarness();h.flow.freshRun();h.controller.state.board.fill(0);h.controller.state.board[0]=h.controller.state.board[1]=1;
@@ -171,7 +177,7 @@ test('terminal committed turn cancels queued Pause; ordinary moves and internal 
  const h=reactorHarness();h.flow.freshRun();h.controller.state.board.fill(0);h.controller.state.board[0]=1;h.controller.state.heat=99;
  h.controller.act(0,1);h.flow.pause();h.controller.finish();await h.flow.settledTurn();
  assert.equal(h.controller.phase,'RESULT');assert.equal(h.requests.length,0);assert.equal(h.flow.locked,false);
- h.flow.freshRun();h.controller.pause();h.flow.resume();assert.equal(h.requests.length,0);
+ h.flow.freshRun();h.controller.pause();await h.flow.resume();assert.equal(h.requests.length,1);
 });
 for(const power of ['cool','upgrade']) {
  const key=power==='cool'?'coolCoreRemaining':'upgradeRemaining';
@@ -205,15 +211,15 @@ test('refill unavailable outside stable depleted live run; developer restart is 
 });
 test('disposal invalidates delayed start and rewards',async()=>{
  for(const start of [true,false]){
-  const h=reactorHarness({deferred:true});if(!start){h.flow.freshRun();h.controller.state.coolCoreRemaining=0;}
-  const pending=start?h.flow.start():h.flow.refill('cool');const count=h.started;h.flow.destroy();h.resolve();await pending;
+  const h=reactorHarness({deferred:true});h.flow.freshRun();if(start)h.controller.pause();else h.controller.state.coolCoreRemaining=0;
+  const pending=start?h.flow.start(true):h.flow.refill('cool');const count=h.started;h.flow.destroy();h.resolve();await pending;
   assert.equal(h.started,count);assert.equal(h.acks.length,0);
  }
 });
 test('Reactor engineering placements preserve unlimited interstitials and separate one-run ceilings',()=>{
- assert.equal(REACTOR_PLACEMENTS.length,5);
+ assert.equal(REACTOR_PLACEMENTS.length,6);
  for(const p of REACTOR_PLACEMENTS){assert.equal(p.enabled,true);assert.equal(p.cooldownSeconds,0);if(p.adType==='interstitial')assert.equal(p.sessionLimitEnabled,false);if(p.adType==='rewarded')assert.equal(p.maxPerRun,1);}
- assert.deepEqual(REACTOR_PLACEMENTS.filter(p=>p.adType==='interstitial').map(p=>p.safeEvents),[['start-requested'],['pause-requested']]);
+ assert.deepEqual(REACTOR_PLACEMENTS.filter(p=>p.adType==='interstitial').map(p=>p.safeEvents),[['restart-requested'],['resume-requested'],['main-menu-requested'],['pause-requested']]);
 });
 function serviceHarness() {
   let now=0;const calls=[];
@@ -223,21 +229,20 @@ function serviceHarness() {
   return {service,calls,request,advance:ms=>{now+=ms;service.tick();}};
 }
 test('all five Reactor placements use website slug, exact semantic events and hard revive ceiling',()=>{
-  const h=serviceHarness();assert.equal([...h.service.placements.values()].filter(p=>p.gameId===GAME_ID).length,5);assert.deepEqual(h.service.placements.get('reactor.start-interstitial').safeEvents,['start-requested']);
+  const h=serviceHarness();assert.equal([...h.service.placements.values()].filter(p=>p.gameId===GAME_ID).length,6);assert.deepEqual(h.service.placements.get('reactor.restart-interstitial').safeEvents,['restart-requested']);
   assert.deepEqual(h.service.placements.get('reactor.pause-interstitial').safeEvents,['pause-requested']);
   h.service.tunePlacement('reactor.cool-refill',{maxPerRun:9});assert.equal(h.service.placements.get('reactor.cool-refill').maxPerRun,1);
 });
-test('timer eligibility never shows, non-playing time excluded, PLAY safe event required',async()=>{
-  const h=serviceHarness();h.advance(200000);assert.equal(h.service.activeSeconds,0);h.service.setGameState('playing');h.advance(180000);
+test('timer eligibility never shows, non-playing time included, PLAY safe event required',async()=>{
+  const h=serviceHarness();h.advance(200000);assert.equal(h.service.gameOpenSeconds,200);h.service.setGameState('playing');h.advance(180000);
   assert.equal(h.calls.length,0);assert.equal(h.service.interstitialEligibility().eligible,true);
-  assert.equal((await h.request('reactor.start-interstitial',{safeEvent:'run-ended'})).reason,'no-safe-event');
-  assert.equal((await h.request('reactor.start-interstitial',{safeEvent:'start-requested'})).result,'completed');assert.equal(h.calls.length,1);
+  assert.equal((await h.request('reactor.restart-interstitial',{safeEvent:'run-ended'})).reason,'no-safe-event');
+  assert.equal((await h.request('reactor.restart-interstitial',{safeEvent:'restart-requested'})).result,'completed');assert.equal(h.calls.length,1);
 });
-for(const reason of ['not-enough-active-play','cooldown','session-cap']) test(`PLAY cannot bypass website ${reason}`,async()=>{
-  const h=serviceHarness();h.service.config.interstitial.firstSeconds=0;h.service.nextEligibleAt=reason==='not-enough-active-play'?180:0;
-  if(reason==='cooldown')h.service.interstitialCooldownAt=0;
+for(const reason of ['timer-not-ready','session-cap']) test(`PLAY cannot bypass website ${reason}`,async()=>{
+  const h=serviceHarness();h.service.config.interstitial.timerSeconds=reason==='timer-not-ready'?180:0;
   if(reason==='session-cap'){h.service.config.interstitial.sessionLimitEnabled=true;h.service.interstitialCount=3;}
-  assert.equal((await h.request('reactor.start-interstitial',{safeEvent:'start-requested'})).reason,reason);assert.equal(h.calls.length,0);
+  assert.equal((await h.request('reactor.restart-interstitial',{safeEvent:'restart-requested'})).reason,reason);assert.equal(h.calls.length,0);
 });
 test('host shown-run cap survives stats reset and rejects missing run context',async()=>{
   const h=serviceHarness();assert.equal((await h.request('reactor.cool-refill',{userInitiated:true})).reason,'run-context-required');

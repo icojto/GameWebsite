@@ -14,8 +14,9 @@ export function registerGamePlacements(service: AdService): void {
 }
 
 export const REACTOR_PLACEMENTS: readonly Placement[] = [
-  { id: 'reactor.startup', gameId: 'reactor-stack', adType: 'startup', enabled: true, cooldownSeconds: 0, maxPerSession: 1 },
-  { id: 'reactor.start-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['start-requested'] },
+  { id: 'reactor.restart-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['restart-requested'] },
+  { id: 'reactor.resume-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['resume-requested'] },
+  { id: 'reactor.menu-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['main-menu-requested'] },
   { id: 'reactor.pause-interstitial', gameId: 'reactor-stack', adType: 'interstitial', enabled: true, cooldownSeconds: 0, sessionLimitEnabled: false, maxPerSession: 3, safeEvents: ['pause-requested'] },
   { id: 'reactor.cool-refill', gameId: 'reactor-stack', adType: 'rewarded', enabled: true, cooldownSeconds: 0, maxPerSession: 10, maxPerRun: 1 },
   { id: 'reactor.upgrade-refill', gameId: 'reactor-stack', adType: 'rewarded', enabled: true, cooldownSeconds: 0, maxPerSession: 10, maxPerRun: 1 },
