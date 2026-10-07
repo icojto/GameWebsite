@@ -1,6 +1,6 @@
 {
   "name": "studio-game-portal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -22,11 +22,13 @@
     "test:reactor": "node --experimental-transform-types --test games/reactor-stack/tests/game.test.ts",
     "test:reactor-ads": "node --experimental-transform-types --test tests/reactor-ads.test.mjs",
     "build:games": "node scripts/build-games.mjs",
-    "build": "npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs && node scripts/verify-ads-production.mjs",
+    "build": "npm run build:games && tsc --noEmit && vite build && node scripts/static-routes.mjs && node scripts/verify-ads-production.mjs",
     "verify:ads-production": "node scripts/verify-ads-production.mjs",
-    "verify:pages": "node scripts/verify-pages.mjs",
     "preview": "vite preview --host 127.0.0.1",
-    "test:monetization": "node --experimental-transform-types --test tests/monetization-preprovider.test.mjs"
+    "test:monetization": "node --experimental-transform-types --test tests/monetization-preprovider.test.mjs",
+    "verify:static-release": "node scripts/verify-static-release.mjs",
+    "cf:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "cf:dev": "wrangler dev --local --ip 127.0.0.1"
   },
   "dependencies": {
     "phaser": "^4.2.1"
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@types/node": "^24.13.6",
     "typescript": "^7.0.2",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "wrangler": "4.148.0"
   }
 }

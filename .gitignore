@@ -15,3 +15,7 @@ coverage/
 
 .qa-build-identity.json
 outputs/
+
+.wrangler/
+.dev.vars
+.dev.vars.*

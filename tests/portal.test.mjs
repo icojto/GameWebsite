@@ -14,7 +14,7 @@ test('only Games 001 and 002 are public', () => {
 
 test('route metadata follows the public catalog', () => {
   assert.deepEqual(publicPages.map((page) => page.path), [
-    '/', '/games/orbit-break/', '/games/reactor-stack/', '/about/', '/contact/',
+    '/', '/games/orbit-break/', '/games/reactor-stack/', '/about/', '/contact/', '/privacy/', '/terms/',
   ]);
   assert.equal(new Set(publicPages.map((page) => page.title)).size, publicPages.length);
   for (const page of publicPages) {

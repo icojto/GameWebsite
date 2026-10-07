@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { websiteVersion } from './build-identity.mjs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,7 +22,7 @@ for (const entry of await readdir(dist, { recursive: true, withFileTypes: true }
   const filename = path.join(entry.parentPath, entry.name);
   const body = await readFile(filename, 'utf8');
   for (const token of forbidden) assert.ok(!body.includes(token), `Development ad code leaked into ${path.relative(dist, filename)}: ${token}`);
-  if(entry.name.endsWith('.html')){const match=body.match(/name="odesos-build" content="([^"]+)"/);assert.ok(match,'Missing build metadata: '+filename);const meta=JSON.parse(match[1].replace(/&quot;/g,'"').replace(/&amp;/g,'&'));assert.deepEqual(Object.keys(meta).sort(),['dirty','id','mode','revision','schema']);assert.equal(meta.mode,'production');assert.equal(typeof meta.dirty,'boolean');assert.match(meta.id,/^[a-f0-9-]{36}$/);assert.match(meta.revision,/^[a-f0-9]{40}$/);identities.add(meta.id);}
+  if(entry.name.endsWith('.html')){const match=body.match(/name="odesos-build" content="([^"]+)"/);assert.ok(match,'Missing build metadata: '+filename);const meta=JSON.parse(match[1].replace(/&quot;/g,'"').replace(/&amp;/g,'&'));assert.deepEqual(Object.keys(meta).sort(),['dirty','id','mode','revision','schema','version']);assert.equal(meta.mode,'production');assert.equal(meta.version,websiteVersion);assert.equal(typeof meta.dirty,'boolean');assert.match(meta.id,/^[a-f0-9-]{36}$/);assert.match(meta.revision,/^[a-f0-9]{40}$/);identities.add(meta.id);}
   inspected++;
 }
 assert.equal(identities.size,1,'Mixed build identities');
