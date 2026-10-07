@@ -16,3 +16,5 @@
 12. New separate workbook: 20 requested sheets (slash-invalid sheet name adapted), 64 tests derived from requirements/environments, 24 Pass / 4 Fail / 35 Blocked / 1 N/A / 0 Not run. Dashboard verified-only denominator and status-change recalculation tested; no formula errors found. Rendered previews and saved-file structural verification retained. Desktop Excel native interaction was not performed.
 
 Final boundary: legal public-page release depends on identity/processing/Terms decisions; technical activation gate remains blocked. Human/provider queues are exact and account operations have not been performed. No real ad clicks or invalid-traffic test was attempted.
+
+Checkpoint evidence: live-public-routes.json records robots/sitemap 200 and privacy/terms/ads.txt 404. Final targeted portal/privacy checks: 7 Pass. Draft PR22 at commit 5060b4291d4c7975d3a4e0a8c7eec2355af22665; no merge/deploy. Owned QA sessions were stopped and temporary tabs/viewport cleaned up.

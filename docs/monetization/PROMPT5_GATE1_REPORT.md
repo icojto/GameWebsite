@@ -17,3 +17,5 @@ Required next input is in HUMAN_PROMPT5_GATE1.md: exact approved public identity
 Change boundary: clean-base feature branch codex/monetization-preprovider-v1. Human reviews/merges/deploys. No real integration/activation, agreements, provider submissions, automatic next task or worldwide compliance claim.
 
 Prompt 5 requests a final phrase declaring pre-provider site readiness. That readiness cannot truthfully be asserted while the legal publication gate remains open. The correct checkpoint is: GATE 1 INDEPENDENT PREPARATION COMPLETE — LEGAL PUBLICATION AND ACTIVATION BLOCKED — WAITING FOR HRISTO.
+
+Draft review: https://github.com/icojto/GameWebsite/pull/22 . Candidate commit: 5060b4291d4c7975d3a4e0a8c7eec2355af22665. No merge/deploy. Live robots.txt and sitemap.xml returned 200; Privacy, Terms and ads.txt returned 404. The ads.txt absence is expected while waiting for a real ID. Final targeted Contact/privacy checks passed (7 tests). Temporary QA servers/tabs were closed at the checkpoint.
