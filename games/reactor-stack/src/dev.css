@@ -4,3 +4,12 @@
 /* Leave public powers and the compact HUD uncovered while inspecting. */
 @media(max-width:700px),(max-aspect-ratio:11/10){#dev-panel{bottom:66px;height:calc(100% - 110px);max-height:620px;border-radius:8px}}
 body:has(#game-shell[data-layout="compact-landscape"]) #dev-panel{left:152px;right:0;top:32px;bottom:32px;width:calc(100% - 152px);height:calc(100% - 64px)}
+/* Overlay only: opening DEV never participates in the player/board grid. */
+#dev-panel,body:has(#game-shell[data-layout="compact-landscape"]) #dev-panel{position:fixed;left:auto;right:8px;top:auto;bottom:52px;width:min(540px,calc(100% - 16px));height:min(650px,calc(100% - 60px));border:1px solid #3bc3d4;border-radius:10px;display:flex;flex-direction:column}
+#dev-panel[hidden]{display:none!important}
+.dev-tabs{display:flex;flex-wrap:wrap;gap:3px;padding:6px;border-bottom:1px solid #25566a}
+.dev-tabs button{font:10px Arial,sans-serif;min-height:32px;flex:1;padding:4px;border:1px solid #286c83;border-radius:5px;background:#0e2b39;color:#c7f6f8}
+.dev-tabs button[aria-selected="true"]{background:#315769;color:#fff}
+#dev-panel .dev-scroll{height:auto;min-height:0;flex:1}
+#dev-panel [hidden]{display:none!important}
+body > .qa-game-launcher{top:auto;bottom:8px;right:8px;width:44px;height:36px;min-width:44px;min-height:36px;padding:3px;z-index:21}

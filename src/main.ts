@@ -15,6 +15,7 @@ let disposeGameFrame = () => {};
 const adRuntime = createAdRuntime();
 
 type Theme = 'light' | 'dark';
+declare global { interface Window { odesosTheme: { apply(theme: Theme): void; resolve(read: (key:string) => string | null, dark:boolean): Theme } } }
 type CatalogGame = (typeof publicGameCatalog)[number];
 const siteBase = import.meta.env.BASE_URL.replace(/\/$/, '');
 const sitePath = (route: string): string => `${siteBase}${route}${/^\/games\/[^/]+$/.test(route) ? '/' : ''}`;
@@ -22,11 +23,9 @@ const escapeHtml = (value: string): string => value.replace(/[&"<>']/g, (charact
   '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;', "'": '&#39;',
 })[character]!);
 
-const storedTheme = readThemePreference();
+readThemePreference(); // Preserve the existing legacy preference migration.
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-setTheme(storedTheme === 'light' || storedTheme === 'dark'
-  ? storedTheme
-  : prefersDark ? 'dark' : 'light');
+setTheme(window.odesosTheme.resolve(key => siteStorage.get(key), prefersDark));
 
 renderRoute();
 
@@ -343,12 +342,14 @@ function renderHeader(active: 'home' | 'games' | 'about' | 'contact' | ''): stri
         <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
         <span><strong>OdesosGames</strong><small>Original games, made here</small></span>
       </a>
+      ${active === 'games' ? '<details class="game-nav"><summary aria-label="Open navigation menu">Menu</summary>' : ''}
       <nav class="nav-links" aria-label="Portal">
         <a class="nav-link${active === 'home' ? ' is-active' : ''}" href="${sitePath('/')}"${active === 'home' ? ' aria-current="page"' : ''}>Home</a>
         <a class="nav-link${active === 'games' ? ' is-active' : ''}" href="${sitePath('/')}#collection"${active === 'games' ? ' aria-current="page"' : ''}>Games</a>
         <a class="nav-link${active === 'about' ? ' is-active' : ''}" href="${sitePath('/about/')}"${active === 'about' ? ' aria-current="page"' : ''}>About</a>
         <a class="nav-link${active === 'contact' ? ' is-active' : ''}" href="${sitePath('/contact/')}"${active === 'contact' ? ' aria-current="page"' : ''}>Contact</a>
       </nav>
+      ${active === 'games' ? '</details>' : ''}
       <button class="theme-toggle" type="button" aria-label="Switch color theme" aria-pressed="false">
         <span class="sun-icon" aria-hidden="true">☀</span>
         <span class="moon-icon" aria-hidden="true">☾</span>
@@ -477,12 +478,22 @@ function bindGameFrame(game: CatalogGame): void {
 
   const actionBar = playerStage.querySelector<HTMLElement>('.player-action-bar')!;
   function fitPlayer() {
-    playerStage.style.setProperty('--player-available-height', `${playerAllocation(window.innerHeight, actionBar.getBoundingClientRect().height)}px`);
+    const viewport = window.visualViewport?.height ?? window.innerHeight;
+    const full = document.fullscreenElement === playerStage;
+    const top = playerStage.getBoundingClientRect().top + (full ? 0 : window.scrollY);
+    const bottom = parseFloat(getComputedStyle(playerStage).paddingBottom) || 0;
+    playerStage.style.setProperty('--player-available-height', `${playerAllocation(viewport, actionBar.getBoundingClientRect().height, top, bottom)}px`);
     playerStage.dataset.compact = String(window.innerHeight < 520);
   }
-  const actionResize = new ResizeObserver(fitPlayer);
+  let fitFrame = 0;
+  const scheduleFit = () => { if (!fitFrame) fitFrame = requestAnimationFrame(() => { fitFrame = 0; fitPlayer(); }); };
+  const actionResize = new ResizeObserver(scheduleFit);
   actionResize.observe(actionBar);
-  window.addEventListener('resize', fitPlayer);
+  const header = document.querySelector('.topbar');
+  if (header) actionResize.observe(header);
+  window.addEventListener('resize', scheduleFit);
+  window.visualViewport?.addEventListener('resize', scheduleFit);
+  document.addEventListener('fullscreenchange', scheduleFit);
   fitPlayer();
   let timeout = window.setTimeout(showError, 10_000);
 
@@ -570,7 +581,10 @@ function bindGameFrame(game: CatalogGame): void {
 
   disposeGameFrame = () => {
     actionResize.disconnect();
-    window.removeEventListener('resize', fitPlayer);
+    cancelAnimationFrame(fitFrame);
+    window.removeEventListener('resize', scheduleFit);
+    window.visualViewport?.removeEventListener('resize', scheduleFit);
+    document.removeEventListener('fullscreenchange', scheduleFit);
     window.clearTimeout(timeout);
     gameFrame.removeEventListener('load', handleLoad);
     gameFrame.removeEventListener('error', showError);
@@ -594,10 +608,7 @@ function getTheme(): Theme {
 }
 
 function setTheme(theme: Theme): void {
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
-  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    ?.setAttribute('content', theme === 'dark' ? '#060a12' : '#f4f7fb');
+  window.odesosTheme.apply(theme);
 }
 
 function updateThemeControl(control: HTMLButtonElement | null, theme: Theme): void {

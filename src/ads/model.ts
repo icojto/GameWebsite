@@ -27,7 +27,7 @@ export interface AdProvider {
 export const DEFAULT_CONFIG = {
   master: true,
   startup: { enabled: false, oncePerSession: true, courtesy: true },
-  interstitial: { enabled: true, firstSeconds: 180, intervalSeconds: 180, cooldownSeconds: 180, sessionLimitEnabled: false, maxPerSession: 3, resetAfterRewarded: true },
+  interstitial: { enabled: true, timerSeconds: 180, sessionLimitEnabled: false, maxPerSession: 3 },
   rewarded: { enabled: true, cooldownSeconds: 0, maxPerSession: 10, courtesy: true },
   banner: { enabled: false },
   courtesy: { enabled: true, durationMs: 1000, startup: true, interstitial: true, rewarded: true, mascot: true, animation: true, preset: 'friendly' },
@@ -60,11 +60,14 @@ export function normalizeConfig(input: unknown): AdConfig {
   const raw = source as { mock?: { nextResult?: string }; courtesy?: { preset?: string } };
   if (outcomes.includes(raw.mock?.nextResult ?? '')) clean.mock.nextResult = raw.mock!.nextResult!;
   if (raw.courtesy?.preset === 'concise') clean.courtesy.preset = 'concise';
+  // Migrate the old first threshold; retire interval/cooldown/reward reset gates.
+  const legacy = source.interstitial as Record<string, unknown> | undefined;
+  if (legacy && legacy.timerSeconds === undefined && typeof legacy.firstSeconds === 'number' && Number.isFinite(legacy.firstSeconds)) clean.interstitial.timerSeconds = Math.round(Math.max(0, Math.min(86400, legacy.firstSeconds)));
   return clean;
 }
 export type Counters = Record<'requests' | 'accepted' | 'blocked' | 'prepared' | 'shown' | 'completed' | 'closed' | 'failed' | 'no_fill' | 'timeout' | 'unavailable', number>;
 export const emptyCounters = (): Counters => ({ requests: 0, accepted: 0, blocked: 0, prepared: 0, shown: 0, completed: 0, closed: 0, failed: 0, no_fill: 0, timeout: 0, unavailable: 0 });
 export interface AdEvent {
   timestamp: string; event: string; gameId: string | null; placementId?: string; adType?: AdType;
-  requestId?: string; result?: AdResult; reason?: string; activeSeconds: number; sessionSeconds: number;
+  requestId?: string; result?: AdResult; reason?: string; gameOpenSeconds: number; sessionSeconds: number;
 }

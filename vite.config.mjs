@@ -13,6 +13,11 @@ export default defineConfig(({command}) => ({
   define: { __WEBSITE_VERSION__: JSON.stringify(websiteVersion) },
   plugins: [identityPlugin(buildMetadata(command==='serve'?'development':'production')), {
     name: 'portal-game-routes',
+    transformIndexHtml(html) {
+      const session = command === 'serve' ? process.env.VITE_QA_SESSION : null;
+      return session && /^[a-zA-Z0-9_-]{8,64}$/.test(session)
+        ? html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" /><meta name="qa-session" content="${session}" /><meta name="theme-storage-prefix" content="odesos.qa.${session}." data-query-key="qa" data-session="${session}" />`) : html;
+    },
     configureServer(server) {
       // Source directories share portal route names. Keep exact page requests
       // in the portal; leave /embed/ and all nested asset requests untouched.

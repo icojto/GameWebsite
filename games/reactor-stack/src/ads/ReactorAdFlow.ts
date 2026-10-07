@@ -13,7 +13,7 @@ const placement = (power: Power) => `reactor.${power}-refill`;
 /** Reactor transitions only. Host remains authoritative for all ad policy and clocks. */
 export class ReactorAdFlow {
   runId = '';
-  pending: 'start' | 'pause' | Power | null = null;
+  pending: 'start' | 'pause' | 'resume' | 'menu' | Power | null = null;
   pauseQueued = false;
   suspended = false;
   attempts = { cool: false, upgrade: false };
@@ -40,19 +40,13 @@ export class ReactorAdFlow {
     this.lastResult = `${result.result}: ${result.reason ?? 'none'}`;
     return result;
   }
-  async start(): Promise<void> {
+  async start(restart = false): Promise<void> {
     if (this.locked || !['MENU', 'RESULT', 'PAUSED'].includes(this.controller.phase)) return;
     this.pending = 'start'; this.hooks.cancelGesture(); const token = ++this.epoch; this.hooks.changed();
     try {
-      if (this.ads.capabilities.fullscreenAvailable) {
-        let interstitial = true;
-        if (this.ads.capabilities.startupDue) {
-          const result = await this.request('startup', 'reactor.startup');
-          interstitial = result.result === 'blocked' && ['disabled', 'startup-once-per-session', 'placement-cap'].includes(result.reason ?? '');
-        }
-        if (this.alive && token === this.epoch && interstitial)
-          await this.request('interstitial', 'reactor.start-interstitial', { safeEvent: 'start-requested' });
-      }
+      // Initial menu PLAY never requests an ad, even after a long menu wait.
+      if ((restart || this.controller.phase !== 'MENU') && this.ads.capabilities.fullscreenAvailable)
+        await this.request('interstitial', 'reactor.restart-interstitial', { safeEvent: 'restart-requested' });
     } catch { this.lastResult = 'failed: transport'; }
     finally {
       if (this.alive && token === this.epoch) { this.pending = null; this.freshRun(); }
@@ -74,10 +68,25 @@ export class ReactorAdFlow {
     } catch { this.lastResult = 'failed: transport'; }
     finally { if (this.alive && token === this.epoch) { this.pending = null; this.hooks.changed(); } }
   }
-  resume(): void { if (!this.locked) { this.controller.resume(); this.hooks.changed(); } }
-  menu(): boolean {
+  async resume(): Promise<void> {
+    if (this.locked || this.controller.phase !== 'PAUSED') return;
+    this.pending = 'resume'; const token = this.epoch; this.hooks.changed();
+    try {
+      if (this.ads.capabilities.fullscreenAvailable)
+        await this.request('interstitial', 'reactor.resume-interstitial', { safeEvent: 'resume-requested' });
+    } catch { this.lastResult = 'failed: transport'; }
+    finally { if (this.alive && token === this.epoch) { this.pending = null; this.controller.resume(); this.hooks.changed(); } }
+  }
+  async menu(): Promise<boolean> {
     if (this.locked || this.controller.phase === 'RESOLVING') return false;
-    this.epoch++; this.runId = ''; this.controller.setMenu(); this.hooks.cancelGesture(); this.hooks.changed(); return true;
+    this.pending = 'menu'; this.hooks.cancelGesture(); const token = this.epoch; this.hooks.changed();
+    try {
+      if (this.ads.capabilities.fullscreenAvailable)
+        await this.request('interstitial', 'reactor.menu-interstitial', { safeEvent: 'main-menu-requested' });
+    } catch { this.lastResult = 'failed: transport'; }
+    finally { if (this.alive && token === this.epoch) this.pending = null; }
+    if (!this.alive || token !== this.epoch) return false;
+    this.epoch++; this.runId = ''; this.controller.setMenu(); this.hooks.changed(); return true;
   }
   async refill(power: Power): Promise<void> {
     if (!this.canRefill(power)) return;

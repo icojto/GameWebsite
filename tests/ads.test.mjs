@@ -13,6 +13,36 @@ import { ContextHelp } from '../shared/dev/help.ts';
 import { fieldHelp, actionHelp, ACTION_HELP } from '../src/ads/dev/help.ts';
 
 let sequence = 0;
+test('authoritative timer starts at game entry, counts all states, and dies on leave/reload',()=>{
+ const h=harness();h.advance(10);assert.equal(h.service.gameOpenSeconds,10);assert.equal(h.service.interstitialSeconds,10);
+ for(const phase of ['unknown','menu','paused','game-over','playing']){h.service.setGameState(phase);h.service.setVisible(false);h.advance(40);}
+ assert.equal(h.service.gameOpenSeconds,210);assert.equal(h.service.interstitialEligibility().eligible,true);assert.deepEqual(h.calls,[]);
+ h.service.setContext(null);h.advance(500);assert.equal(h.service.gameOpenSeconds,0);assert.equal(h.service.interstitialEligibility().reason,'timer-not-ready');
+ h.service.setContext('test-game');assert.equal(h.service.interstitialSeconds,0);h.advance(100);h.service.setContext('test-game');assert.equal(h.service.interstitialSeconds,0);
+ h.service.destroy();h.advance(500);assert.equal(h.service.gameOpenSeconds,0);assert.equal(h.service.interstitialEligibility().reason,'timer-not-ready');
+});
+for(const result of ['completed','closed','failed','no_fill','timeout','unavailable','blocked'])test(`shown rewarded ${result} never resets fullscreen timer`,async()=>{
+ const h=harness({showAd:async(_r,_s,shown)=>{shown();return result;}});h.advance(190);
+ await h.request('rewarded',{userInitiated:true});assert.equal(h.service.interstitialSeconds,190);assert.equal(h.service.lastFullscreen,null);assert.equal(h.service.interstitialEligibility().eligible,true);
+});
+for(const result of ['failed','no_fill','timeout','unavailable','blocked'])test(`pre-show ${result} leaves eligible clock unchanged`,async()=>{
+ const h=harness({prepareAd:async()=>result});h.advance(200);
+ await h.request('interstitial',{safeEvent:'run-ended'});assert.equal(h.service.interstitialSeconds,200);assert.equal(h.service.lastFullscreen,null);
+});
+for(const type of ['startup','interstitial'])test(`${type} resets on SHOWN, never on terminal completion`,async()=>{
+ let h;h=harness({showAd:async(_r,_s,shown)=>{shown();assert.equal(h.service.interstitialSeconds,0);h.advance(30);return 'closed';}});h.advance(200);
+ await h.request(type,{safeEvent:'run-ended'});assert.equal(h.service.interstitialSeconds,30);assert.equal(h.service.secondsSince(h.service.lastFullscreen),30);assert.equal(h.service.interstitialEligibility().secondsRemaining,150);
+});
+test('old config migrates one threshold and discards overlapping clocks/reward reset',()=>{
+ const config=normalizeConfig({interstitial:{firstSeconds:45,intervalSeconds:90,cooldownSeconds:300,resetAfterRewarded:true}});
+ assert.equal(config.interstitial.timerSeconds,45);for(const key of ['firstSeconds','intervalSeconds','cooldownSeconds','resetAfterRewarded'])assert.equal(key in config.interstitial,false);
+});
+test('real pre-show watchdog timeout and unavailable provider retain elapsed timer',async()=>{
+ const stalled=harness({prepareAd:()=>new Promise(()=>{})});stalled.advance(200);
+ assert.equal((await stalled.request('interstitial',{safeEvent:'run-ended'})).result,'timeout');assert.equal(stalled.service.interstitialSeconds,200);assert.equal(stalled.service.lastFullscreen,null);
+ const unavailable=harness({isReady:()=>false});unavailable.advance(200);
+ assert.equal((await unavailable.request('interstitial',{safeEvent:'run-ended'})).result,'unavailable');assert.equal(unavailable.service.interstitialSeconds,200);
+});
 test('every interstitial registry default crosses 100; zero finite global cap blocks',async()=>{
   for(const original of [...ORBIT_PLACEMENTS, ...REACTOR_PLACEMENTS, devPlacement('test-game','interstitial',['play-requested'])].filter(p=>p.adType==='interstitial')){
     const h=harness();h.service.setGameState('playing');h.service.register({...original,id:'interstitial',gameId:'test-game'});
@@ -58,17 +88,16 @@ test('summary separates current policy, active preparation and historical result
   assert.equal(h.service.describe('interstitial',true).Current,'ELIGIBLE');
   await h.request('interstitial',{safeEvent:'run-ended'});
   const summary=h.service.describe('interstitial',true);
-  assert.equal(summary.Current,'WAITING');assert.equal(summary['Last result'],'COMPLETED');assert.equal(summary['Active-play wait seconds'],180);assert.equal(summary['Cooldown remaining seconds'],180);
+  assert.equal(summary.Current,'WAITING');assert.equal(summary['Last result'],'COMPLETED');assert.equal(summary['Time until eligible'],180);
   h.service.lastResults.rewarded={result:'closed',reason:'player-skip'};assert.equal(h.service.describe('rewarded',true)['Last result'],'SKIPPED');
   h.service.lastResults.rewarded={result:'closed',reason:'qa-abort'};assert.equal(h.service.describe('rewarded',true)['Last result'],'CLOSED/CANCELLED');
   assert.equal('Completed' in h.service.describe('banner',true),false);
   h.service.clearStats();assert.equal(h.service.describe('interstitial',true)['Last result'],'NONE');assert.equal(h.service.interstitialCount,1);
 });
-test('timing shortcuts and Force keep documented independent boundaries',async()=>{
-  const h=harness();h.service.setGameState('playing');h.advance(12);h.service.interstitialCooldownAt=0;
-  h.service.devAction('eligible');assert.equal(h.service.nextEligibleAt,12);assert.equal(h.service.interstitialCooldownAt,0);
-  h.service.devAction('timer');assert.equal(h.service.nextEligibleAt,192);assert.equal(h.service.activeSeconds,12);
-  h.service.devAction('cooldown');assert.equal(h.service.interstitialCooldownAt,null);assert.equal(h.service.nextEligibleAt,192);
+test('timing shortcuts use one authoritative clock; Force retains placement restrictions',async()=>{
+  const h=harness();h.advance(12);
+  h.service.devAction('eligible');assert.equal(h.service.interstitialSeconds,180);assert.equal(h.service.interstitialEligibility().eligible,true);
+  h.service.devAction('timer');assert.equal(h.service.interstitialSeconds,0);assert.equal(h.service.gameOpenSeconds,12);
   h.service.config.interstitial.enabled=false;h.service.config.interstitial.sessionLimitEnabled=true;h.service.config.interstitial.maxPerSession=0;
   const force=()=>h.service.request({requestId:`force-${++sequence}`,gameId:'test-game',placementId:'interstitial',adType:'interstitial'},true);
   assert.equal((await force()).result,'completed');h.service.placements.get('interstitial').enabled=false;assert.equal((await force()).reason,'disabled');
@@ -164,38 +193,39 @@ for (const outcome of ['failed', 'no_fill', 'timeout', 'unavailable']) {
     assert.equal(h.service.busy, false);
   });
 }
-test('only visible playing time counts; eligibility never shows an ad', () => {
+test('menu, paused, result and hidden wall-clock time count; eligibility never shows an ad', () => {
   const h = harness();
   h.service.setGameState('menu'); h.advance(200);
   h.service.setGameState('paused'); h.advance(200);
   h.service.setGameState('game-over'); h.advance(200);
   h.service.setGameState('playing'); h.service.setVisible(false); h.advance(200);
-  assert.equal(h.service.activeSeconds, 0);
+  assert.equal(h.service.gameOpenSeconds, 800);
   h.service.setVisible(true); h.advance(180);
-  assert.equal(h.service.activeSeconds, 180);
+  assert.equal(h.service.gameOpenSeconds, 980);
   assert.equal(h.service.interstitialEligibility().eligible, true);
   assert.equal(h.service.eligibleEvents, 1);
   assert.deepEqual(h.calls, []);
 });
 test('interstitial requires time and registered semantic event', async () => {
   const h = harness();
-  assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).reason, 'not-enough-active-play');
+  assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).reason, 'timer-not-ready');
   h.service.devAction('eligible');
   assert.equal((await h.request('interstitial')).reason, 'no-safe-event');
   assert.equal((await h.request('interstitial', { safeEvent: 'arbitrary-click' })).reason, 'no-safe-event');
   assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).result, 'completed');
 });
-test('interstitial interval, cooldown, and session cap work independently', async () => {
+test('single interstitial clock and independent session cap', async () => {
   const h = harness(); h.service.config.interstitial.sessionLimitEnabled = true; h.service.config.interstitial.maxPerSession = 1;
   h.service.devAction('eligible');
   await h.request('interstitial', { safeEvent: 'run-ended' });
   h.service.devAction('eligible');
   assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).reason, 'session-cap');
   h.service.config.interstitial.maxPerSession = 3;
-  assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).reason, 'cooldown');
+  h.service.devAction('timer');
+  assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).reason, 'timer-not-ready');
   h.advance(180);
   assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).result, 'completed');
-  assert.equal(h.service.interstitialEligibility().reason, 'not-enough-active-play');
+  assert.equal(h.service.interstitialEligibility().reason, 'timer-not-ready');
 });
 test('rewarded requires explicit opt-in', async () => {
   const h = harness();
@@ -222,11 +252,10 @@ test('one fullscreen request at a time; deadline settles broken provider', async
   assert.equal((await first).result, 'timeout');
   assert.equal(h.service.busy, false);
 });
-test('rewarded showing resets the interstitial cooldown by default', async () => {
+test('rewarded showing leaves an eligible interstitial clock untouched', async () => {
   const h = harness(); h.service.devAction('eligible');
   await h.request('rewarded', { userInitiated: true });
-  assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).reason, 'cooldown');
-  h.advance(180);
+  assert.equal(h.service.interstitialEligibility().eligible, true);
   assert.equal((await h.request('interstitial', { safeEvent: 'run-ended' })).result, 'completed');
 });
 test('website service prepares then delegates showing without rendering courtesy', async () => {
@@ -390,8 +419,8 @@ test('bridge authenticates source/origin/game and deduplicates requests and ackn
 import { conciseEvents, mvpStatus, MVP_EVENT_LIMIT } from '../src/ads/dev/view-model.ts';
 test('MVP exposes actual timing/cooldown block reasons and bounded concise history',()=>{
  const h=harness();h.service.setGameState('menu');
- assert.equal(mvpStatus(h.service,true)['Block reason'],'not-enough-active-play');h.service.devAction('eligible');assert.equal(mvpStatus(h.service,true)['Interstitial eligibility'],'Eligible');
- h.service.interstitialCooldownAt=h.service.lastInterstitial=0;assert.equal(mvpStatus(h.service,true)['Block reason'],'cooldown');h.service.devAction('eligible');assert.equal(mvpStatus(h.service,true)['Block reason'],'cooldown');h.service.devAction('cooldown');assert.equal(mvpStatus(h.service,true)['Interstitial eligibility'],'Eligible');
+ assert.equal(mvpStatus(h.service,true)['Block reason'],'timer-not-ready');h.service.devAction('eligible');assert.equal(mvpStatus(h.service,true)['Interstitial eligibility'],'Eligible');
+ h.service.devAction('timer');assert.equal(mvpStatus(h.service,true)['Block reason'],'timer-not-ready');h.service.devAction('eligible');assert.equal(mvpStatus(h.service,true)['Interstitial eligibility'],'Eligible');
  for(let i=0;i<25;i++)h.service.emit('diagnostic-'+i,undefined,undefined,'sample');assert.equal(conciseEvents(h.service.events).length,MVP_EVENT_LIMIT);assert.ok(conciseEvents(h.service.events)[0].includes('diagnostic-24'));assert.ok(!conciseEvents(h.service.events).some(x=>x.includes('{')));
  assert.equal(mvpStatus(h.service,false)['Block reason'],'renderer-disconnected');
 });

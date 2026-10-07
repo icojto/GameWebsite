@@ -3,8 +3,6 @@ import { gameRandom } from '../../../shared/storage.mjs';
 import { heatPercent } from './hud.ts';
 import { bindBoardPointer, canvasPoint } from './board-pointer.ts';
 import { MenuPresentation } from './menu-presentation.ts';
-import { mountViewportFallback } from '../../../shared/game-viewport.ts';
-import '../../../shared/game-viewport.css';
 import { connectReactorAds } from './ads/integration.ts';
 import './style.css';
 import { ReactorAudio } from './audio.ts';
@@ -27,7 +25,7 @@ document.querySelector('#app')!.innerHTML = `
   <main class="board-area"><div class="board-header"><span id="mode-label">CONTAINMENT GRID</span><span id="hint" aria-live="polite">Select a cell, then a neighbor.</span></div><div class="board-holder"><div id="board" aria-label="Six column, six row reactor board"></div></div><div class="heat"><span id="heat-label">CORE HEAT</span><div class="heat-track"><i id="heat-bar"></i></div><strong id="heat">0%</strong></div></main>
   <section class="portrait-bar"><button id="portrait-pause">PAUSE</button><button id="portrait-cool"><span data-power-label>COOL CORE</span> <span id="portrait-cool-count">1</span></button><button id="portrait-upgrade"><span data-power-label>UPGRADE</span> <span id="portrait-upgrade-count">1</span></button><button id="portrait-scores">SCORES</button></section>
 </div>
-<section class="overlay" id="menu-overlay"><div class="dialog menu-dialog"><div class="reactor-icon">◉</div><span class="kicker" id="menu-kicker">CONTAINMENT PROTOCOL / 002</span><h2 id="menu-title">REACTOR STACK</h2><p id="menu-copy">Move cells into adjacent empty slots or merge equal reactor cells. Build stability before heat reaches critical.</p><button class="primary" id="start">INITIALIZE REACTOR</button><small>Tap or drag into a neighboring slot. Tier V moves, but cannot merge.</small></div></section>
+<section class="overlay" id="menu-overlay"><div class="dialog menu-dialog"><div class="reactor-icon">◉</div><span class="kicker" id="menu-kicker">CONTAINMENT PROTOCOL / 002</span><h2 id="menu-title">REACTOR STACK</h2><p id="menu-copy">Move cells into adjacent empty slots or merge equal reactor cells. Build stability before heat reaches critical.</p><button class="primary" id="start">PLAY</button><small>Tap or drag into a neighboring slot. Tier V moves, but cannot merge.</small></div></section>
 <section class="overlay" id="pause-overlay" hidden><div class="dialog"><span class="kicker">INTERFACE PAUSED</span><h2>PAUSED</h2><button class="primary" id="resume">RESUME</button><button class="dialog-button" id="sound">SOUND ON</button><button class="dialog-button" id="restart">RESTART RUN</button><button class="dialog-button" id="main-menu">MAIN MENU</button></div></section>
 <section class="overlay" id="scores-overlay" hidden><div class="dialog scores-dialog"><span class="kicker">PERSISTENT LOCAL DATA</span><h2>LOCAL SCORES</h2><ol id="score-list"></ol><button class="dialog-button" id="close-scores">CLOSE</button></div></section>`;
 
@@ -41,8 +39,7 @@ const sessionLog: SessionEntry[] = [];
 let ads: ReturnType<typeof connectReactorAds> | undefined;
 const REACTOR_SCENE_KEY = 'ReactorScene';
 const menuPresentation = new MenuPresentation();
-const updateViewportFallback = mountViewportFallback(el('app'));
-let viewportSupported = true;
+
 
 class ReactorScene extends Phaser.Scene {
   cells = new Map<number, Phaser.GameObjects.Container>(); grid!: Phaser.GameObjects.Graphics; selection!: Phaser.GameObjects.Graphics; geometry = { size: 1, left: 0, top: 0 }; gesture = new Gesture(); effects = 0; debug = { indices: false, legal: false, selection: true, geometry: false, bounds: false }; debugNodes: Phaser.GameObjects.Text[] = [];
@@ -53,7 +50,7 @@ class ReactorScene extends Phaser.Scene {
     this.scale.on('resize', () => { this.layoutBoard(); if(controller.phase!=='RESOLVING')this.render(); this.highlight(); });
     const point = (x: number, y: number, id: number) => ({ ...canvasPoint(x, y, this.game.canvas.getBoundingClientRect(), this.scale.width, this.scale.height), id });
     this.boardPointer = bindBoardPointer(this.game.canvas, {
-      enabled: () => viewportSupported && controller.phase === 'PLAYING' && !ads?.flow.locked && !document.querySelector('.overlay:not([hidden]),dialog[open]'),
+      enabled: () => controller.phase === 'PLAYING' && !ads?.flow.locked && !document.querySelector('.overlay:not([hidden]),dialog[open]'),
       begin: (x, y, id) => this.gesture.begin(this.hit(point(x, y, id)), id),
       release: (x, y, id) => this.release(point(x, y, id)),
       cancel: () => this.clearGesture(),
@@ -85,8 +82,6 @@ const game = new Phaser.Game({ type: Phaser.AUTO, parent: 'board', width: 600, h
 const scene = () => game.scene.getScene(REACTOR_SCENE_KEY) as ReactorScene;
 const resizeBoard = () => {
   const shell=el('game-shell'), mode=layoutMode(shell.clientWidth,shell.clientHeight);
-  viewportSupported=updateViewportFallback(shell.clientWidth,shell.clientHeight);
-  const current=scene(); if(current?.grid){const held=!viewportSupported || !!ads?.flow.suspended;current.time.paused=held;if(held){current.tweens.pauseAll();current.clearGesture();}else current.tweens.resumeAll();}
   if(shell.dataset.layout!==mode)shell.dataset.layout=mode;
   el('mode-label').textContent=mode==='wide'?'REACTOR CONTAINMENT':'CONTAINMENT GRID';
   const rect=el('board').getBoundingClientRect(),width=Math.round(rect.width),height=Math.round(rect.height);
@@ -106,18 +101,18 @@ function cool() { if(ads?.flow.canRefill('cool')) { void ads.flow.refill('cool')
 function armUpgrade() { if(ads?.flow.canRefill('upgrade')) { void ads.flow.refill('upgrade'); return; } if(ads?.flow.locked)return; if(controller.state.upgradeRemaining<=0){message('Upgrade charge has been used.');return;} if(controller.phase!=='PLAYING')return; upgradeArmed=!upgradeArmed; message(upgradeArmed?'UPGRADE ARMED — select a Tier I–IV cell.':'Upgrade cancelled.'); }
 function recordCompletion() { const result=controller.state.result; if(completedRecorded || !result) return; completedRecorded=true; const state=controller.state; const scores=recordScore({score:state.score,moves:state.moves,result}); best=scores[0]?.score??best; sessionLog.push({result,reason:state.reason,score:state.score,moves:state.moves,duration:Math.round((performance.now()-runStartedAt)/1000),peakHeat:state.peakHeat,stability:state.stability,merges:[...state.mergeCounts],coolUsed:state.coolUsed,upgradeUsed:state.upgradeUsed,coolGranted:state.coolGranted,upgradeGranted:state.upgradeGranted}); if(sessionLog.length>100)sessionLog.shift(); }
 function resetMenuPresentation() { menuPresentation.reset(view=>{el('menu-kicker').textContent=view.kicker;el('menu-title').textContent=view.title;el('menu-copy').textContent=view.copy;el('start').textContent=view.start;el('menu-overlay').classList.remove('failed');}); }
-function returnToMenu() { if(!ads?.flow.menu())return false;scene().clean();resetMenuPresentation();el('pause-overlay').hidden=true;el('scores-overlay').hidden=true;el('menu-overlay').hidden=false;return true; }
+function returnToMenu() { if(ads?.flow.locked || controller.phase === 'RESOLVING')return false;void ads?.flow.menu().then(changed=>{if(!changed)return;scene().clean();resetMenuPresentation();el('pause-overlay').hidden=true;el('scores-overlay').hidden=true;el('menu-overlay').hidden=false;});return true; }
 function showMenuResult(win:boolean) { const state=controller.state; el('menu-kicker').textContent=win?'CONTAINMENT SECURED':'CONTAINMENT FAILURE'; el('menu-title').textContent=win?'REACTOR STABLE':'CORE OVERLOAD'; el('menu-copy').textContent=`${state.reason}. Score ${state.score} · ${state.moves} moves · High score ${best}.`; el('start').textContent='REINITIALIZE REACTOR'; el('menu-overlay').hidden=false; el('menu-overlay').classList.toggle('failed',!win); }
 function showScores() { const entries=readScores(); el('score-list').innerHTML=entries.length?entries.map(entry=>`<li><b>${entry.score}</b><span>${entry.moves} MOVES · ${entry.result}</span></li>`).join(''):'<li><span>No completed runs yet.</span></li>'; el('scores-overlay').hidden=false; }
 for(const id of ['pause','portrait-pause'])el(id).onclick=pause; for(const id of ['cool','portrait-cool'])el(id).onclick=cool; for(const id of ['upgrade','portrait-upgrade'])el(id).onclick=armUpgrade; for(const id of ['scores','portrait-scores'])el(id).onclick=showScores;
-el('start').onclick=()=>{void ads?.flow.start();}; el('resume').onclick=resume; el('sound').onclick=()=>{audio.setMuted(!audio.muted);el('sound').textContent=audio.muted?'SOUND OFF':'SOUND ON';}; el('restart').onclick=()=>{void ads?.flow.start();}; el('main-menu').onclick=returnToMenu; el('close-scores').onclick=()=>el('scores-overlay').hidden=true;
+el('start').onclick=()=>{void ads?.flow.start();}; el('resume').onclick=resume; el('sound').onclick=()=>{audio.setMuted(!audio.muted);el('sound').textContent=audio.muted?'SOUND OFF':'SOUND ON';}; el('restart').onclick=()=>{void ads?.flow.start(true);}; el('main-menu').onclick=returnToMenu; el('close-scores').onclick=()=>el('scores-overlay').hidden=true;
 
 ads = connectReactorAds(controller, audio, {
   start: () => { el('pause-overlay').hidden = true; scene().startRun(); },
   cancelGesture: () => { const s=scene(); if(s?.grid){s.gesture.down=null;s.gesture.pointer=null;s.highlight();} },
   feedback: message,
   refresh: () => { if(scene()?.grid) scene().hud(); },
-  freeze: value => { const s=scene(); if(!s?.grid)return; const held=value || !viewportSupported;s.time.paused=held; if(held)s.tweens.pauseAll();else s.tweens.resumeAll(); },
+  freeze: value => { const s=scene(); if(!s?.grid)return; const held=value;s.time.paused=held; if(held)s.tweens.pauseAll();else s.tweens.resumeAll(); },
 });
 
-if (import.meta.env.DEV) { void import('./dev-panel.ts').then(({ mountDevPanel }) => mountDevPanel({ controller, game, scene, audio, sessionLog, locked: () => !!ads?.flow.locked || controller.phase === 'RESOLVING' || !!document.querySelector('dialog[open]'), menu: returnToMenu, startRun, showScores, message, runDuration: () => runStartedAt ? Math.round((performance.now()-runStartedAt)/1000) : 0, render: () => { scene().layoutBoard(); scene().render(); scene().hud(); }, resetDefaults: () => { Object.assign(controller.runtimeConfig, copyConfig(DEFAULT_CONFIG)); clampConfig(controller.runtimeConfig); message('Runtime tuning reset. Structural changes apply on restart.'); }, recordCompletion, qaState: () => ({phase:controller.phase,runId:ads?.flow.runId,pendingTransition:ads?.flow.pending,adSuspended:ads?.flow.suspended,bridgeConnected:ads?.client.connected,capabilities:ads?.client.capabilities,error:ads?.flow.lastResult,gridWidth:controller.activeConfig.gridWidth,gridHeight:controller.activeConfig.gridHeight,board:[...controller.state.board],heat:controller.state.heat,heatMaximum:controller.activeConfig.heatMaximum,stability:controller.state.stability,stabilityTarget:controller.activeConfig.stabilityTarget,moves:controller.state.moves,score:controller.state.score,selection:scene().gesture.selected,upgradeArmed,resolution:controller.phase==='RESOLVING',pauseQueued:ads?.flow.pauseQueued,inventory:{cool:controller.state.coolCoreRemaining,upgrade:controller.state.upgradeRemaining},used:{cool:controller.state.coolUsed,upgrade:controller.state.upgradeUsed},granted:{cool:controller.state.coolGranted,upgrade:controller.state.upgradeGranted},shownAttempts:{...ads?.flow.attempts},completedRecorded,sessionLogCount:sessionLog.length,viewportSupported}), finalize: () => { scene().clean(); scene().showResult(); scene().hud(); } })); }
+if (import.meta.env.DEV) { void import('./dev-panel.ts').then(({ mountDevPanel }) => mountDevPanel({ controller, game, scene, audio, sessionLog, locked: () => !!ads?.flow.locked || controller.phase === 'RESOLVING' || !!document.querySelector('dialog[open]'), menu: returnToMenu, startRun, showScores, message, runDuration: () => runStartedAt ? Math.round((performance.now()-runStartedAt)/1000) : 0, render: () => { scene().layoutBoard(); scene().render(); scene().hud(); }, resetDefaults: () => { Object.assign(controller.runtimeConfig, copyConfig(DEFAULT_CONFIG)); clampConfig(controller.runtimeConfig); message('Runtime tuning reset. Structural changes apply on restart.'); }, recordCompletion, qaState: () => ({phase:controller.phase,runId:ads?.flow.runId,pendingTransition:ads?.flow.pending,adSuspended:ads?.flow.suspended,bridgeConnected:ads?.client.connected,capabilities:ads?.client.capabilities,error:ads?.flow.lastResult,gridWidth:controller.activeConfig.gridWidth,gridHeight:controller.activeConfig.gridHeight,board:[...controller.state.board],heat:controller.state.heat,heatMaximum:controller.activeConfig.heatMaximum,stability:controller.state.stability,stabilityTarget:controller.activeConfig.stabilityTarget,moves:controller.state.moves,score:controller.state.score,selection:scene().gesture.selected,upgradeArmed,resolution:controller.phase==='RESOLVING',pauseQueued:ads?.flow.pauseQueued,inventory:{cool:controller.state.coolCoreRemaining,upgrade:controller.state.upgradeRemaining},used:{cool:controller.state.coolUsed,upgrade:controller.state.upgradeUsed},granted:{cool:controller.state.coolGranted,upgrade:controller.state.upgradeGranted},shownAttempts:{...ads?.flow.attempts},completedRecorded,sessionLogCount:sessionLog.length}), finalize: () => { scene().clean(); scene().showResult(); scene().hud(); } })); }

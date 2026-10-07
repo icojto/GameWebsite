@@ -30,7 +30,7 @@ class PointerCanvas extends EventTarget {
   setPointerCapture(id:number){if(this.failCapture)throw Error('capture denied');this.captured.add(id);}
   hasPointerCapture(id:number){return this.captured.has(id);}
   releasePointerCapture(id:number){this.captured.delete(id);this.send('lostpointercapture',id);}
-  send(type:string,id=1,x=10,y=10,button=0){const event=new Event(type,{cancelable:true});Object.assign(event,{pointerId:id,clientX:x,clientY:y,button});this.dispatchEvent(event);return event;}
+  send(type:string,id=1,x=10,y=10,button=0,pointerType='mouse'){const event=new Event(type,{cancelable:true});Object.assign(event,{pointerId:id,clientX:x,clientY:y,button,pointerType});(type==='pointermove'||type==='pointerup'||type==='pointercancel'?this.ownerDocument.defaultView:this).dispatchEvent(event);return event;}
 }
 function pointerBoard(){
   const canvas=new PointerCanvas(),controller=new TurnController(()=>0),gesture=new Gesture();controller.start();controller.state.board.fill(0);controller.state.board[0]=1;
@@ -42,6 +42,13 @@ test('captured touch/pen/mouse drag releases one valid move and ignores duplicat
  const h=pointerBoard();assert.equal(h.canvas.send('pointerdown').defaultPrevented,true);assert.equal(h.canvas.hasPointerCapture(1),true);
  h.canvas.send('pointermove',1,30,10);h.canvas.send('pointerup',1,30,10);h.canvas.send('pointerup',1,30,10);
  assert.equal(h.accepted,1);assert.equal(h.controller.state.moves,1);assert.equal(h.controller.phase,'RESOLVING');assert.equal(h.canvas.captured.size,0);h.input.destroy();
+});
+test('Android touch button=-1 with denied capture still releases one board action',()=>{
+ const h=pointerBoard();h.canvas.failCapture=true;
+ assert.equal(h.canvas.send('pointerdown',7,10,10,-1,'touch').defaultPrevented,true);
+ assert.equal(h.canvas.send('pointermove',7,30,10,-1,'touch').defaultPrevented,true);
+ h.canvas.send('pointerup',7,30,10,-1,'touch');h.canvas.send('pointerup',7,30,10,-1,'touch');
+ assert.equal(h.accepted,1);assert.equal(h.controller.state.moves,1);assert.equal(h.gesture.pointer,null);h.input.destroy();
 });
 test('tap source/destination remains one accepted move; invalid diagonal drag is free',()=>{
  const h=pointerBoard();h.canvas.send('pointerdown');h.canvas.send('pointerup');assert.equal(h.gesture.selected,0);
@@ -55,9 +62,9 @@ test('cancel, capture loss, blur and disabled release cannot commit or leave sel
   h.canvas.send('pointerup',1,30,10);assert.equal(h.accepted,0,event);assert.equal(h.gesture.pointer,null);assert.equal(h.gesture.selected,null);assert.equal(h.canvas.captured.size,0);h.input.destroy();
  }
 });
-test('foreign pointers/right mouse/capture denial cannot hijack a board stroke',()=>{
+test('foreign pointers/right mouse/capture fallback cannot hijack a board stroke',()=>{
  const h=pointerBoard();h.canvas.send('pointerdown');h.canvas.send('pointerdown',2,30,10);h.canvas.send('pointerup',2,30,10);assert.equal(h.accepted,0);assert.equal(h.gesture.pointer,1);h.canvas.send('pointerup',1,30,10);assert.equal(h.accepted,1);h.input.destroy();
- const other=pointerBoard();other.canvas.send('pointerdown',1,10,10,2);assert.equal(other.canvas.captured.size,0);other.canvas.failCapture=true;other.canvas.send('pointerdown');other.canvas.send('pointerup',1,30,10);assert.equal(other.accepted,0);assert.equal(other.gesture.pointer,null);other.input.destroy();
+ const other=pointerBoard();other.canvas.send('pointerdown',1,10,10,2);assert.equal(other.canvas.captured.size,0);other.canvas.failCapture=true;other.canvas.send('pointerdown');other.canvas.send('pointerup',1,30,10);assert.equal(other.accepted,1);assert.equal(other.gesture.pointer,null);other.input.destroy();
 });
 test('pointer coordinates use current CSS rectangle after resize without board-state mutation',()=>{
  const h=pointerBoard(),before=JSON.stringify(h.controller.state);

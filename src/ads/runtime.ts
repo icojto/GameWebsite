@@ -20,9 +20,12 @@ export function createAdRuntime(): { attach: (gameId: string | null, frame: HTML
     const send = (message: Record<string, unknown>) => frame.contentWindow?.postMessage({ protocol: 'odesos-ads', version: 1, ...message }, location.origin);
     presentation.bind(gameId, send);
     let bridge = createAdBridge(service, { origin: location.origin, source: frame.contentWindow, gameId, send, presentation });
+    let awaitingInitialLoad = !frame.classList.contains('is-ready');
     const receive = (event: MessageEvent) => bridge.receive(event);
     const reload = () => {
-      bridge.dispose(); service.cancelActive('frame-reloaded'); service.setGameState('unknown');
+      bridge.dispose();
+      if (awaitingInitialLoad) { awaitingInitialLoad = false; service.cancelActive('frame-loaded'); service.setGameState('unknown'); }
+      else service.setContext(gameId);
       presentation.bind(gameId, send);
       bridge = createAdBridge(service, { origin: location.origin, source: frame.contentWindow, gameId, send, presentation });
       tools?.attachFrame(frame);

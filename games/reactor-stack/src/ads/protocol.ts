@@ -33,8 +33,7 @@ const keys = (v: Record<string, unknown>, allowed: string[]) => Object.keys(v).e
 const results = ['completed', 'closed', 'failed', 'no_fill', 'timeout', 'unavailable', 'blocked'];
 const types = ['startup', 'interstitial', 'rewarded'];
 export function placementType(id: string, previews = false): AdType | null {
-  if (id === 'reactor.startup') return 'startup';
-  if (id === 'reactor.start-interstitial' || id === 'reactor.pause-interstitial') return 'interstitial';
+  if (['reactor.restart-interstitial', 'reactor.pause-interstitial', 'reactor.resume-interstitial', 'reactor.menu-interstitial'].includes(id)) return 'interstitial';
   if ((id === 'reactor.cool-refill' || id === 'reactor.upgrade-refill')) return 'rewarded';
   if (previews) for (const type of types) if (id === `dev-${GAME_ID}-${type}`) return type as AdType;
   return null;

@@ -8,7 +8,8 @@ export class AdService {
   gameId: string | null = null;
   gameState: GameState = 'unknown';
   visible = true;
-  activeSeconds = 0;
+  private contextOpenedAt: number | null = null;
+  private timerResetAt: number | null = null;
   startup = { requested: false, shown: false, completed: false };
   stats: Record<AdType, Counters> = { startup: emptyCounters(), interstitial: emptyCounters(), rewarded: emptyCounters(), banner: emptyCounters() };
   placementStats = new Map<string, Counters>();
@@ -25,14 +26,11 @@ export class AdService {
   lastRequest: AdRequest | null = null;
   lastResults: Partial<Record<AdType, { result: AdResult; reason?: string }>> = {};
   lastFullscreen: number | null = null;
-  interstitialCooldownAt: number | null = null;
   lastInterstitial: number | null = null;
   lastRewarded: number | null = null;
-  nextEligibleAt: number;
   private listeners = new Set<(event: AdEvent) => void>();
   private now: () => number;
   private started: number;
-  private lastTick: number;
   private active: AbortController | null = null;
   private previouslyEligible = false;
   private usedIds = new Set<string>();
@@ -46,9 +44,8 @@ export class AdService {
   constructor(provider: AdProvider, options: Options = {}) {
     this.provider = provider;
     this.options = options;
-    this.now = options.now ?? (() => performance.now());
-    this.started = this.lastTick = this.now();
-    this.nextEligibleAt = this.config.interstitial.firstSeconds;
+    this.now = options.now ?? (() => Date.now());
+    this.started = this.now();
   }
   get busy(): boolean { return this.active !== null; }
   get sessionAdsShown(): number { return [...this.placementHistory.values()].reduce((total, value)=>total+value.shown,0); }
@@ -82,7 +79,7 @@ export class AdService {
       const blocked=!p.enabled?'disabled':p.sessionLimitEnabled!==false && (history?.shown??0)>=p.maxPerSession?'placement-cap':history && (this.secondsSince(history.at)??0)<p.cooldownSeconds?'placement-cooldown':'';
       return blocked?`${p.id}: ${blocked}`:'';
     }).filter(Boolean).join('; ') || 'Checked on request (including run context)';
-    if(type==='interstitial') {result['Active-play wait seconds']=Math.ceil(Math.max(0,this.nextEligibleAt-this.activeSeconds));result['Cooldown remaining seconds']=this.interstitialCooldownAt===null?0:Math.ceil(Math.max(0,this.config.interstitial.cooldownSeconds-(this.secondsSince(this.interstitialCooldownAt)??0)));result['Session cap']=this.config.interstitial.sessionLimitEnabled?this.config.interstitial.maxPerSession:'Unlimited';}
+    if(type==='interstitial') {result['Time until eligible']=Math.ceil(this.interstitialEligibility().secondsRemaining);result['Interstitial timer']=Math.floor(this.interstitialSeconds);result['Session cap']=this.config.interstitial.sessionLimitEnabled?this.config.interstitial.maxPerSession:'Unlimited';}
     if(type==='rewarded') result['Rewards acknowledged']=this.rewardAcknowledgments;
     return result;
   }
@@ -117,19 +114,19 @@ export class AdService {
     try { return this.provider.isReady(type); }
     catch { this.lastError = 'provider-readiness-failed'; return false; }
   }
+  get gameOpenSeconds(): number { return this.secondsSince(this.contextOpenedAt) ?? 0; }
+  get interstitialSeconds(): number { return this.secondsSince(this.timerResetAt) ?? 0; }
   get sessionSeconds(): number { return Math.max(0, (this.now() - this.started) / 1000); }
   secondsSince(value: number | null): number | null { return value === null ? null : Math.max(0, (this.now() - value) / 1000); }
   subscribe(listener: (event: AdEvent) => void): () => void { this.listeners.add(listener); return () => this.listeners.delete(listener); }
   emit(event: string, request?: Partial<AdRequest>, result?: AdResult, reason?: string): void {
-    const entry: AdEvent = { timestamp: new Date().toISOString(), event, gameId: request?.gameId ?? this.gameId, ...request, result, reason, activeSeconds: this.activeSeconds, sessionSeconds: this.sessionSeconds };
+    const entry: AdEvent = { timestamp: new Date().toISOString(), event, gameId: request?.gameId ?? this.gameId, ...request, result, reason, gameOpenSeconds: this.gameOpenSeconds, sessionSeconds: this.sessionSeconds };
     this.events.push(entry);
     if (this.events.length > 200) this.events.shift();
     for (const listener of this.listeners) { try { listener(entry); } catch { /* Observers cannot hold an ad request open. */ } }
   }
   configure(input: unknown): void {
-    const previousFirst = this.config.interstitial.firstSeconds;
     this.config = normalizeConfig(input);
-    if (!this.interstitialCount && this.nextEligibleAt === previousFirst) this.nextEligibleAt = this.config.interstitial.firstSeconds;
     if (!this.config.master) this.cancelActive('disabled');
     if (!this.config.master || !this.config.banner.enabled) this.setBanner(false);
     this.tick();
@@ -145,26 +142,25 @@ export class AdService {
     this.tick();
     this.cancelActive('route-changed');
     this.gameId = gameId;
+    this.contextOpenedAt = this.timerResetAt = gameId ? this.now() : null;
+    this.lastFullscreen = null;
+    this.previouslyEligible = false;
     this.gameState = 'unknown';
     this.emit('game-context');
   }
   setGameState(state: GameState): void { this.tick(); this.gameState = state; this.emit('game-state', undefined, undefined, state); }
   setVisible(visible: boolean): void { this.tick(); this.visible = visible; this.emit('visibility', undefined, undefined, visible ? 'visible' : 'hidden'); }
   tick(): void {
-    const now = this.now();
-    if (this.gameId && this.gameState === 'playing' && this.visible && !this.busy) this.activeSeconds += Math.max(0, (now - this.lastTick) / 1000);
-    this.lastTick = now;
     const eligible = this.interstitialEligibility().eligible;
     if (eligible && !this.previouslyEligible) { this.eligibleEvents++; this.emit('interstitial-eligible'); }
     this.previouslyEligible = eligible;
   }
   interstitialEligibility(safeEvent?: string, placement?: Placement): { eligible: boolean; reason: string; secondsRemaining: number } {
     const cfg = this.config.interstitial;
-    const remaining = Math.max(0, this.nextEligibleAt - this.activeSeconds);
+    const remaining = Math.max(0, cfg.timerSeconds - this.interstitialSeconds);
     const reason = !this.config.master || !cfg.enabled ? 'disabled' : this.busy ? 'another-ad-active'
       : cfg.sessionLimitEnabled && this.interstitialCount >= cfg.maxPerSession ? 'session-cap'
-      : remaining > 0 ? 'not-enough-active-play'
-      : this.interstitialCooldownAt !== null && (this.secondsSince(this.interstitialCooldownAt) ?? 0) < cfg.cooldownSeconds ? 'cooldown'
+      : !this.gameId || remaining > 0 ? 'timer-not-ready'
       : !this.providerReady('interstitial') ? 'provider-unavailable'
       : placement && (!safeEvent || !placement.safeEvents?.includes(safeEvent)) ? 'no-safe-event' : '';
     return { eligible: !reason, reason: reason || 'eligible-awaiting-safe-event', secondsRemaining: remaining };
@@ -248,8 +244,13 @@ export class AdService {
           this.placementHistory.set(request.placementId, { shown: (history?.shown ?? 0) + 1, at: this.now() });
           if (runKey) this.placementRunHistory.set(runKey, (this.placementRunHistory.get(runKey) ?? 0) + 1);
           if (request.adType === 'startup') this.startup.shown = true;
-          if (request.adType === 'interstitial') { this.interstitialCount++; this.lastInterstitial = this.now(); this.nextEligibleAt = this.activeSeconds + this.config.interstitial.intervalSeconds; }
+          if (request.adType === 'interstitial') { this.interstitialCount++; this.lastInterstitial = this.now(); }
           if (request.adType === 'rewarded') { this.rewardedCount++; this.lastRewarded = this.now(); }
+          if (request.adType === 'startup' || request.adType === 'interstitial') {
+            this.timerResetAt = this.lastFullscreen = this.now();
+            this.previouslyEligible = false;
+            this.emit('interstitial-timer-reset', request);
+          }
           this.emit('ad-shown', request);
         }), controller.signal);
         result = typeof outcome === 'string' ? outcome : outcome.result;
@@ -261,12 +262,6 @@ export class AdService {
     } finally {
       clearTimeout(timer);
       controller.abort('finished');
-      this.lastTick = this.now();
-      if (shown) this.lastFullscreen = this.now();
-      if (shown && (request.adType !== 'rewarded' || this.config.interstitial.resetAfterRewarded)) {
-        this.interstitialCooldownAt = this.now();
-        this.emit('cooldown-reset', request);
-      }
       if (shown && request.adType === 'rewarded') this.lastRewarded = this.now();
       this.active = null;
     }
@@ -300,11 +295,11 @@ export class AdService {
     } catch { this.count('banner', 'failed'); host.hidden = true; this.bannerVisible = false; }
   }
   cancelActive(reason = 'cancelled'): void { this.active?.abort(reason); }
-  devAction(action: 'eligible' | 'timer' | 'cooldown' | 'startup'): void {
+  devAction(action: 'eligible' | 'timer' | 'startup'): void {
     if (!this.options.development || this.busy) return;
-    if (action === 'eligible') this.nextEligibleAt = this.activeSeconds;
-    if (action === 'timer') this.nextEligibleAt = this.activeSeconds + this.config.interstitial.firstSeconds;
-    if (action === 'cooldown') this.interstitialCooldownAt = null;
+    if (!this.gameId) return;
+    if (action === 'eligible') this.timerResetAt = this.now() - this.config.interstitial.timerSeconds * 1000;
+    if (action === 'timer') this.timerResetAt = this.now();
     if (action === 'startup') this.startup = { requested: false, shown: false, completed: false };
     this.tick();
     this.emit(`dev-reset-${action}`);
@@ -315,7 +310,7 @@ export class AdService {
     this.placementStats.clear(); this.events = []; this.blockedReasons = {}; this.eligibleEvents = 0; this.rewardAcknowledgments = 0;
     this.emit('stats-cleared', undefined, undefined, 'Eligibility, caps and reward receipts are retained');
   }
-  destroy(): void { this.cancelActive('destroyed'); this.setBanner(false); this.provider.destroy(); this.listeners.clear(); }
+  destroy(): void { this.gameId = null; this.gameState = 'unknown'; this.contextOpenedAt = this.timerResetAt = null; this.cancelActive('destroyed'); this.setBanner(false); this.provider.destroy(); this.listeners.clear(); }
 }
 
 /** A broken future provider must still settle within the host deadline/cancellation. */

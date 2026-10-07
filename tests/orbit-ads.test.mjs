@@ -188,15 +188,14 @@ test('all four approved placements use website slug, exact semantic events and h
   assert.deepEqual(h.service.placements.get('orbit.restart-interstitial').safeEvents,['restart-requested']);
   h.service.tunePlacement('orbit.revive',{maxPerRun:9});assert.equal(h.service.placements.get('orbit.revive').maxPerRun,1);
 });
-test('timer eligibility never shows, non-playing time excluded, PLAY safe event required',async()=>{
-  const h=serviceHarness();h.advance(200000);assert.equal(h.service.activeSeconds,0);h.service.setGameState('playing');h.advance(180000);
+test('timer eligibility never shows, non-playing time included, PLAY safe event required',async()=>{
+  const h=serviceHarness();h.advance(200000);assert.equal(h.service.gameOpenSeconds,200);h.service.setGameState('playing');h.advance(180000);
   assert.equal(h.calls.length,0);assert.equal(h.service.interstitialEligibility().eligible,true);
   assert.equal((await h.request('orbit.play-interstitial',{safeEvent:'run-ended'})).reason,'no-safe-event');
   assert.equal((await h.request('orbit.play-interstitial',{safeEvent:'play-requested'})).result,'completed');assert.equal(h.calls.length,1);
 });
-for(const reason of ['not-enough-active-play','cooldown','session-cap']) test(`PLAY cannot bypass website ${reason}`,async()=>{
-  const h=serviceHarness();h.service.config.interstitial.firstSeconds=0;h.service.nextEligibleAt=reason==='not-enough-active-play'?180:0;
-  if(reason==='cooldown')h.service.interstitialCooldownAt=0;
+for(const reason of ['timer-not-ready','session-cap']) test(`PLAY cannot bypass website ${reason}`,async()=>{
+  const h=serviceHarness();h.service.config.interstitial.timerSeconds=reason==='timer-not-ready'?180:0;
   if(reason==='session-cap'){h.service.config.interstitial.sessionLimitEnabled=true;h.service.interstitialCount=3;}
   assert.equal((await h.request('orbit.play-interstitial',{safeEvent:'play-requested'})).reason,reason);assert.equal(h.calls.length,0);
 });
@@ -251,7 +250,7 @@ test('ad lifecycle wiring blocks Phaser input and ordinary UI, with DEV shortcut
   const scene=readFileSync(new URL('../games/orbit-break/src/game/OrbitBreakScene.ts',import.meta.url),'utf8');
   const ui=readFileSync(new URL('../games/orbit-break/src/game/ui.ts',import.meta.url),'utf8');
   const dev=readFileSync(new URL('../games/orbit-break/src/dev/DevPanel.ts',import.meta.url),'utf8');
-  assert.match(scene,/this\.input\.enabled = !value/);assert.match(scene,/if \(this\.adSuspended \|\| !this\.viewportSupported\) return/);assert.match(scene,/this\.audio\.suspendForAd\(value\)/);
+  assert.match(scene,/this\.input\.enabled = !value/);assert.match(scene,/if \(this\.adSuspended\) return/);assert.match(scene,/this\.audio\.suspendForAd\(value\)/);
   assert.match(ui,/this\.root\.inert = value/);assert.match(ui,/if \(this\.blocked\) return/);assert.match(dev,/if \(this\.root\.inert\) return/);
 });
 test('stale, wrong-run and duplicate result cannot release or reward a newer request',async()=>{
@@ -290,6 +289,6 @@ test('fresh normal Orbit PLAY and RESTART couple host policy to exactly-once run
  assert.equal(h.service.config.startup.enabled,false);h.service.devAction('eligible');assert.equal(h.calls.length,0);
  await Promise.all([flow.requestStartRun(),flow.requestStartRun()]);const first=flow.runId;
  assert.equal(counts.started,1);assert.equal(h.calls.length,1);assert.equal(requests[0].safeEvent,'play-requested');
- flow.death();h.service.setGameState('game-over');h.service.devAction('eligible');assert.equal(h.service.interstitialEligibility().reason,'cooldown');h.service.devAction('cooldown');
+ flow.death();h.service.setGameState('game-over');assert.equal(h.service.interstitialEligibility().reason,'timer-not-ready');h.service.devAction('eligible');assert.equal(h.service.interstitialEligibility().eligible,true);
  await Promise.all([flow.requestStartRun(),flow.requestStartRun()]);assert.notEqual(flow.runId,first);assert.equal(counts.started,2);assert.equal(counts.finalized,1);assert.equal(h.calls.length,2);assert.equal(requests[1].safeEvent,'restart-requested');assert.equal(h.service.rewardAcknowledgments,0);
 });

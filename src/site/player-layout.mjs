@@ -1,4 +1,4 @@
 /** Reserve actual action-bar height; never impose a floor larger than the viewport. */
-export function playerAllocation(viewportHeight, actionHeight) {
-  return Math.max(0, Math.floor(viewportHeight - actionHeight - 16));
+export function playerAllocation(viewportHeight, actionHeight, stageTop = 0, bottomInset = 0) {
+  return Math.max(0, Math.floor(viewportHeight - stageTop - actionHeight - bottomInset));
 }
