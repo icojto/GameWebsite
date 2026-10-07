@@ -1,25 +1,20 @@
-name: Deploy GitHub Pages
+name: Static release CI
 
 on:
   push:
     branches: [main]
+  pull_request:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: github-pages
+  group: static-release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    if: github.ref == 'refs/heads/main'
+  verify:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
@@ -28,6 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run test:qa-contract
       - run: npm run test:monetization
       - run: npm run test:portal
       - run: npm run test:ads
@@ -36,10 +32,12 @@ jobs:
       - run: npm run test:reactor
       - run: npm run test:reactor-ads
       - run: npm run build
-      - run: npm run verify:pages
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - run: npm run verify:ads-production
+      - run: npm run verify:static-release
+      - run: npm run cf:check
+        env:
+          WRANGLER_SEND_METRICS: false
+      - uses: actions/upload-artifact@v4
         with:
+          name: static-release
           path: dist
-      - uses: actions/deploy-pages@v4
-        id: deployment

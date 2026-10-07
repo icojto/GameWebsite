@@ -22,6 +22,11 @@ const staticPages = [
   },
 ];
 
+staticPages.push(
+  {path:'/privacy/',title:'Privacy — OdesosGames',description:'How OdesosGames handles browser-local data, website delivery and contact correspondence.'},
+  {path:'/terms/',title:'Terms — OdesosGames',description:'Terms for free OdesosGames browser games, saved progress and mandatory user rights.'},
+);
+
 const gamePages = publicGameCatalog.map((game) => ({
   path: `${game.route}/`,
   title: `${game.title} — OdesosGames`,

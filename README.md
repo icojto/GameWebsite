@@ -34,11 +34,11 @@ npm.cmd run test:ads
 npm.cmd run test:orbit
 npm.cmd run test:reactor
 npm.cmd run build
-npm.cmd run verify:pages
+npm.cmd run verify:static-release
 npm.cmd run preview
 ```
 
-Open the URL printed by Vite Preview, normally <http://127.0.0.1:4173/>. Verify `/`, `/games/orbit-break/`, `/games/reactor-stack/`, `/about/`, and `/contact/`. Unknown paths have a branded static `404.html` for GitHub Pages. Games 003–005 remain hidden from public routing.
+Open the URL printed by Vite Preview, normally <http://127.0.0.1:4173/>. Verify `/`, `/games/orbit-break/`, `/games/reactor-stack/`, `/about/`, and `/contact/`. Unknown paths have a branded static `404.html` for static hosting. Games 003–005 remain hidden from public routing.
 
 ## How the game integration works
 
@@ -58,31 +58,22 @@ The current abstract Orbit Break treatment is intentionally procedural. Final st
 2. Add one entry to `gameCatalog` in `src/games/catalog.mjs`. Give it a unique `slug`, `route`, `embedBase`, and `embedPath`. Set `visibility: 'public'` only after approval; use `artVariant: 'title'` until approved art is available.
 3. Add the matching repository-local source directory to `gameBuilds` in the same file, keyed by the same slug.
 4. Add any required packages to the root `package.json` and run `npm.cmd install`; portal scripts intentionally use only the root dependency installation.
-5. Run `npm.cmd run check`, `npm.cmd run test:portal`, `npm.cmd run build`, `npm.cmd run verify:pages`, and `npm.cmd run preview`.
+5. Run `npm.cmd run check`, `npm.cmd run test:portal`, `npm.cmd run build`, `npm.cmd run verify:static-release`, and `npm.cmd run preview`.
 6. Test the generated card, route, iframe, controls, sound, and mobile sizing.
 
 No homepage template change is needed: catalog entries automatically create cards and routes.
 
-## GitHub Pages preparation
+## Cloudflare Workers static hosting
 
-The project site is configured for <https://odesosgames.com/>. The Pages build uses `/` as Vite's base and builds each game embed under `/games/<slug>/embed/`. Static HTML with route-specific title, description, canonical, social metadata, and structured data is generated for the homepage, both public games, About, and Contact. A sitemap and robots file list only those public routes. The old `https://icojto.github.io/GameWebsite/` URL redirects to the custom domain; it is not a second deployment path.
+Website 0.2.0 targets an asset-only Cloudflare Worker named gamewebsite with Git integration. GitHub retains source control, PR review and CI; Workers Builds compiles the static site with npm run build and Wrangler serves ./dist. The existing live GitHub Pages origin remains until a later human-approved cutover.
 
-To reproduce the Pages artifact locally on Windows:
+Seven real static routes cover Home, both public games, About, Contact, Privacy and Terms. Root 404.html supplies genuine 404 responses; directory index pages use trailing slashes. This is not an SPA fallback. Existing game embeds, robots and sitemap are preserved.
 
-```powershell
-cd GameWebsite
-npm.cmd ci
-npm.cmd run check
-npm.cmd run test:portal
-npm.cmd run build
-npm.cmd run verify:pages
-```
+Run npm run verify:static-release after building for the provider-neutral metadata/assets/404 checks. Run npm run cf:check for a non-deploying Wrangler dry-run; npm run cf:dev starts local Workers static emulation. Existing preview and qa:preview remain the Vite production-preview commands. Wrangler 4.148.0 is an exact development-only dependency; it is not part of the browser bundle. Temporary Wrangler output is ignored. For local checks, WRANGLER_SEND_METRICS=false disables Wrangler CLI usage metrics; this is distinct from visitor analytics, which remains absent.
 
-The verifier serves `dist` locally from `/` and checks public routes and embeds, metadata, social image, sitemap, robots, 404, linked assets, preserved on-hold embeds, and Signal Below's SVG scenes. It rejects stale `/GameWebsite/` links and does not publish anything. The native portal tests cover catalogue visibility and safe storage behavior.
+The workflow .github/workflows/static-release.yml runs required tests, build, static-release verification and Wrangler dry-run on PRs and main, uploading dist without deploying. Main remains the future production branch. The Gate 2 feature branch must first have an isolated Cloudflare Preview; do not merge merely to obtain a preview.
 
-The workflow at `.github/workflows/pages.yml` runs only for pushes to `main`; it installs with `npm ci`, checks, tests, builds, verifies, uploads `dist`, and deploys to the `github-pages` environment. GitHub Pages must remain configured with **GitHub Actions** as its source and `odesosgames.com` as its custom domain in repository Settings → Pages. For a workflow-published site, GitHub ignores a repository `CNAME` file; the Pages setting is authoritative. To publish a fix, review and merge its PR into `main`, confirm the **Deploy GitHub Pages** workflow succeeds in the Actions tab, and open the site URL above. The repository and Pages site are currently public; verify that publication is intended before merging.
-
-The Contact page does not publish a contact address because no approved public channel is in this repository. A human must supply one before a later compliance submission. No legal policies, consent system, ads, accounts, analytics, or backend are implemented by this website pass. See [website release checklist](docs/website-release-checklist.md) for the human QA gate.
+See [Workers static handoff](docs/release/cloudflare-workers-static.md). Public contact/legal pages and scoped saved-data controls are implemented. Production uses Null ads; no CMP, ad SDK, analytics, accounts or backend is active.
 
 ## Mock-only monetization blueprint
 

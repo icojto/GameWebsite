@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { websiteVersion } from './build-identity.mjs';
 import { gameCatalog, publicGameCatalog } from '../src/games/catalog.mjs';
 import { publicPages, siteOrigin, socialImagePath } from '../src/site/pages.mjs';
 
@@ -27,7 +28,7 @@ const server = createServer(async (request, response) => {
       : 'application/octet-stream';
     response.writeHead(200, { 'content-type': type }).end(body);
   } catch {
-    response.writeHead(404).end();
+    response.writeHead(404, { 'content-type': 'text/html' }).end(await readFile(path.join(distRoot, '404.html')));
   }
 });
 
@@ -54,12 +55,21 @@ async function checkHtmlAssets(html) {
 }
 
 try {
+  const config = JSON.parse(await readFile(path.join(portalRoot, 'wrangler.jsonc'), 'utf8'));
+  assert.equal(config.assets.directory, './dist');
+  assert.equal(config.assets.not_found_handling, '404-page');
+  assert.equal(config.assets.html_handling, 'auto-trailing-slash');
+  assert.deepEqual(config.previews, {}, 'Static-only branch Previews require an explicit empty previews block');
+  assert.equal(config.main, undefined, 'Static hosting must not introduce a Worker script');
+  const headers = await readFile(path.join(distRoot, '_headers'), 'utf8');
+  assert.equal(headers, await readFile(path.join(portalRoot, 'public', '_headers'), 'utf8'));
+  assert.match(headers, /X-Content-Type-Options: nosniff/);
   const homepage = await fetchOk('/');
   await checkHtmlAssets(homepage);
   assert.deepEqual(publicGameCatalog.map((game) => game.slug), ['orbit-break', 'reactor-stack']);
   assert.equal(publicGameCatalog.length, 2);
   assert.deepEqual(publicPages.map((page) => page.path), [
-    '/', '/games/orbit-break/', '/games/reactor-stack/', '/about/', '/contact/',
+    '/', '/games/orbit-break/', '/games/reactor-stack/', '/about/', '/contact/', '/privacy/', '/terms/',
   ]);
   const titles = new Set();
   for (const page of publicPages) {
@@ -100,10 +110,15 @@ try {
 
   const notFound = await fetchOk('/404.html');
   assert.match(notFound, /<h1>Page not found<\/h1>/);
+  assert.ok(notFound.includes('Website '+websiteVersion));
+  const unknown = await fetchStatus('/unknown-release-check/child');
+  assert.equal(unknown.status, 404);
+  assert.match(await unknown.text(), /<h1>Page not found<\/h1>/);
   assert.match(notFound, /<meta name="robots" content="noindex"/);
   assert.match(notFound, /<main id="main-content"/);
+  assert.match(notFound, /<div id="app">/, 'Static 404 must mount the portal so footer privacy controls initialize');
   assert.match(notFound, /href="\/about\/"/);
-  assert.doesNotMatch(notFound, /<script type="module"/);
+  assert.match(notFound, /<script type="module"/);
 
   const portalSource = await readFile(path.join(portalRoot, 'src', 'main.ts'), 'utf8');
   const portalCss = await readFile(path.join(portalRoot, 'src', 'styles.css'), 'utf8');

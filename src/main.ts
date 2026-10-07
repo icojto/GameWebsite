@@ -1,4 +1,4 @@
-import { scopedUrl } from '../shared/storage.mjs';
+import { gameStorage, scopedUrl } from '../shared/storage.mjs';
 import './styles.css';
 import { playerAllocation } from './site/player-layout.mjs';
 import { publicGameCatalog } from './games/catalog.mjs';
@@ -6,6 +6,8 @@ import { publicPages, siteOrigin, socialImagePath } from './site/pages.mjs';
 import { readThemePreference, siteStorage } from './site/storage.mjs';
 import { createAdRuntime } from './ads/runtime.ts';
 import { requestPrivacySettings } from './site/privacy-settings.mjs';
+import { clearPublicLocalData } from './site/local-data.mjs';
+import { operatorHtml, privacyHtml, termsHtml } from './site/legal-content.mjs';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Portal root is missing.');
@@ -58,6 +60,8 @@ function renderRoute(manageFocus = false): void {
   else if (path === '/') renderHome();
   else if (path === '/about') renderAbout();
   else if (path === '/contact') renderContact();
+  else if (path === '/privacy') renderLegal('Privacy', privacyHtml);
+  else if (path === '/terms') renderLegal('Terms', termsHtml);
   else renderNotFound();
   adRuntime.attach(game?.slug ?? null, document.querySelector<HTMLIFrameElement>('.game-frame'), document.querySelector<HTMLElement>('[data-ad-slot="game-page-primary"]'));
   syncRouteMetadata(path);
@@ -273,6 +277,7 @@ function renderAbout(): void {
       <main id="main-content" tabindex="-1" class="simple-page">
         <p class="eyebrow"><span></span>About the project</p>
         <h1>Small games. Room to explore.</h1>
+        ${operatorHtml}
         <p>OdesosGames is an independent browser-game project focused on games you can open and play without a download.</p>
         <p>Orbit Break is a one-action survival game. Reactor Stack is a puzzle about combining energy cells while managing heat. Both are available here for desktop and mobile browsers.</p>
         <a class="text-link" href="${sitePath('/')}#collection">Explore the games <span aria-hidden="true">→</span></a>
@@ -291,7 +296,8 @@ function renderContact(): void {
       <main id="main-content" tabindex="-1" class="simple-page">
         <p class="eyebrow"><span></span>Contact</p>
         <h1>Get in touch</h1>
-        <p>For questions about OdesosGames, email <a href="mailto:contact@odesosgames.com">contact@odesosgames.com</a>.</p>
+        ${operatorHtml}
+        <p>For questions about the games or privacy, use the contact details above.</p>
         <p>Please do not include passwords, payment details or identity documents in your message.</p>
         <a class="text-link" href="${sitePath('/')}#collection">Browse games <span aria-hidden="true">→</span></a>
       </main>
@@ -300,17 +306,31 @@ function renderContact(): void {
   bindSharedControls();
 }
 
+function renderLegal(title: string, content: string): void {
+  document.body.dataset.view = 'content';
+  document.title = title + ' — OdesosGames';
+  app!.innerHTML = `<div class="site-shell">${renderHeader('')}<main id="main-content" tabindex="-1" class="simple-page legal-page"><h1>${title === 'Privacy' ? 'Privacy Policy' : 'Terms of Use'}</h1>${content}</main>${renderFooter()}</div>`;
+  bindSharedControls();
+}
+
 function renderFooter(): string {
   return `
     <footer class="site-footer">
-      <div class="footer-brand"><strong>OdesosGames</strong><span>Independent browser games · ${publicGameCatalog.length} playable games</span></div>
+      <div class="footer-brand"><strong>OdesosGames · Website ${__WEBSITE_VERSION__}</strong><span>Independent browser games · ${publicGameCatalog.length} playable games</span></div>
       <nav aria-label="Footer games"><strong>Games</strong>${publicGameCatalog.map((game) => `<a href="${sitePath(game.route)}">${escapeHtml(game.title)}</a>`).join('')}</nav>
-      <nav aria-label="Odesos information"><strong>Odesos</strong><a href="${sitePath('/about/')}">About</a><a href="${sitePath('/contact/')}">Contact</a><button type="button" class="privacy-settings-link" data-privacy-settings>Privacy and cookie settings</button></nav>
+      <nav aria-label="Odesos information"><strong>Odesos</strong><a href="${sitePath('/about/')}">About</a><a href="${sitePath('/contact/')}">Contact</a><a href="${sitePath('/privacy/')}">Privacy</a><a href="${sitePath('/terms/')}">Terms</a><button type="button" class="privacy-settings-link" data-privacy-settings aria-label="Privacy and cookie settings">Privacy and cookie<br />settings</button></nav>
     </footer>
     <dialog class="privacy-settings-dialog" aria-labelledby="privacy-settings-title">
       <h2 id="privacy-settings-title">Privacy and cookie settings</h2>
       <p data-privacy-settings-status role="status"></p>
-      <p>Game progress and preferences are stored in this browser. You can remove them using your browser’s site data controls for OdesosGames. Clearing site data removes saved progress and preferences.</p>
+      <p>Manage this browser’s public-game progress, scores, mute preference, theme and reactions. This control leaves hidden-game saves, test data and unrelated data untouched.</p>
+      <p>Close other game tabs before clearing. Removed progress cannot be recovered; games may create fresh default data when reopened.</p>
+      <button type="button" data-clear-start>Clear Local Data</button>
+      <section data-clear-confirm hidden aria-labelledby="clear-local-title">
+        <h3 id="clear-local-title">Clear public game data?</h3>
+        <p>This removes Orbit progression, scores and mute preference; Reactor scores; theme; and public-game reactions, including legacy theme and best-score keys.</p>
+        <div class="dialog-actions"><button type="button" data-clear-cancel>Cancel</button><button type="button" data-clear-confirm-button>Confirm Clear Local Data</button></div>
+      </section>
       <p>For privacy questions, email <a href="mailto:contact@odesosgames.com">contact@odesosgames.com</a>.</p>
       <form method="dialog"><button type="submit">Close</button></form>
     </dialog>`;
@@ -393,6 +413,27 @@ function bindSharedControls(): void {
       ? 'Advertising privacy controls are not active on this site. No advertising consent choice is being recorded here.'
       : 'Advertising privacy controls could not open. No consent choice was changed. Please try again later.';
     privacyDialog?.showModal();
+  });
+
+  const clearSection = privacyDialog?.querySelector<HTMLElement>('[data-clear-confirm]');
+  const clearStart = privacyDialog?.querySelector<HTMLButtonElement>('[data-clear-start]');
+  const clearCancel = privacyDialog?.querySelector<HTMLButtonElement>('[data-clear-cancel]');
+  clearStart?.addEventListener('click', () => { if (clearSection) clearSection.hidden = false; clearCancel?.focus(); });
+  clearCancel?.addEventListener('click', () => { if (clearSection) clearSection.hidden = true; clearStart?.focus(); });
+  privacyDialog?.addEventListener('close', () => { if (clearSection) clearSection.hidden = true; privacyButton?.focus(); });
+  privacyDialog?.querySelector('[data-clear-confirm-button]')?.addEventListener('click', () => {
+    // Stop the active iframe before removing data, so it cannot re-save an old run.
+    disposeGameFrame();
+    document.querySelector('.game-frame')?.remove();
+    const result = clearPublicLocalData(gameStorage);
+    setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    renderRoute();
+    const nextDialog = document.querySelector<HTMLDialogElement>('.privacy-settings-dialog');
+    const status = nextDialog?.querySelector<HTMLElement>('[data-privacy-settings-status]');
+    if (status) status.textContent = result.ok
+      ? 'Public game data cleared. Fresh default data may be created when a game opens. No advertising consent choice was recorded.'
+      : 'Some local data could not be removed. Check browser site-data controls. No advertising consent choice was recorded.';
+    nextDialog?.showModal();
   });
 
   const themeToggle = document.querySelector<HTMLButtonElement>('.theme-toggle');

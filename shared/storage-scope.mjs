@@ -9,7 +9,7 @@ export function scopedStorage(getStorage, session = null) {
     get available(){return available},
     getItem(key) { try { return getStorage().getItem(prefix + key) ?? memory.get(key) ?? null; } catch { available=false;return memory.get(key) ?? null; } },
     setItem(key, value) { memory.set(key, String(value)); try { getStorage().setItem(prefix + key, String(value)); } catch { available=false;/* isolated memory fallback */ } },
-    removeItem(key) { memory.delete(key); try { getStorage().removeItem(prefix + key); } catch { /* optional storage */ } },
+    removeItem(key) { memory.delete(key); try { getStorage().removeItem(prefix + key); } catch { available=false; /* optional storage */ } },
     resetSession() {
       if (!session) throw new Error('Session reset requires QA storage');
       memory.clear();
