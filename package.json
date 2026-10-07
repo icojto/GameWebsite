@@ -25,7 +25,8 @@
     "build": "npm run build:games && tsc --noEmit && vite build && node scripts/pages-routes.mjs && node scripts/verify-ads-production.mjs",
     "verify:ads-production": "node scripts/verify-ads-production.mjs",
     "verify:pages": "node scripts/verify-pages.mjs",
-    "preview": "vite preview --host 127.0.0.1"
+    "preview": "vite preview --host 127.0.0.1",
+    "test:monetization": "node --experimental-transform-types --test tests/monetization-preprovider.test.mjs"
   },
   "dependencies": {
     "phaser": "^4.2.1"

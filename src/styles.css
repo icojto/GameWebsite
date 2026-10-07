@@ -464,3 +464,12 @@ body[data-view='game'] { overscroll-behavior: none; }
   .mini-orbit, .mini-orbit .mini-player, .mini-shot { animation: none; }
   .orbit-stage .hazard, .mini-shot { opacity: 1; }
 }
+
+/* User-opened privacy controls, independent of ad/CMP availability. */
+.privacy-settings-link { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.privacy-settings-link:hover { text-decoration: underline; }
+.privacy-settings-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.privacy-settings-dialog { width: min(36rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; padding: 1.5rem; border-radius: 1rem; color: var(--ink); background: var(--surface-strong); }
+.privacy-settings-dialog::backdrop { background: rgba(0, 0, 0, .5); }
+.privacy-settings-dialog p { line-height: 1.6; }
+.privacy-settings-dialog button { font: inherit; padding: .6rem 1rem; cursor: pointer; }
