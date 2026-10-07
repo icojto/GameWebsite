@@ -23,6 +23,7 @@ const server = createServer(async (request, response) => {
     const type = target.endsWith('.html') ? 'text/html'
       : target.endsWith('.js') ? 'text/javascript'
       : target.endsWith('.css') ? 'text/css'
+      : target.endsWith('.txt') ? 'text/plain; charset=utf-8'
       : target.endsWith('.svg') ? 'image/svg+xml'
       : target.endsWith('.png') ? 'image/png'
       : 'application/octet-stream';
@@ -61,6 +62,13 @@ try {
   assert.equal(config.assets.html_handling, 'auto-trailing-slash');
   assert.deepEqual(config.previews, {}, 'Static-only branch Previews require an explicit empty previews block');
   assert.equal(config.main, undefined, 'Static hosting must not introduce a Worker script');
+  const ads = await fetch(new URL('/ads.txt', origin));
+  assert.equal(ads.status, 200, '/ads.txt must be a directly served static asset');
+  assert.match(ads.headers.get('content-type') ?? '', /^text\/plain\b/i);
+  assert.equal(await ads.text(), 'google.com, pub-7528917701173650, DIRECT, f08c47fec0942fa0\n');
+  const crawlerRules = await fetchOk('/robots.txt');
+  assert.match(crawlerRules, /^User-agent: \*\nAllow: \/\n/m);
+  assert.doesNotMatch(crawlerRules, /^Disallow:\s*\/ads\.txt\s*$/im);
   const headers = await readFile(path.join(distRoot, '_headers'), 'utf8');
   assert.equal(headers, await readFile(path.join(portalRoot, 'public', '_headers'), 'utf8'));
   assert.match(headers, /X-Content-Type-Options: nosniff/);
