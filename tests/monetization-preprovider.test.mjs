@@ -4,6 +4,17 @@ import { requestPrivacySettings } from '../src/site/privacy-settings.mjs';
 import { GoogleH5Adapter } from '../src/ads/google-h5-adapter.ts';
 import { NullAdAdapter } from '../src/ads/null-adapter.ts';
 
+test('ads.txt declares exactly the direct approved Google publisher', () => {
+  const content = readFileSync(new URL('../public/ads.txt', import.meta.url), 'utf8');
+  const rows = content.trimEnd().split(/\r?\n/);
+  assert.deepEqual(rows, ['google.com, pub-7528917701173650, DIRECT, f08c47fec0942fa0']);
+  assert.equal(rows.filter((row) => row.startsWith('google.com,')).length, 1);
+  assert.equal(rows[0].split(', ')[1], 'pub-7528917701173650');
+  assert.equal(rows[0].split(', ')[2], 'DIRECT');
+  assert.equal(rows[0].split(', ')[3], 'f08c47fec0942fa0');
+  assert.doesNotMatch(rows.join('\n'), /sample|pub-0{4}|playgama|doubleclick/i);
+});
+
 test('AdSense ownership metadata does not activate an advertising provider', async () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const tags = html.match(/<meta\b[^>]*name="google-adsense-account"[^>]*>/g) ?? [];
