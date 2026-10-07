@@ -1,5 +1,6 @@
 import { scopedUrl } from '../shared/storage.mjs';
 import './styles.css';
+import { playerAllocation } from './site/player-layout.mjs';
 import { publicGameCatalog } from './games/catalog.mjs';
 import { publicPages, siteOrigin, socialImagePath } from './site/pages.mjs';
 import { readThemePreference, siteStorage } from './site/storage.mjs';
@@ -413,6 +414,15 @@ function bindGameFrame(game: CatalogGame): void {
   const reactionButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-reaction]')];
   const reactionKey = `odesos.player.reaction.${game.slug}`;
 
+  const actionBar = playerStage.querySelector<HTMLElement>('.player-action-bar')!;
+  function fitPlayer() {
+    playerStage.style.setProperty('--player-available-height', `${playerAllocation(window.innerHeight, actionBar.getBoundingClientRect().height)}px`);
+    playerStage.dataset.compact = String(window.innerHeight < 520);
+  }
+  const actionResize = new ResizeObserver(fitPlayer);
+  actionResize.observe(actionBar);
+  window.addEventListener('resize', fitPlayer);
+  fitPlayer();
   let timeout = window.setTimeout(showError, 10_000);
 
   function handleLoad(): void {
@@ -498,6 +508,8 @@ function bindGameFrame(game: CatalogGame): void {
   }
 
   disposeGameFrame = () => {
+    actionResize.disconnect();
+    window.removeEventListener('resize', fitPlayer);
     window.clearTimeout(timeout);
     gameFrame.removeEventListener('load', handleLoad);
     gameFrame.removeEventListener('error', showError);

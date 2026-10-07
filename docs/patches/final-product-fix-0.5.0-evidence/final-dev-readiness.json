@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "instance": "cb0382df-160c-4047-a91a-ade2090ab6d6",
+  "id": "8f614255-beca-43dd-9488-9617f33ee3f2",
+  "revision": "7571df5c5990ba1e7bd55706b8aa16ebc994da8f",
+  "dirty": true,
+  "mode": "development",
+  "session": "38e833d4-9ac8-4611-af7f-a4687cd7ceaa",
+  "command": "C:\\Program Files\\nodejs\\node.exe C:\\Users\\mlgjm\\.codex\\worktrees\\qa-4b-1-retest\\GameWebsite\\scripts\\qa-launch.mjs dev",
+  "cwd": "C:\\Users\\mlgjm\\.codex\\worktrees\\qa-4b-1-retest\\GameWebsite\\",
+  "port": 5191,
+  "url": "http://127.0.0.1:5191/games/reactor-stack/?qa=38e833d4-9ac8-4611-af7f-a4687cd7ceaa",
+  "pid": 13568,
+  "stages": {
+    "process": "started",
+    "http": "reachable",
+    "routes": "portal-and-both-iframe-modules-verified",
+    "browser": "BROWSER_NOT_VERIFIED",
+    "game": "NOT_VERIFIED"
+  },
+  "failure": null,
+  "nextStep": "Open the URL in the browser and compare build identity, mounted canvas and actual bridge/renderer capability.",
+  "browserEvidence": {
+    "url": "http://127.0.0.1:5191/games/reactor-stack/?qa=38e833d4-9ac8-4611-af7f-a4687cd7ceaa",
+    "buildMeta": "8f614255-beca-43dd-9488-9617f33ee3f2",
+    "mountedCanvas": true,
+    "renderer": "Connected",
+    "source": "Actual CUA DOM and screenshot; launcher shell stages are not rewritten"
+  }
+}

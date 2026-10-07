@@ -57,3 +57,24 @@ test('actual profile migration, corruption, reset and reload through QA adapter 
  const profile=new ProfileStore(structuredClone(DEFAULT_CONFIG),qa);assert.equal(profile.bestScore,420);profile.setStars(100);profile.reset();assert.equal(profile.bestScore,420);assert.equal(loadMute(qa),true);
  const reloaded=new ProfileStore(structuredClone(DEFAULT_CONFIG),scopedStorage(()=>real,'session_A'));assert.equal(reloaded.bestScore,420);assert.equal(real.getItem(PROFILE_KEY),'real profile sentinel');assert.equal(real.getItem(LEGACY_BEST_KEY),'9999');qa.resetSession();assert.equal(real.getItem(PROFILE_KEY),'real profile sentinel');
 });
+
+
+import { MenuPresentation, INITIAL_MENU } from '../games/reactor-stack/src/menu-presentation.ts';
+import { ReactorAdFlow } from '../games/reactor-stack/src/ads/ReactorAdFlow.ts';
+import { playableViewport } from '../shared/game-viewport.ts';
+test('FAI-001 Force Fail → Reinitialize → Pause → Main Menu clears stale UI and invalidates late result',async()=>{
+ const controller=new TurnController(()=>.1),ui=new MenuPresentation();let view={...INITIAL_MENU},completed=[];
+ const ads={capabilities:{fullscreenAvailable:false,rewardedAvailable:false,startupDue:false},request(){assert.fail('Null lifecycle should not request')},acknowledge(){}};
+ const flow=new ReactorAdFlow(controller,ads,{start(){ui.reset(v=>view=v);controller.start()},changed(){},cancelGesture(){},feedback(){}});
+ flow.freshRun();controller.state.heat=controller.activeConfig.heatMaximum;controller.reEvaluate();completed.push({...controller.state});
+ const terminalState=controller.state;const late=ui.guard(()=>controller.phase==='RESULT'&&controller.state===terminalState,()=>view={...INITIAL_MENU,title:'CORE OVERLOAD',start:'REINITIALIZE REACTOR',failed:true});
+ late();assert.equal(view.failed,true);await flow.start();const freshId=flow.runId;assert.ok(freshId);assert.equal(controller.state.heat,0);flow.pause();await new Promise(r=>setImmediate(r));assert.equal(controller.phase,'PAUSED');assert.equal(flow.menu(),true);ui.reset(v=>view=v);late();
+ assert.deepEqual(view,INITIAL_MENU);assert.equal(controller.phase,'MENU');assert.equal(flow.runId,'');assert.equal(completed.length,1);assert.equal(completed[0].result,'FAIL');
+});
+test('terminal guard cannot render after phase change even before UI invalidation',()=>{
+ const ui=new MenuPresentation();let phase='RESULT',renders=0;const late=ui.guard(()=>phase==='RESULT',()=>renders++);phase='MENU';late();assert.equal(renders,0);
+});
+test('declared minimum provides a graceful fallback instead of accepting a clipped frame',()=>{
+ assert.equal(playableViewport(240,280),true);assert.equal(playableViewport(239,280),false);assert.equal(playableViewport(240,279),false);
+ for(const size of [[320,800],[640,360],[844,390],[1920,1080]])assert.equal(playableViewport(...size),true);
+});

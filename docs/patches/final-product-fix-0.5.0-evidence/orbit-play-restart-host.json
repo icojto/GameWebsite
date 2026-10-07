@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "sampledAt": "2026-10-07T00:56:27.916Z",
+  "session": "0c84fda3-bc1b-4678-b176-8a1ce546b083",
+  "mode": "development",
+  "build": {
+    "schema": 1,
+    "id": "ea701324-f161-4e5e-971f-ecae0e9a097d",
+    "revision": "7571df5c5990ba1e7bd55706b8aa16ebc994da8f",
+    "dirty": true,
+    "mode": "development"
+  },
+  "game": "website",
+  "gameId": "orbit-break",
+  "phase": "game-over",
+  "pendingTransition": false,
+  "adSuspended": false,
+  "rendererReady": true,
+  "request": {
+    "requestId": "b6d32449-19e5-49e1-8d20-aa012221d7a0",
+    "gameId": "orbit-break",
+    "placementId": "orbit.restart-interstitial",
+    "adType": "interstitial",
+    "safeEvent": "restart-requested"
+  },
+  "state": "completed",
+  "error": null,
+  "eligibility": {
+    "eligible": false,
+    "reason": "not-enough-active-play",
+    "secondsRemaining": 172.5428999999985
+  },
+  "counters": {
+    "startup": {
+      "requests": 0,
+      "accepted": 0,
+      "blocked": 0,
+      "prepared": 0,
+      "shown": 0,
+      "completed": 0,
+      "closed": 0,
+      "failed": 0,
+      "no_fill": 0,
+      "timeout": 0,
+      "unavailable": 0
+    },
+    "interstitial": {
+      "requests": 2,
+      "accepted": 2,
+      "blocked": 0,
+      "prepared": 2,
+      "shown": 2,
+      "completed": 2,
+      "closed": 0,
+      "failed": 0,
+      "no_fill": 0,
+      "timeout": 0,
+      "unavailable": 0
+    },
+    "rewarded": {
+      "requests": 0,
+      "accepted": 0,
+      "blocked": 0,
+      "prepared": 0,
+      "shown": 0,
+      "completed": 0,
+      "closed": 0,
+      "failed": 0,
+      "no_fill": 0,
+      "timeout": 0,
+      "unavailable": 0
+    },
+    "banner": {
+      "requests": 0,
+      "accepted": 0,
+      "blocked": 0,
+      "prepared": 0,
+      "shown": 0,
+      "completed": 0,
+      "closed": 0,
+      "failed": 0,
+      "no_fill": 0,
+      "timeout": 0,
+      "unavailable": 0
+    }
+  },
+  "limits": {
+    "master": true,
+    "startup": {
+      "enabled": false,
+      "oncePerSession": true,
+      "courtesy": true
+    },
+    "interstitial": {
+      "enabled": true,
+      "firstSeconds": 180,
+      "intervalSeconds": 180,
+      "cooldownSeconds": 180,
+      "sessionLimitEnabled": false,
+      "maxPerSession": 3,
+      "resetAfterRewarded": true
+    },
+    "rewarded": {
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 10,
+      "courtesy": true
+    },
+    "banner": {
+      "enabled": false
+    },
+    "courtesy": {
+      "enabled": true,
+      "durationMs": 1000,
+      "startup": true,
+      "interstitial": true,
+      "rewarded": true,
+      "mascot": true,
+      "animation": true,
+      "preset": "friendly"
+    },
+    "mock": {
+      "loadingMs": 300,
+      "durationMs": 5000,
+      "presentationTimeoutMs": 5000,
+      "nextResult": "completed"
+    }
+  },
+  "placements": [
+    {
+      "id": "orbit.startup",
+      "gameId": "orbit-break",
+      "adType": "startup",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 1
+    },
+    {
+      "id": "orbit.play-interstitial",
+      "gameId": "orbit-break",
+      "adType": "interstitial",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "sessionLimitEnabled": false,
+      "maxPerSession": 100,
+      "safeEvents": [
+        "play-requested"
+      ]
+    },
+    {
+      "id": "orbit.restart-interstitial",
+      "gameId": "orbit-break",
+      "adType": "interstitial",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "sessionLimitEnabled": false,
+      "maxPerSession": 100,
+      "safeEvents": [
+        "restart-requested"
+      ]
+    },
+    {
+      "id": "orbit.revive",
+      "gameId": "orbit-break",
+      "adType": "rewarded",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 100,
+      "maxPerRun": 1
+    },
+    {
+      "id": "reactor.startup",
+      "gameId": "reactor-stack",
+      "adType": "startup",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 1
+    },
+    {
+      "id": "reactor.start-interstitial",
+      "gameId": "reactor-stack",
+      "adType": "interstitial",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "sessionLimitEnabled": false,
+      "maxPerSession": 3,
+      "safeEvents": [
+        "start-requested"
+      ]
+    },
+    {
+      "id": "reactor.pause-interstitial",
+      "gameId": "reactor-stack",
+      "adType": "interstitial",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "sessionLimitEnabled": false,
+      "maxPerSession": 3,
+      "safeEvents": [
+        "pause-requested"
+      ]
+    },
+    {
+      "id": "reactor.cool-refill",
+      "gameId": "reactor-stack",
+      "adType": "rewarded",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 10,
+      "maxPerRun": 1
+    },
+    {
+      "id": "reactor.upgrade-refill",
+      "gameId": "reactor-stack",
+      "adType": "rewarded",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 10,
+      "maxPerRun": 1
+    },
+    {
+      "id": "dev-orbit-break-startup",
+      "gameId": "orbit-break",
+      "adType": "startup",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 100,
+      "sessionLimitEnabled": true,
+      "safeEvents": []
+    },
+    {
+      "id": "dev-orbit-break-interstitial",
+      "gameId": "orbit-break",
+      "adType": "interstitial",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 100,
+      "sessionLimitEnabled": false,
+      "safeEvents": [
+        "play-requested",
+        "restart-requested"
+      ]
+    },
+    {
+      "id": "dev-orbit-break-rewarded",
+      "gameId": "orbit-break",
+      "adType": "rewarded",
+      "enabled": true,
+      "cooldownSeconds": 0,
+      "maxPerSession": 100,
+      "sessionLimitEnabled": true,
+      "safeEvents": []
+    }
+  ]
+}

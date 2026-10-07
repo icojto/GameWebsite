@@ -1,0 +1,82 @@
+- link "Skip to main content":
+  - /url: "#main-content"
+- banner "Primary navigation":
+  - link "OdesosGames home":
+    - /url: /
+    - strong: OdesosGames
+    - generic: Original games, made here
+  - navigation "Portal":
+    - link "Home":
+      - /url: /
+    - link "Games":
+      - /url: /#collection
+    - link "About":
+      - /url: /about/
+    - link "Contact":
+      - /url: /contact/
+  - button "Switch to dark theme":
+    - generic: ☀
+    - generic: ☾
+- main:
+  - region "Orbit Break player":
+    - region "Orbit Break play area":
+      - iframe [active]:
+        - main "Orbit Break game":
+          - generic "Orbit Break status":
+            - generic: ORBIT BREAK
+            - generic: SCORE
+            - strong: "000005"
+            - generic: BEST 000370
+            - generic: LV 01
+            - progressbar "Experience to next level"
+            - generic: 0 / 100 XP
+            - generic "Star balance": ★ 0
+          - dialog "PAUSED":
+            - heading "PAUSED" [level=2]
+            - button "Close PAUSED" [active]: ×
+            - paragraph: The orbit is on hold.
+            - button "▶ RESUME"
+            - button "⚙ SETTINGS"
+            - button "⌂ MAIN MENU"
+          - status
+    - region "Orbit Break player actions":
+      - generic: "001"
+      - strong: Orbit Break
+      - button "Like Orbit Break":
+        - generic: 👍
+        - generic: Like
+      - button "Dislike Orbit Break":
+        - generic: 👎
+        - generic: Dislike
+      - button "Controls":
+        - generic: "?"
+        - generic: Controls
+      - button "Open Orbit Break in fullscreen":
+        - generic: ⛶
+        - generic: Fullscreen
+  - region "Orbit Break":
+    - paragraph: Now playable
+    - heading "Orbit Break" [level=1]
+    - paragraph: A compact one-action survival game built for quick runs and clean restarts.
+    - term: Type
+    - definition: Arcade · One action
+    - term: Orientation
+    - definition: Any orientation
+    - term: Play
+    - definition: Browser
+    - generic "How to play"
+- contentinfo:
+  - strong: OdesosGames
+  - generic: Independent browser games · 2 playable games
+  - navigation "Footer games":
+    - strong: Games
+    - link "Orbit Break":
+      - /url: /games/orbit-break/
+    - link "Reactor Stack":
+      - /url: /games/reactor-stack/
+  - navigation "Odesos information":
+    - strong: Odesos
+    - link "About":
+      - /url: /about/
+    - link "Contact":
+      - /url: /contact/

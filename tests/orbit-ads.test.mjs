@@ -251,7 +251,7 @@ test('ad lifecycle wiring blocks Phaser input and ordinary UI, with DEV shortcut
   const scene=readFileSync(new URL('../games/orbit-break/src/game/OrbitBreakScene.ts',import.meta.url),'utf8');
   const ui=readFileSync(new URL('../games/orbit-break/src/game/ui.ts',import.meta.url),'utf8');
   const dev=readFileSync(new URL('../games/orbit-break/src/dev/DevPanel.ts',import.meta.url),'utf8');
-  assert.match(scene,/this\.input\.enabled = !value/);assert.match(scene,/if \(this\.adSuspended\) return/);assert.match(scene,/this\.audio\.suspendForAd\(value\)/);
+  assert.match(scene,/this\.input\.enabled = !value/);assert.match(scene,/if \(this\.adSuspended \|\| !this\.viewportSupported\) return/);assert.match(scene,/this\.audio\.suspendForAd\(value\)/);
   assert.match(ui,/this\.root\.inert = value/);assert.match(ui,/if \(this\.blocked\) return/);assert.match(dev,/if \(this\.root\.inert\) return/);
 });
 test('stale, wrong-run and duplicate result cannot release or reward a newer request',async()=>{
@@ -281,4 +281,15 @@ test('broker completion deadline includes the visual duration after readiness',a
   broker.receive({...identity,type:'ad-presentation-ready'});broker.receive({...identity,type:'ad-presentation-shown'});
   await new Promise(r=>setTimeout(r,30));assert.equal(broker.receive({...identity,type:'ad-presentation-completed'}),true);
   assert.equal((await result).result,'completed');broker.unbind(GAME_ID);
+});
+
+test('fresh normal Orbit PLAY and RESTART couple host policy to exactly-once run lifecycle',async()=>{
+ const h=serviceHarness(),run=new RunState(createRuntimeConfig()),requests=[],counts={started:0,finalized:0};
+ const port={capabilities:h.service.capabilities(GAME_ID),request(type,placement,values){requests.push({placement,...values});return h.request(placement,values)},acknowledge(){assert.fail('interstitial must not acknowledge a reward')}};
+ const flow=new OrbitAdFlow(run,port,{started(){counts.started++;h.service.setGameState('playing')},finalized(){counts.finalized++},changed(){}});
+ assert.equal(h.service.config.startup.enabled,false);h.service.devAction('eligible');assert.equal(h.calls.length,0);
+ await Promise.all([flow.requestStartRun(),flow.requestStartRun()]);const first=flow.runId;
+ assert.equal(counts.started,1);assert.equal(h.calls.length,1);assert.equal(requests[0].safeEvent,'play-requested');
+ flow.death();h.service.setGameState('game-over');h.service.devAction('eligible');assert.equal(h.service.interstitialEligibility().reason,'cooldown');h.service.devAction('cooldown');
+ await Promise.all([flow.requestStartRun(),flow.requestStartRun()]);assert.notEqual(flow.runId,first);assert.equal(counts.started,2);assert.equal(counts.finalized,1);assert.equal(h.calls.length,2);assert.equal(requests[1].safeEvent,'restart-requested');assert.equal(h.service.rewardAcknowledgments,0);
 });

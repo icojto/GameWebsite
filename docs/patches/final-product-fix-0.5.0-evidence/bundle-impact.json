@@ -1,0 +1,50 @@
+[
+  {
+    "component": "Portal",
+    "type": "js",
+    "path": "assets\\index-BOgPhKpY.js",
+    "bytes": 48983,
+    "recordedPR20Baseline": 48269,
+    "deltaBytes": 714
+  },
+  {
+    "component": "Portal",
+    "type": "css",
+    "path": "assets\\index-pgz_r3R2.css",
+    "bytes": 21757,
+    "recordedPR20Baseline": 21560,
+    "deltaBytes": 197
+  },
+  {
+    "component": "Orbit",
+    "type": "js",
+    "path": "games\\orbit-break\\embed\\assets\\index-DbBcsXOb.js",
+    "bytes": 1429449,
+    "recordedPR20Baseline": 1428281,
+    "deltaBytes": 1168
+  },
+  {
+    "component": "Orbit",
+    "type": "css",
+    "path": "games\\orbit-break\\embed\\assets\\index-DymSiOyC.css",
+    "bytes": 8862,
+    "recordedPR20Baseline": 8551,
+    "deltaBytes": 311
+  },
+  {
+    "component": "Reactor",
+    "type": "js",
+    "path": "games\\reactor-stack\\embed\\assets\\index-442q_VRk.js",
+    "bytes": 1413336,
+    "recordedPR20Baseline": 1410571,
+    "deltaBytes": 2765
+  },
+  {
+    "component": "Reactor",
+    "type": "css",
+    "path": "games\\reactor-stack\\embed\\assets\\index-B9cx6lSS.css",
+    "bytes": 12316,
+    "recordedPR20Baseline": 11088,
+    "deltaBytes": 1228
+  }
+]

@@ -45,3 +45,10 @@ test('legacy theme migrates once without deleting unrelated data', () => {
   data.set('odesos.theme', 'light');
   assert.equal(readThemePreference(storage), 'light');
 });
+
+
+import { playerAllocation } from '../src/site/player-layout.mjs';
+test('player allocation reserves measured controls at short/mobile heights without a giant minimum',()=>{
+ for(const [height,bar] of [[280,58],[200,102],[360,58],[640,102],[1080,58]]){const available=playerAllocation(height,bar);assert.ok(available>=0);assert.ok(available+bar+16<=height);}
+ assert.equal(playerAllocation(100,120),0);assert.equal(playerAllocation(280,58),206);
+});
