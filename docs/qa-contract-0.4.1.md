@@ -76,3 +76,8 @@ QA Reactor initialization uses an injected deterministic stream seeded 41; repea
 Use the patch checkout/commands in the dated handoff. Newly reachable groups include DEV-040/047/053, REA-022/device matrix layout assertions, PROD-008 mute verification, QA reset/focus/storage migration, diagnostics/config inspection and real resolving/reward prerequisites. Do not automatically pass remaining assertions in those rows or the 65 historical environment-blocked cases.
 
 Still separate: LIVE after human merge/deploy; physical touch/orientation, subjective audio, assistive technology, OS/background behavior, long-session performance, cross-browser/native fullscreen; clipboard-specific tests; actual saved download bytes; production destructive tests in a disposable browser profile. Browser checks here are desktop emulation and targeted UI/state evidence. The prior source-less MutationObserver error remains unattributed; console-clean status is not verified.
+
+
+## Current panel and product fix supplement
+
+See [QA contract 0.5.0](qa-contract-0.5.0.md) for the MVP/Advanced split, selectors, minimum viewport and targeted human gate. This historical launcher/fixture contract remains intact.

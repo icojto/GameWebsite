@@ -1,0 +1,1726 @@
+[
+  {
+    "size": [
+      320,
+      800
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 365.5,
+        "height": 267,
+        "left": 6,
+        "right": 273,
+        "top": 98.5,
+        "width": 267,
+        "x": 6,
+        "y": 98.5
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 457,
+            "height": 44,
+            "left": 5,
+            "right": 92,
+            "top": 413,
+            "width": 87,
+            "x": 5,
+            "y": 413
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 457,
+            "height": 44,
+            "left": 96,
+            "right": 183,
+            "top": 413,
+            "width": 87,
+            "x": 96,
+            "y": 413
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 457,
+            "height": 44,
+            "left": 187,
+            "right": 274,
+            "top": 413,
+            "width": 87,
+            "x": 187,
+            "y": 413
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 68,
+        "height": 28,
+        "left": 5,
+        "right": 274,
+        "top": 40,
+        "width": 269,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "bottom": 68,
+        "height": 13.75,
+        "left": 5,
+        "right": 274,
+        "top": 54.25,
+        "width": 269,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        462,
+        279
+      ],
+      "size": [
+        279,
+        462
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      360,
+      640
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 297,
+        "height": 223,
+        "left": 27,
+        "right": 250,
+        "top": 74,
+        "width": 223,
+        "x": 27,
+        "y": 74
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 364,
+            "height": 44,
+            "left": 5,
+            "right": 91.328125,
+            "top": 320,
+            "width": 86.328125,
+            "x": 5,
+            "y": 320
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 364,
+            "height": 44,
+            "left": 95.328125,
+            "right": 181.65625,
+            "top": 320,
+            "width": 86.328125,
+            "x": 95.328125,
+            "y": 320
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 364,
+            "height": 44,
+            "left": 185.65625,
+            "right": 272,
+            "top": 320,
+            "width": 86.34375,
+            "x": 185.65625,
+            "y": 320
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 68,
+        "height": 28,
+        "left": 5,
+        "right": 272,
+        "top": 40,
+        "width": 267,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "bottom": 68,
+        "height": 13.75,
+        "left": 5,
+        "right": 272,
+        "top": 54.25,
+        "width": 267,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        369,
+        277
+      ],
+      "size": [
+        277,
+        369
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      390,
+      844
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 411,
+        "height": 314,
+        "left": 17.5,
+        "right": 331.5,
+        "top": 97,
+        "width": 314,
+        "x": 17.5,
+        "y": 97
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 480,
+            "height": 44,
+            "left": 8,
+            "right": 83,
+            "top": 436,
+            "width": 75,
+            "x": 8,
+            "y": 436
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 480,
+            "height": 44,
+            "left": 89,
+            "right": 171.5,
+            "top": 436,
+            "width": 82.5,
+            "x": 89,
+            "y": 436
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 480,
+            "height": 44,
+            "left": 177.5,
+            "right": 260,
+            "top": 436,
+            "width": 82.5,
+            "x": 177.5,
+            "y": 436
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 480,
+            "height": 44,
+            "left": 266,
+            "right": 341,
+            "top": 436,
+            "width": 75,
+            "x": 266,
+            "y": 436
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 341,
+        "top": 63,
+        "width": 333,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 341,
+        "top": 77.25,
+        "width": 333,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        488,
+        349
+      ],
+      "size": [
+        349,
+        488
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      412,
+      915
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 451,
+        "height": 353,
+        "left": 9,
+        "right": 362,
+        "top": 98,
+        "width": 353,
+        "x": 9,
+        "y": 98
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 521,
+            "height": 44,
+            "left": 8,
+            "right": 88.234375,
+            "top": 477,
+            "width": 80.234375,
+            "x": 8,
+            "y": 477
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 521,
+            "height": 44,
+            "left": 94.234375,
+            "right": 182.5,
+            "top": 477,
+            "width": 88.265625,
+            "x": 94.234375,
+            "y": 477
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 521,
+            "height": 44,
+            "left": 188.5,
+            "right": 276.75,
+            "top": 477,
+            "width": 88.25,
+            "x": 188.5,
+            "y": 477
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 521,
+            "height": 44,
+            "left": 282.75,
+            "right": 363,
+            "top": 477,
+            "width": 80.25,
+            "x": 282.75,
+            "y": 477
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 363,
+        "top": 63,
+        "width": 355,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 363,
+        "top": 77.25,
+        "width": 355,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        529,
+        371
+      ],
+      "size": [
+        371,
+        529
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      430,
+      932
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 462,
+        "height": 365,
+        "left": 12,
+        "right": 377,
+        "top": 97,
+        "width": 365,
+        "x": 12,
+        "y": 97
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 531,
+            "height": 44,
+            "left": 8,
+            "right": 92.515625,
+            "top": 487,
+            "width": 84.515625,
+            "x": 8,
+            "y": 487
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 531,
+            "height": 44,
+            "left": 98.515625,
+            "right": 191.5,
+            "top": 487,
+            "width": 92.984375,
+            "x": 98.515625,
+            "y": 487
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 531,
+            "height": 44,
+            "left": 197.5,
+            "right": 290.46875,
+            "top": 487,
+            "width": 92.96875,
+            "x": 197.5,
+            "y": 487
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 531,
+            "height": 44,
+            "left": 296.46875,
+            "right": 381,
+            "top": 487,
+            "width": 84.53125,
+            "x": 296.46875,
+            "y": 487
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 381,
+        "top": 63,
+        "width": 373,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 381,
+        "top": 77.25,
+        "width": 373,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        539,
+        389
+      ],
+      "size": [
+        389,
+        539
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      640,
+      360
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 260,
+        "height": 219,
+        "left": 266,
+        "right": 485,
+        "top": 41,
+        "width": 219,
+        "x": 266,
+        "y": 41
+      },
+      "controls": [
+        {
+          "id": "reactor-pause",
+          "name": "Ⅱ PAUSE",
+          "r": {
+            "bottom": 107,
+            "height": 44,
+            "left": 16,
+            "right": 143,
+            "top": 63,
+            "width": 127,
+            "x": 16,
+            "y": 63
+          }
+        },
+        {
+          "id": "reactor-cool",
+          "name": "❄COOL CORE1",
+          "r": {
+            "bottom": 195,
+            "height": 56,
+            "left": 16,
+            "right": 77.5,
+            "top": 139,
+            "width": 61.5,
+            "x": 16,
+            "y": 139
+          }
+        },
+        {
+          "id": "reactor-upgrade",
+          "name": "⇧UPGRADE1",
+          "r": {
+            "bottom": 195,
+            "height": 56,
+            "left": 81.5,
+            "right": 143,
+            "top": 139,
+            "width": 61.5,
+            "x": 81.5,
+            "y": 139
+          }
+        },
+        {
+          "name": "HIGH SCORE0›",
+          "r": {
+            "bottom": 268,
+            "height": 43,
+            "left": 16,
+            "right": 143,
+            "top": 225,
+            "width": 127,
+            "x": 16,
+            "y": 225
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 35,
+        "height": 28,
+        "left": 159,
+        "right": 592,
+        "top": 7,
+        "width": 433,
+        "x": 159,
+        "y": 7
+      },
+      "hint": {
+        "bottom": 35,
+        "height": 13.75,
+        "left": 159,
+        "right": 592,
+        "top": 21.25,
+        "width": 433,
+        "x": 159,
+        "y": 21.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        284,
+        599
+      ],
+      "size": [
+        599,
+        284
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      844,
+      390
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 290,
+        "height": 249,
+        "left": 353,
+        "right": 602,
+        "top": 41,
+        "width": 249,
+        "x": 353,
+        "y": 41
+      },
+      "controls": [
+        {
+          "id": "reactor-pause",
+          "name": "Ⅱ PAUSE",
+          "r": {
+            "bottom": 107,
+            "height": 44,
+            "left": 16,
+            "right": 143,
+            "top": 63,
+            "width": 127,
+            "x": 16,
+            "y": 63
+          }
+        },
+        {
+          "id": "reactor-cool",
+          "name": "❄COOL CORE1",
+          "r": {
+            "bottom": 195,
+            "height": 56,
+            "left": 16,
+            "right": 77.5,
+            "top": 139,
+            "width": 61.5,
+            "x": 16,
+            "y": 139
+          }
+        },
+        {
+          "id": "reactor-upgrade",
+          "name": "⇧UPGRADE1",
+          "r": {
+            "bottom": 195,
+            "height": 56,
+            "left": 81.5,
+            "right": 143,
+            "top": 139,
+            "width": 61.5,
+            "x": 81.5,
+            "y": 139
+          }
+        },
+        {
+          "name": "HIGH SCORE0›",
+          "r": {
+            "bottom": 298,
+            "height": 43,
+            "left": 16,
+            "right": 143,
+            "top": 255,
+            "width": 127,
+            "x": 16,
+            "y": 255
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 35,
+        "height": 28,
+        "left": 159,
+        "right": 796,
+        "top": 7,
+        "width": 637,
+        "x": 159,
+        "y": 7
+      },
+      "hint": {
+        "bottom": 35,
+        "height": 13.75,
+        "left": 159,
+        "right": 796,
+        "top": 21.25,
+        "width": 637,
+        "x": 159,
+        "y": 21.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        314,
+        803
+      ],
+      "size": [
+        803,
+        314
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      932,
+      430
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 330,
+        "height": 289,
+        "left": 365,
+        "right": 654,
+        "top": 41,
+        "width": 289,
+        "x": 365,
+        "y": 41
+      },
+      "controls": [
+        {
+          "id": "reactor-pause",
+          "name": "Ⅱ PAUSE",
+          "r": {
+            "bottom": 107,
+            "height": 44,
+            "left": 16,
+            "right": 143,
+            "top": 63,
+            "width": 127,
+            "x": 16,
+            "y": 63
+          }
+        },
+        {
+          "id": "reactor-cool",
+          "name": "❄COOL CORE1",
+          "r": {
+            "bottom": 195,
+            "height": 56,
+            "left": 16,
+            "right": 77.5,
+            "top": 139,
+            "width": 61.5,
+            "x": 16,
+            "y": 139
+          }
+        },
+        {
+          "id": "reactor-upgrade",
+          "name": "⇧UPGRADE1",
+          "r": {
+            "bottom": 195,
+            "height": 56,
+            "left": 81.5,
+            "right": 143,
+            "top": 139,
+            "width": 61.5,
+            "x": 81.5,
+            "y": 139
+          }
+        },
+        {
+          "name": "HIGH SCORE0›",
+          "r": {
+            "bottom": 338,
+            "height": 43,
+            "left": 16,
+            "right": 143,
+            "top": 295,
+            "width": 127,
+            "x": 16,
+            "y": 295
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 35,
+        "height": 28,
+        "left": 159,
+        "right": 860,
+        "top": 7,
+        "width": 701,
+        "x": 159,
+        "y": 7
+      },
+      "hint": {
+        "bottom": 35,
+        "height": 13.75,
+        "left": 159,
+        "right": 860,
+        "top": 21.25,
+        "width": 701,
+        "x": 159,
+        "y": 21.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        354,
+        867
+      ],
+      "size": [
+        867,
+        354
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      768,
+      1024
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 572.5,
+        "height": 472,
+        "left": 9,
+        "right": 481,
+        "top": 100.5,
+        "width": 472,
+        "x": 9,
+        "y": 100.5
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 645,
+            "height": 44,
+            "left": 8,
+            "right": 116.5625,
+            "top": 601,
+            "width": 108.5625,
+            "x": 8,
+            "y": 601
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 645,
+            "height": 44,
+            "left": 122.5625,
+            "right": 242,
+            "top": 601,
+            "width": 119.4375,
+            "x": 122.5625,
+            "y": 601
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 645,
+            "height": 44,
+            "left": 248,
+            "right": 367.421875,
+            "top": 601,
+            "width": 119.421875,
+            "x": 248,
+            "y": 601
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 645,
+            "height": 44,
+            "left": 373.421875,
+            "right": 482,
+            "top": 601,
+            "width": 108.578125,
+            "x": 373.421875,
+            "y": 601
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 482,
+        "top": 63,
+        "width": 474,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 482,
+        "top": 77.25,
+        "width": 474,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        653,
+        490
+      ],
+      "size": [
+        490,
+        653
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      1024,
+      768
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 413,
+        "height": 316,
+        "left": 25.5,
+        "right": 341.5,
+        "top": 97,
+        "width": 316,
+        "x": 25.5,
+        "y": 97
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 8,
+            "right": 87.28125,
+            "top": 438,
+            "width": 79.28125,
+            "x": 8,
+            "y": 438
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 93.28125,
+            "right": 180.5,
+            "top": 438,
+            "width": 87.21875,
+            "x": 93.28125,
+            "y": 438
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 186.5,
+            "right": 273.703125,
+            "top": 438,
+            "width": 87.203125,
+            "x": 186.5,
+            "y": 438
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 279.703125,
+            "right": 359,
+            "top": 438,
+            "width": 79.296875,
+            "x": 279.703125,
+            "y": 438
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 359,
+        "top": 63,
+        "width": 351,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 359,
+        "top": 77.25,
+        "width": 351,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        490,
+        367
+      ],
+      "size": [
+        367,
+        490
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      1280,
+      720
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 382,
+        "height": 285,
+        "left": 29.5,
+        "right": 314.5,
+        "top": 97,
+        "width": 285,
+        "x": 29.5,
+        "y": 97
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 451,
+            "height": 44,
+            "left": 8,
+            "right": 81.796875,
+            "top": 407,
+            "width": 73.796875,
+            "x": 8,
+            "y": 407
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 451,
+            "height": 44,
+            "left": 87.796875,
+            "right": 169,
+            "top": 407,
+            "width": 81.203125,
+            "x": 87.796875,
+            "y": 407
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 451,
+            "height": 44,
+            "left": 175,
+            "right": 256.1875,
+            "top": 407,
+            "width": 81.1875,
+            "x": 175,
+            "y": 407
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 451,
+            "height": 44,
+            "left": 262.1875,
+            "right": 336,
+            "top": 407,
+            "width": 73.8125,
+            "x": 262.1875,
+            "y": 407
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 336,
+        "top": 63,
+        "width": 328,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 336,
+        "top": 77.25,
+        "width": 328,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        459,
+        344
+      ],
+      "size": [
+        344,
+        459
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      1366,
+      768
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 413,
+        "height": 316,
+        "left": 25.5,
+        "right": 341.5,
+        "top": 97,
+        "width": 316,
+        "x": 25.5,
+        "y": 97
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 8,
+            "right": 87.28125,
+            "top": 438,
+            "width": 79.28125,
+            "x": 8,
+            "y": 438
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 93.28125,
+            "right": 180.5,
+            "top": 438,
+            "width": 87.21875,
+            "x": 93.28125,
+            "y": 438
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 186.5,
+            "right": 273.703125,
+            "top": 438,
+            "width": 87.203125,
+            "x": 186.5,
+            "y": 438
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 482,
+            "height": 44,
+            "left": 279.703125,
+            "right": 359,
+            "top": 438,
+            "width": 79.296875,
+            "x": 279.703125,
+            "y": 438
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 359,
+        "top": 63,
+        "width": 351,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 359,
+        "top": 77.25,
+        "width": 351,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        490,
+        367
+      ],
+      "size": [
+        367,
+        490
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      1920,
+      1080
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 604,
+        "height": 499,
+        "left": 9,
+        "right": 508,
+        "top": 105,
+        "width": 499,
+        "x": 9,
+        "y": 105
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 681,
+            "height": 44,
+            "left": 8,
+            "right": 123,
+            "top": 637,
+            "width": 115,
+            "x": 8,
+            "y": 637
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 681,
+            "height": 44,
+            "left": 129,
+            "right": 255.5,
+            "top": 637,
+            "width": 126.5,
+            "x": 129,
+            "y": 637
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 681,
+            "height": 44,
+            "left": 261.5,
+            "right": 388,
+            "top": 637,
+            "width": 126.5,
+            "x": 261.5,
+            "y": 637
+          }
+        },
+        {
+          "name": "SCORES",
+          "r": {
+            "bottom": 681,
+            "height": 44,
+            "left": 394,
+            "right": 509,
+            "top": 637,
+            "width": 115,
+            "x": 394,
+            "y": 637
+          }
+        }
+      ],
+      "fallback": false,
+      "header": {
+        "bottom": 91,
+        "height": 28,
+        "left": 8,
+        "right": 509,
+        "top": 63,
+        "width": 501,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "bottom": 91,
+        "height": 13.75,
+        "left": 8,
+        "right": 509,
+        "top": 77.25,
+        "width": 501,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        689,
+        517
+      ],
+      "size": [
+        517,
+        689
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      640,
+      320
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 172,
+        "height": 98,
+        "left": 250.5,
+        "right": 348.5,
+        "top": 74,
+        "width": 98,
+        "x": 250.5,
+        "y": 74
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 239,
+            "height": 44,
+            "left": 5,
+            "right": 198.65625,
+            "top": 195,
+            "width": 193.65625,
+            "x": 5,
+            "y": 195
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 239,
+            "height": 44,
+            "left": 202.65625,
+            "right": 396.328125,
+            "top": 195,
+            "width": 193.671875,
+            "x": 202.65625,
+            "y": 195
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 239,
+            "height": 44,
+            "left": 400.328125,
+            "right": 594,
+            "top": 195,
+            "width": 193.671875,
+            "x": 400.328125,
+            "y": 195
+          }
+        }
+      ],
+      "fallback": true,
+      "header": {
+        "bottom": 68,
+        "height": 28,
+        "left": 5,
+        "right": 594,
+        "top": 40,
+        "width": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "bottom": 68,
+        "height": 13.75,
+        "left": 5,
+        "right": 594,
+        "top": 54.25,
+        "width": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        244,
+        599
+      ],
+      "size": [
+        599,
+        244
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      640,
+      280
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 132,
+        "height": 58,
+        "left": 270.5,
+        "right": 328.5,
+        "top": 74,
+        "width": 58,
+        "x": 270.5,
+        "y": 74
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 199,
+            "height": 44,
+            "left": 5,
+            "right": 198.65625,
+            "top": 155,
+            "width": 193.65625,
+            "x": 5,
+            "y": 155
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 199,
+            "height": 44,
+            "left": 202.65625,
+            "right": 396.328125,
+            "top": 155,
+            "width": 193.671875,
+            "x": 202.65625,
+            "y": 155
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 199,
+            "height": 44,
+            "left": 400.328125,
+            "right": 594,
+            "top": 155,
+            "width": 193.671875,
+            "x": 400.328125,
+            "y": 155
+          }
+        }
+      ],
+      "fallback": true,
+      "header": {
+        "bottom": 68,
+        "height": 28,
+        "left": 5,
+        "right": 594,
+        "top": 40,
+        "width": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "bottom": 68,
+        "height": 13.75,
+        "left": 5,
+        "right": 594,
+        "top": 54.25,
+        "width": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        204,
+        599
+      ],
+      "size": [
+        599,
+        204
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      640,
+      240
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 92,
+        "height": 18,
+        "left": 290.5,
+        "right": 308.5,
+        "top": 74,
+        "width": 18,
+        "x": 290.5,
+        "y": 74
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 159,
+            "height": 44,
+            "left": 5,
+            "right": 198.65625,
+            "top": 115,
+            "width": 193.65625,
+            "x": 5,
+            "y": 115
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 159,
+            "height": 44,
+            "left": 202.65625,
+            "right": 396.328125,
+            "top": 115,
+            "width": 193.671875,
+            "x": 202.65625,
+            "y": 115
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 159,
+            "height": 44,
+            "left": 400.328125,
+            "right": 594,
+            "top": 115,
+            "width": 193.671875,
+            "x": 400.328125,
+            "y": 115
+          }
+        }
+      ],
+      "fallback": true,
+      "header": {
+        "bottom": 68,
+        "height": 28,
+        "left": 5,
+        "right": 594,
+        "top": 40,
+        "width": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "bottom": 68,
+        "height": 13.75,
+        "left": 5,
+        "right": 594,
+        "top": 54.25,
+        "width": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        164,
+        599
+      ],
+      "size": [
+        599,
+        164
+      ]
+    },
+    "essentialInside": true
+  },
+  {
+    "size": [
+      640,
+      200
+    ],
+    "game": {
+      "canvas": {
+        "bottom": 74,
+        "height": 0,
+        "left": 299.5,
+        "right": 299.5,
+        "top": 74,
+        "width": 0,
+        "x": 299.5,
+        "y": 74
+      },
+      "controls": [
+        {
+          "id": "reactor-portrait-pause",
+          "name": "PAUSE",
+          "r": {
+            "bottom": 119,
+            "height": 44,
+            "left": 5,
+            "right": 198.65625,
+            "top": 75,
+            "width": 193.65625,
+            "x": 5,
+            "y": 75
+          }
+        },
+        {
+          "id": "reactor-portrait-cool",
+          "name": "COOL CORE 1",
+          "r": {
+            "bottom": 119,
+            "height": 44,
+            "left": 202.65625,
+            "right": 396.328125,
+            "top": 75,
+            "width": 193.671875,
+            "x": 202.65625,
+            "y": 75
+          }
+        },
+        {
+          "id": "reactor-portrait-upgrade",
+          "name": "UPGRADE 1",
+          "r": {
+            "bottom": 119,
+            "height": 44,
+            "left": 400.328125,
+            "right": 594,
+            "top": 75,
+            "width": 193.671875,
+            "x": 400.328125,
+            "y": 75
+          }
+        }
+      ],
+      "fallback": true,
+      "header": {
+        "bottom": 68,
+        "height": 28,
+        "left": 5,
+        "right": 594,
+        "top": 40,
+        "width": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "bottom": 68,
+        "height": 13.75,
+        "left": 5,
+        "right": 594,
+        "top": 54.25,
+        "width": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        124,
+        599
+      ],
+      "size": [
+        599,
+        124
+      ]
+    },
+    "essentialInside": true
+  }
+]

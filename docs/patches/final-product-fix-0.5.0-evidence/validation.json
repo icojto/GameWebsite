@@ -1,0 +1,93 @@
+[
+  {
+    "command": "npm run check",
+    "exit": 0,
+    "pass": null,
+    "fail": null,
+    "log": "check.log"
+  },
+  {
+    "command": "npm run test:ads",
+    "exit": 0,
+    "pass": 49,
+    "fail": 0,
+    "log": "test-ads.log"
+  },
+  {
+    "command": "npm run test:portal",
+    "exit": 0,
+    "pass": 5,
+    "fail": 0,
+    "log": "test-portal.log"
+  },
+  {
+    "command": "npm run test:orbit",
+    "exit": 0,
+    "pass": 12,
+    "fail": 0,
+    "log": "test-orbit.log"
+  },
+  {
+    "command": "npm run test:orbit-ads",
+    "exit": 0,
+    "pass": 59,
+    "fail": 0,
+    "log": "test-orbit-ads.log"
+  },
+  {
+    "command": "npm run test:reactor",
+    "exit": 0,
+    "pass": 20,
+    "fail": 0,
+    "log": "test-reactor.log"
+  },
+  {
+    "command": "npm run test:reactor-ads",
+    "exit": 0,
+    "pass": 66,
+    "fail": 0,
+    "log": "test-reactor-ads.log"
+  },
+  {
+    "command": "npm run test:qa-contract",
+    "exit": 0,
+    "pass": 13,
+    "fail": 0,
+    "log": "test-qa-contract.log"
+  },
+  {
+    "command": "npm run build",
+    "exit": 0,
+    "pass": null,
+    "fail": null,
+    "log": "build.log"
+  },
+  {
+    "command": "npm run verify:ads-production",
+    "exit": 0,
+    "pass": null,
+    "fail": null,
+    "log": "verify-ads-production.log"
+  },
+  {
+    "command": "npm run verify:pages",
+    "exit": 0,
+    "pass": null,
+    "fail": null,
+    "log": "verify-pages.log"
+  },
+  {
+    "command": "git diff --check",
+    "exit": 2,
+    "pass": null,
+    "fail": null,
+    "log": "git-diff-check.log"
+  },
+  {
+    "command": "git diff --check (after whitespace-only repair)",
+    "exit": 0,
+    "pass": null,
+    "fail": null,
+    "log": "git-diff-check-final.log"
+  }
+]

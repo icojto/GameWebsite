@@ -44,6 +44,7 @@ body {
   position: absolute; inset: 0; z-index: 2; color: #f4fbff;
   pointer-events: none; font: 600 12px/1.3 "Segoe UI", Inter, system-ui, sans-serif;
 }
+.orbit-ui[data-phase="game-over"] { pointer-events:auto; }
 .orbit-ui button, .orbit-ui input { font: inherit; }
 .orbit-ui button { cursor: pointer; }
 .orbit-ui button:focus-visible, .orbit-ui input:focus-visible { outline: 2px solid #20e9ff; outline-offset: 3px; }

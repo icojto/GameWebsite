@@ -1,0 +1,2790 @@
+[
+  {
+    "w": 320,
+    "h": 800,
+    "host": {
+      "frame": {
+        "h": 462,
+        "w": 279,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 464,
+        "w": 281,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        320,
+        800
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 87,
+          "x": 5,
+          "y": 413
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 87,
+          "x": 96,
+          "y": 413
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 87,
+          "x": 187,
+          "y": 413
+        }
+      ],
+      "canvas": {
+        "h": 267,
+        "visible": true,
+        "w": 267,
+        "x": 6,
+        "y": 98.5
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 269,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 269,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        462,
+        279
+      ],
+      "size": [
+        279,
+        462
+      ]
+    }
+  },
+  {
+    "w": 360,
+    "h": 640,
+    "host": {
+      "frame": {
+        "h": 369.1875,
+        "w": 276.890625,
+        "x": 34.046875,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 371.1875,
+        "w": 321,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        360,
+        640
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 86.328125,
+          "x": 5,
+          "y": 320
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 86.328125,
+          "x": 95.328125,
+          "y": 320
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 86.34375,
+          "x": 185.65625,
+          "y": 320
+        }
+      ],
+      "canvas": {
+        "h": 223,
+        "visible": true,
+        "w": 223,
+        "x": 27,
+        "y": 74
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 267,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 267,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        369,
+        277
+      ],
+      "size": [
+        277,
+        369
+      ]
+    }
+  },
+  {
+    "w": 390,
+    "h": 844,
+    "host": {
+      "frame": {
+        "h": 487.515625,
+        "w": 349,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 489.515625,
+        "w": 351,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 75,
+          "x": 8,
+          "y": 436
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 82.5,
+          "x": 89,
+          "y": 436
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 82.5,
+          "x": 177.5,
+          "y": 436
+        }
+      ],
+      "canvas": {
+        "h": 314,
+        "visible": true,
+        "w": 314,
+        "x": 17.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 333,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 333,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        488,
+        349
+      ],
+      "size": [
+        349,
+        488
+      ]
+    }
+  },
+  {
+    "w": 412,
+    "h": 915,
+    "host": {
+      "frame": {
+        "h": 528.6875,
+        "w": 371,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 530.6875,
+        "w": 373,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        412,
+        915
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 80.234375,
+          "x": 8,
+          "y": 477
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 88.265625,
+          "x": 94.234375,
+          "y": 477
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 88.25,
+          "x": 188.5,
+          "y": 477
+        }
+      ],
+      "canvas": {
+        "h": 353,
+        "visible": true,
+        "w": 353,
+        "x": 9,
+        "y": 98
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 355,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 355,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        529,
+        371
+      ],
+      "size": [
+        371,
+        529
+      ]
+    }
+  },
+  {
+    "w": 430,
+    "h": 932,
+    "host": {
+      "frame": {
+        "h": 538.546875,
+        "w": 389,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 540.546875,
+        "w": 391,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        430,
+        932
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 84.515625,
+          "x": 8,
+          "y": 487
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 92.984375,
+          "x": 98.515625,
+          "y": 487
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 92.96875,
+          "x": 197.5,
+          "y": 487
+        }
+      ],
+      "canvas": {
+        "h": 365,
+        "visible": true,
+        "w": 365,
+        "x": 12,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 373,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 373,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        539,
+        389
+      ],
+      "size": [
+        389,
+        539
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 360,
+    "host": {
+      "frame": {
+        "h": 284,
+        "w": 599,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 286,
+        "w": 601,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        640,
+        360
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 0,
+          "name": "PAUSE",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "COOL CORE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "UPGRADE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "canvas": {
+        "h": 219,
+        "visible": true,
+        "w": 219,
+        "x": 266,
+        "y": 41
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 433,
+        "x": 159,
+        "y": 7
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 433,
+        "x": 159,
+        "y": 21.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        284,
+        599
+      ],
+      "size": [
+        599,
+        284
+      ]
+    }
+  },
+  {
+    "w": 844,
+    "h": 390,
+    "host": {
+      "frame": {
+        "h": 314,
+        "w": 803,
+        "x": 13,
+        "y": 43.78125
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 316,
+        "w": 805,
+        "x": 12,
+        "y": 42.78125
+      },
+      "viewport": [
+        844,
+        390
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 0,
+          "name": "PAUSE",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "COOL CORE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "UPGRADE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "canvas": {
+        "h": 246,
+        "visible": true,
+        "w": 246,
+        "x": 390.5,
+        "y": 43
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 563,
+        "x": 232,
+        "y": 8
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 563,
+        "x": 232,
+        "y": 22.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        314,
+        803
+      ],
+      "size": [
+        803,
+        314
+      ]
+    }
+  },
+  {
+    "w": 932,
+    "h": 430,
+    "host": {
+      "frame": {
+        "h": 354,
+        "w": 867,
+        "x": 25,
+        "y": 16.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 356,
+        "w": 869,
+        "x": 24,
+        "y": 15.59375
+      },
+      "viewport": [
+        932,
+        430
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 0,
+          "name": "PAUSE",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "COOL CORE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "UPGRADE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "canvas": {
+        "h": 286,
+        "visible": true,
+        "w": 286,
+        "x": 402.5,
+        "y": 43
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 627,
+        "x": 232,
+        "y": 8
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 627,
+        "x": 232,
+        "y": 22.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        354,
+        867
+      ],
+      "size": [
+        867,
+        354
+      ]
+    }
+  },
+  {
+    "w": 768,
+    "h": 1024,
+    "host": {
+      "frame": {
+        "h": 653.359375,
+        "w": 490.015625,
+        "x": 131.484375,
+        "y": 58.78125
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 655.359375,
+        "w": 729,
+        "x": 12,
+        "y": 57.78125
+      },
+      "viewport": [
+        768,
+        1024
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 108.5625,
+          "x": 8,
+          "y": 601
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 119.4375,
+          "x": 122.5625,
+          "y": 601
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 119.421875,
+          "x": 248,
+          "y": 601
+        }
+      ],
+      "canvas": {
+        "h": 472,
+        "visible": true,
+        "w": 472,
+        "x": 9,
+        "y": 100.5
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 474,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 474,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        653,
+        490
+      ],
+      "size": [
+        490,
+        653
+      ]
+    }
+  },
+  {
+    "w": 1024,
+    "h": 768,
+    "host": {
+      "frame": {
+        "h": 489.515625,
+        "w": 367.125,
+        "x": 320.9375,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 491.515625,
+        "w": 961,
+        "x": 24,
+        "y": 100.59375
+      },
+      "viewport": [
+        1024,
+        768
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 79.28125,
+          "x": 8,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 87.21875,
+          "x": 93.28125,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 87.203125,
+          "x": 186.5,
+          "y": 438
+        }
+      ],
+      "canvas": {
+        "h": 316,
+        "visible": true,
+        "w": 316,
+        "x": 25.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        490,
+        367
+      ],
+      "size": [
+        367,
+        490
+      ]
+    }
+  },
+  {
+    "w": 1280,
+    "h": 720,
+    "host": {
+      "frame": {
+        "h": 458.796875,
+        "w": 344.09375,
+        "x": 460.453125,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 460.796875,
+        "w": 1217,
+        "x": 24,
+        "y": 100.59375
+      },
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 73.796875,
+          "x": 8,
+          "y": 407
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 81.203125,
+          "x": 87.796875,
+          "y": 407
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 81.1875,
+          "x": 175,
+          "y": 407
+        }
+      ],
+      "canvas": {
+        "h": 285,
+        "visible": true,
+        "w": 285,
+        "x": 29.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 328,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 328,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        459,
+        344
+      ],
+      "size": [
+        344,
+        459
+      ]
+    }
+  },
+  {
+    "w": 1366,
+    "h": 768,
+    "host": {
+      "frame": {
+        "h": 489.515625,
+        "w": 367.125,
+        "x": 491.9375,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 491.515625,
+        "w": 1303,
+        "x": 24,
+        "y": 100.59375
+      },
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 79.28125,
+          "x": 8,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 87.21875,
+          "x": 93.28125,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 87.203125,
+          "x": 186.5,
+          "y": 438
+        }
+      ],
+      "canvas": {
+        "h": 316,
+        "visible": true,
+        "w": 316,
+        "x": 25.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        490,
+        367
+      ],
+      "size": [
+        367,
+        490
+      ]
+    }
+  },
+  {
+    "w": 1920,
+    "h": 1080,
+    "host": {
+      "frame": {
+        "h": 689.1875,
+        "w": 516.890625,
+        "x": 694.046875,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 691.1875,
+        "w": 1440,
+        "x": 232.5,
+        "y": 100.59375
+      },
+      "viewport": [
+        1920,
+        1080
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 115,
+          "x": 8,
+          "y": 637
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 126.5,
+          "x": 129,
+          "y": 637
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 126.5,
+          "x": 261.5,
+          "y": 637
+        }
+      ],
+      "canvas": {
+        "h": 499,
+        "visible": true,
+        "w": 499,
+        "x": 9,
+        "y": 105
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 501,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 501,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        689,
+        517
+      ],
+      "size": [
+        517,
+        689
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 320,
+    "host": {
+      "frame": {
+        "h": 244,
+        "w": 599,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 246,
+        "w": 601,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        640,
+        320
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 195
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 195
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 195
+        }
+      ],
+      "canvas": {
+        "h": 98,
+        "visible": true,
+        "w": 98,
+        "x": 250.5,
+        "y": 74
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        244,
+        599
+      ],
+      "size": [
+        599,
+        244
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 280,
+    "host": {
+      "frame": {
+        "h": 204,
+        "w": 599,
+        "x": 13,
+        "y": 38.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 206,
+        "w": 601,
+        "x": 12,
+        "y": 37.1875
+      },
+      "viewport": [
+        640,
+        280
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 155
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 155
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 155
+        }
+      ],
+      "canvas": {
+        "h": 58,
+        "visible": true,
+        "w": 58,
+        "x": 270.5,
+        "y": 74
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        204,
+        599
+      ],
+      "size": [
+        599,
+        204
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 240,
+    "host": {
+      "frame": {
+        "h": 164,
+        "w": 599,
+        "x": 13,
+        "y": 38.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 166,
+        "w": 601,
+        "x": 12,
+        "y": 37.1875
+      },
+      "viewport": [
+        640,
+        240
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 115
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 115
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 115
+        }
+      ],
+      "canvas": {
+        "h": 18,
+        "visible": true,
+        "w": 18,
+        "x": 290.5,
+        "y": 74
+      },
+      "fallback": true,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        164,
+        599
+      ],
+      "size": [
+        599,
+        164
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 200,
+    "host": {
+      "frame": {
+        "h": 124,
+        "w": 599,
+        "x": 13,
+        "y": 38.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 126,
+        "w": 601,
+        "x": 12,
+        "y": 37.1875
+      },
+      "viewport": [
+        640,
+        200
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 75
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 75
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 75
+        }
+      ],
+      "canvas": {
+        "h": 0,
+        "visible": false,
+        "w": 0,
+        "x": 299.5,
+        "y": 74
+      },
+      "fallback": true,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        124,
+        599
+      ],
+      "size": [
+        599,
+        124
+      ]
+    }
+  },
+  {
+    "w": 320,
+    "h": 800,
+    "host": {
+      "frame": {
+        "h": 462,
+        "w": 279,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 464,
+        "w": 281,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        320,
+        800
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 87,
+          "x": 5,
+          "y": 413
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 87,
+          "x": 96,
+          "y": 413
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 87,
+          "x": 187,
+          "y": 413
+        }
+      ],
+      "canvas": {
+        "h": 267,
+        "visible": true,
+        "w": 267,
+        "x": 6,
+        "y": 98.5
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 269,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 269,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        462,
+        279
+      ],
+      "size": [
+        279,
+        462
+      ]
+    }
+  },
+  {
+    "w": 360,
+    "h": 640,
+    "host": {
+      "frame": {
+        "h": 369.1875,
+        "w": 276.890625,
+        "x": 34.046875,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 371.1875,
+        "w": 321,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        360,
+        640
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 86.328125,
+          "x": 5,
+          "y": 320
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 86.328125,
+          "x": 95.328125,
+          "y": 320
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 86.34375,
+          "x": 185.65625,
+          "y": 320
+        }
+      ],
+      "canvas": {
+        "h": 223,
+        "visible": true,
+        "w": 223,
+        "x": 27,
+        "y": 74
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 267,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 267,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        369,
+        277
+      ],
+      "size": [
+        277,
+        369
+      ]
+    }
+  },
+  {
+    "w": 390,
+    "h": 844,
+    "host": {
+      "frame": {
+        "h": 487.515625,
+        "w": 349,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 489.515625,
+        "w": 351,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 75,
+          "x": 8,
+          "y": 436
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 82.5,
+          "x": 89,
+          "y": 436
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 82.5,
+          "x": 177.5,
+          "y": 436
+        }
+      ],
+      "canvas": {
+        "h": 314,
+        "visible": true,
+        "w": 314,
+        "x": 17.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 333,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 333,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        488,
+        349
+      ],
+      "size": [
+        349,
+        488
+      ]
+    }
+  },
+  {
+    "w": 412,
+    "h": 915,
+    "host": {
+      "frame": {
+        "h": 528.6875,
+        "w": 371,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 530.6875,
+        "w": 373,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        412,
+        915
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 80.234375,
+          "x": 8,
+          "y": 477
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 88.265625,
+          "x": 94.234375,
+          "y": 477
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 88.25,
+          "x": 188.5,
+          "y": 477
+        }
+      ],
+      "canvas": {
+        "h": 353,
+        "visible": true,
+        "w": 353,
+        "x": 9,
+        "y": 98
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 355,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 355,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        529,
+        371
+      ],
+      "size": [
+        371,
+        529
+      ]
+    }
+  },
+  {
+    "w": 430,
+    "h": 932,
+    "host": {
+      "frame": {
+        "h": 538.546875,
+        "w": 389,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 540.546875,
+        "w": 391,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        430,
+        932
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 84.515625,
+          "x": 8,
+          "y": 487
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 92.984375,
+          "x": 98.515625,
+          "y": 487
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 92.96875,
+          "x": 197.5,
+          "y": 487
+        }
+      ],
+      "canvas": {
+        "h": 365,
+        "visible": true,
+        "w": 365,
+        "x": 12,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 373,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 373,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        539,
+        389
+      ],
+      "size": [
+        389,
+        539
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 360,
+    "host": {
+      "frame": {
+        "h": 284,
+        "w": 599,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 286,
+        "w": 601,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        640,
+        360
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 0,
+          "name": "PAUSE",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "COOL CORE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "UPGRADE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "canvas": {
+        "h": 219,
+        "visible": true,
+        "w": 219,
+        "x": 266,
+        "y": 41
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 433,
+        "x": 159,
+        "y": 7
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 433,
+        "x": 159,
+        "y": 21.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        284,
+        599
+      ],
+      "size": [
+        599,
+        284
+      ]
+    }
+  },
+  {
+    "w": 844,
+    "h": 390,
+    "host": {
+      "frame": {
+        "h": 314,
+        "w": 803,
+        "x": 13,
+        "y": 43.78125
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 316,
+        "w": 805,
+        "x": 12,
+        "y": 42.78125
+      },
+      "viewport": [
+        844,
+        390
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 0,
+          "name": "PAUSE",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "COOL CORE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "UPGRADE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "canvas": {
+        "h": 246,
+        "visible": true,
+        "w": 246,
+        "x": 390.5,
+        "y": 43
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 563,
+        "x": 232,
+        "y": 8
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 563,
+        "x": 232,
+        "y": 22.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        314,
+        803
+      ],
+      "size": [
+        803,
+        314
+      ]
+    }
+  },
+  {
+    "w": 932,
+    "h": 430,
+    "host": {
+      "frame": {
+        "h": 354,
+        "w": 867,
+        "x": 25,
+        "y": 16.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 356,
+        "w": 869,
+        "x": 24,
+        "y": 15.59375
+      },
+      "viewport": [
+        932,
+        430
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 0,
+          "name": "PAUSE",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "COOL CORE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 0,
+          "name": "UPGRADE 1",
+          "visible": false,
+          "w": 0,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "canvas": {
+        "h": 286,
+        "visible": true,
+        "w": 286,
+        "x": 402.5,
+        "y": 43
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 627,
+        "x": 232,
+        "y": 8
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 627,
+        "x": 232,
+        "y": 22.25
+      },
+      "layout": "compact-landscape",
+      "scroll": [
+        354,
+        867
+      ],
+      "size": [
+        867,
+        354
+      ]
+    }
+  },
+  {
+    "w": 768,
+    "h": 1024,
+    "host": {
+      "frame": {
+        "h": 653.359375,
+        "w": 490.015625,
+        "x": 131.484375,
+        "y": 58.78125
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 655.359375,
+        "w": 729,
+        "x": 12,
+        "y": 57.78125
+      },
+      "viewport": [
+        768,
+        1024
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 108.5625,
+          "x": 8,
+          "y": 601
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 119.4375,
+          "x": 122.5625,
+          "y": 601
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 119.421875,
+          "x": 248,
+          "y": 601
+        }
+      ],
+      "canvas": {
+        "h": 472,
+        "visible": true,
+        "w": 472,
+        "x": 9,
+        "y": 100.5
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 474,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 474,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        653,
+        490
+      ],
+      "size": [
+        490,
+        653
+      ]
+    }
+  },
+  {
+    "w": 1024,
+    "h": 768,
+    "host": {
+      "frame": {
+        "h": 489.515625,
+        "w": 367.125,
+        "x": 320.9375,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 491.515625,
+        "w": 961,
+        "x": 24,
+        "y": 100.59375
+      },
+      "viewport": [
+        1024,
+        768
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 79.28125,
+          "x": 8,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 87.21875,
+          "x": 93.28125,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 87.203125,
+          "x": 186.5,
+          "y": 438
+        }
+      ],
+      "canvas": {
+        "h": 316,
+        "visible": true,
+        "w": 316,
+        "x": 25.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        490,
+        367
+      ],
+      "size": [
+        367,
+        490
+      ]
+    }
+  },
+  {
+    "w": 1280,
+    "h": 720,
+    "host": {
+      "frame": {
+        "h": 458.796875,
+        "w": 344.09375,
+        "x": 460.453125,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 460.796875,
+        "w": 1217,
+        "x": 24,
+        "y": 100.59375
+      },
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 73.796875,
+          "x": 8,
+          "y": 407
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 81.203125,
+          "x": 87.796875,
+          "y": 407
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 81.1875,
+          "x": 175,
+          "y": 407
+        }
+      ],
+      "canvas": {
+        "h": 285,
+        "visible": true,
+        "w": 285,
+        "x": 29.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 328,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 328,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        459,
+        344
+      ],
+      "size": [
+        344,
+        459
+      ]
+    }
+  },
+  {
+    "w": 1366,
+    "h": 768,
+    "host": {
+      "frame": {
+        "h": 489.515625,
+        "w": 367.125,
+        "x": 491.9375,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 491.515625,
+        "w": 1303,
+        "x": 24,
+        "y": 100.59375
+      },
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 79.28125,
+          "x": 8,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 87.21875,
+          "x": 93.28125,
+          "y": 438
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 87.203125,
+          "x": 186.5,
+          "y": 438
+        }
+      ],
+      "canvas": {
+        "h": 316,
+        "visible": true,
+        "w": 316,
+        "x": 25.5,
+        "y": 97
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 351,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        490,
+        367
+      ],
+      "size": [
+        367,
+        490
+      ]
+    }
+  },
+  {
+    "w": 1920,
+    "h": 1080,
+    "host": {
+      "frame": {
+        "h": 689.1875,
+        "w": 516.890625,
+        "x": 694.046875,
+        "y": 101.59375
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 691.1875,
+        "w": 1440,
+        "x": 232.5,
+        "y": 100.59375
+      },
+      "viewport": [
+        1920,
+        1080
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 115,
+          "x": 8,
+          "y": 637
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 126.5,
+          "x": 129,
+          "y": 637
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 126.5,
+          "x": 261.5,
+          "y": 637
+        }
+      ],
+      "canvas": {
+        "h": 499,
+        "visible": true,
+        "w": 499,
+        "x": 9,
+        "y": 105
+      },
+      "fallback": false,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 501,
+        "x": 8,
+        "y": 63
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 501,
+        "x": 8,
+        "y": 77.25
+      },
+      "layout": "portrait",
+      "scroll": [
+        689,
+        517
+      ],
+      "size": [
+        517,
+        689
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 320,
+    "host": {
+      "frame": {
+        "h": 244,
+        "w": 599,
+        "x": 13,
+        "y": 117.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 246,
+        "w": 601,
+        "x": 12,
+        "y": 116.1875
+      },
+      "viewport": [
+        640,
+        320
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 195
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 195
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 195
+        }
+      ],
+      "canvas": {
+        "h": 98,
+        "visible": true,
+        "w": 98,
+        "x": 250.5,
+        "y": 74
+      },
+      "fallback": true,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        244,
+        599
+      ],
+      "size": [
+        599,
+        244
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 280,
+    "host": {
+      "frame": {
+        "h": 204,
+        "w": 599,
+        "x": 13,
+        "y": 38.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 206,
+        "w": 601,
+        "x": 12,
+        "y": 37.1875
+      },
+      "viewport": [
+        640,
+        280
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 155
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 155
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 155
+        }
+      ],
+      "canvas": {
+        "h": 58,
+        "visible": true,
+        "w": 58,
+        "x": 270.5,
+        "y": 74
+      },
+      "fallback": true,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        204,
+        599
+      ],
+      "size": [
+        599,
+        204
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 240,
+    "host": {
+      "frame": {
+        "h": 164,
+        "w": 599,
+        "x": 13,
+        "y": 38.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 166,
+        "w": 601,
+        "x": 12,
+        "y": 37.1875
+      },
+      "viewport": [
+        640,
+        240
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 115
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 115
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 115
+        }
+      ],
+      "canvas": {
+        "h": 18,
+        "visible": true,
+        "w": 18,
+        "x": 290.5,
+        "y": 74
+      },
+      "fallback": true,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        164,
+        599
+      ],
+      "size": [
+        599,
+        164
+      ]
+    }
+  },
+  {
+    "w": 640,
+    "h": 200,
+    "host": {
+      "frame": {
+        "h": 124,
+        "w": 599,
+        "x": 13,
+        "y": 38.1875
+      },
+      "src": "http://127.0.0.1:5191/games/reactor-stack/embed/index.html?qa=0c84fda3-bc1b-4678-b176-8a1ce546b083",
+      "stage": {
+        "h": 126,
+        "w": 601,
+        "x": 12,
+        "y": 37.1875
+      },
+      "viewport": [
+        640,
+        200
+      ]
+    },
+    "game": {
+      "buttons": [
+        {
+          "h": 44,
+          "name": "PAUSE",
+          "visible": true,
+          "w": 193.65625,
+          "x": 5,
+          "y": 75
+        },
+        {
+          "h": 44,
+          "name": "COOL CORE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 202.65625,
+          "y": 75
+        },
+        {
+          "h": 44,
+          "name": "UPGRADE 1",
+          "visible": true,
+          "w": 193.671875,
+          "x": 400.328125,
+          "y": 75
+        }
+      ],
+      "canvas": {
+        "h": 0,
+        "visible": false,
+        "w": 0,
+        "x": 299.5,
+        "y": 74
+      },
+      "fallback": true,
+      "header": {
+        "h": 28,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 40
+      },
+      "hint": {
+        "h": 13.75,
+        "visible": true,
+        "w": 589,
+        "x": 5,
+        "y": 54.25
+      },
+      "layout": "constrained",
+      "scroll": [
+        124,
+        599
+      ],
+      "size": [
+        599,
+        124
+      ]
+    }
+  }
+]

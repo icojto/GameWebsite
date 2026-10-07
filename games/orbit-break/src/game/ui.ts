@@ -32,6 +32,7 @@ export class OrbitUI {
   private toastEl: HTMLElement;
   private blocked = false;
   private adsAvailable = false;
+  private panelFocus: HTMLElement | null = null;
 
   constructor(parent: HTMLElement, private readonly profile: ProfileStore,
     private readonly audio: OrbitAudio, private readonly actions: UIActions) {
@@ -134,6 +135,7 @@ export class OrbitUI {
     if (this.blocked || (panel === 'why-ads' && this.phase !== 'menu')) return;
     if ((panel === 'quests' || panel === 'locker' || panel === 'scores')
       && (this.phase === 'playing' || this.phase === 'paused')) return;
+    if (!this.panel) this.panelFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.panel = panel;
     this.renderPanel();
     this.audio.uiCue();
@@ -152,6 +154,9 @@ export class OrbitUI {
     this.panelEl.innerHTML = '';
     this.audio.uiCue();
     if (wasWhyAds) this.must<HTMLButtonElement>('[data-ui="why-ads"]').focus();
+    else if (this.panelFocus?.isConnected && !this.panelFocus.closest('[hidden]')) this.panelFocus.focus({preventScroll:true});
+    else if(this.phase==='game-over') this.must<HTMLButtonElement>('[data-death] [data-ui="start"]').focus();
+    else if(this.phase==='menu') this.must<HTMLButtonElement>('[data-start] [data-ui="start"]').focus();
   }
 
   notify(message: string, levelUp = false): void {

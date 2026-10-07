@@ -51,6 +51,14 @@ export class AdService {
     this.nextEligibleAt = this.config.interstitial.firstSeconds;
   }
   get busy(): boolean { return this.active !== null; }
+  get sessionAdsShown(): number { return [...this.placementHistory.values()].reduce((total, value)=>total+value.shown,0); }
+  /** Read-only safety history; observation resets do not replenish an attempt. */
+  rewardAttempt(id: string, runId?: string): { used: number | null; remaining: number | null } {
+    const placement=this.placements.get(id);
+    if(!placement || placement.maxPerRun===undefined || !runId)return {used:null,remaining:null};
+    const used=this.placementRunHistory.get(`${id}:${runId}`) ?? 0;
+    return {used,remaining:Math.max(0,placement.maxPerRun-used)};
+  }
   /** Policy/readiness diagnostics, separate from historical observations. */
   describe(type: AdType, rendererReady: boolean): Record<string,string | number> {
     if(type==='banner') return { Current: !this.providerReady(type)?'UNAVAILABLE':this.bannerVisible?'VISIBLE':'HIDDEN', Reason:'Website slot; local display observations only', Shown:this.stats.banner.shown };

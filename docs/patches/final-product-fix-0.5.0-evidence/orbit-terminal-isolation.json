@@ -1,0 +1,84 @@
+{
+  "before": {
+    "schemaVersion": 1,
+    "sequence": 1,
+    "sampledAt": "2026-10-07T00:55:40.276Z",
+    "session": "0c84fda3-bc1b-4678-b176-8a1ce546b083",
+    "mode": "development",
+    "build": {
+      "schema": 1,
+      "id": "ea701324-f161-4e5e-971f-ecae0e9a097d",
+      "revision": "7571df5c5990ba1e7bd55706b8aa16ebc994da8f",
+      "dirty": true,
+      "mode": "development"
+    },
+    "game": "orbit-break",
+    "phase": "game-over",
+    "runId": "b5e3f6cc-8fa3-42b7-a91d-6f35aa8583d4",
+    "pendingTransition": false,
+    "adSuspended": false,
+    "bridgeConnected": true,
+    "capabilities": {
+      "providerMode": "mock",
+      "fullscreenAvailable": true,
+      "rewardedAvailable": true,
+      "startupDue": false
+    },
+    "error": "completed",
+    "direction": 1,
+    "angleRadians": 18.194069673204854,
+    "elapsedMs": 8984.030000000079,
+    "score": 89,
+    "tier": 1,
+    "difficulty": 1.1617125400000015,
+    "projectileCount": 1,
+    "revive": {
+      "consumed": false,
+      "offerMs": 0,
+      "finalized": true
+    },
+    "userMute": false,
+    "effectiveSuspension": false
+  },
+  "after": {
+    "schemaVersion": 1,
+    "sequence": 1,
+    "sampledAt": "2026-10-07T00:55:50.278Z",
+    "session": "0c84fda3-bc1b-4678-b176-8a1ce546b083",
+    "mode": "development",
+    "build": {
+      "schema": 1,
+      "id": "ea701324-f161-4e5e-971f-ecae0e9a097d",
+      "revision": "7571df5c5990ba1e7bd55706b8aa16ebc994da8f",
+      "dirty": true,
+      "mode": "development"
+    },
+    "game": "orbit-break",
+    "phase": "game-over",
+    "runId": "b5e3f6cc-8fa3-42b7-a91d-6f35aa8583d4",
+    "pendingTransition": false,
+    "adSuspended": false,
+    "bridgeConnected": true,
+    "capabilities": {
+      "providerMode": "mock",
+      "fullscreenAvailable": true,
+      "rewardedAvailable": true,
+      "startupDue": false
+    },
+    "error": "completed",
+    "direction": 1,
+    "angleRadians": 18.194069673204854,
+    "elapsedMs": 8984.030000000079,
+    "score": 89,
+    "tier": 1,
+    "difficulty": 1.1617125400000015,
+    "projectileCount": 1,
+    "revive": {
+      "consumed": false,
+      "offerMs": 0,
+      "finalized": true
+    },
+    "userMute": false,
+    "effectiveSuspension": false
+  }
+}

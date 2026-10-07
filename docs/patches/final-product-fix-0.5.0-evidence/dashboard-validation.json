@@ -1,0 +1,12 @@
+{
+  "total": 332,
+  "pass": 316,
+  "fail": 8,
+  "na": 8,
+  "applicable": 324,
+  "passRate": 0.9753086419753086,
+  "completionRate": 1,
+  "gate": "NOT READY - successful targeted retests still required",
+  "boundaries": "retest Yes alone stays NOT READY; Fail→Blocked lowers completion and keeps NOT READY; restored before rendering",
+  "engine": "Artifact Tool; native Excel recalculation not exercised"
+}

@@ -188,3 +188,14 @@ test('developer unlock-all and artificial scores are session-only', () => {
   assert.equal(reloaded.devUnlockAll, false);
   assert.deepEqual(reloaded.devScores, []);
 });
+
+
+import { allowsBackgroundAction } from '../games/orbit-break/src/game/input-policy.ts';
+test('terminal and paused UI own pointer/keyboard input; only menu/playing accept background actions',()=>{
+ for(const phase of ['game-over','paused'])assert.equal(allowsBackgroundAction(phase,false),false);
+ for(const phase of ['menu','playing']){assert.equal(allowsBackgroundAction(phase,false),true);assert.equal(allowsBackgroundAction(phase,true),false);}
+ const run=new RunState(createRuntimeConfig());run.start();run.phase='game-over';const before=JSON.stringify(run);
+ for(let i=0;i<20;i++){if(allowsBackgroundAction(run.phase,false))run.start();}
+ assert.equal(JSON.stringify(run),before,'background taps/Space never start a terminal run');
+ run.start();assert.equal(run.phase,'playing','explicit result start remains available');
+});

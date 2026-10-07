@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "sampledAt": "2026-10-07T00:56:28.728Z",
+  "session": "0c84fda3-bc1b-4678-b176-8a1ce546b083",
+  "mode": "development",
+  "build": {
+    "schema": 1,
+    "id": "ea701324-f161-4e5e-971f-ecae0e9a097d",
+    "revision": "7571df5c5990ba1e7bd55706b8aa16ebc994da8f",
+    "dirty": true,
+    "mode": "development"
+  },
+  "game": "orbit-break",
+  "phase": "game-over",
+  "runId": "b6578f75-74fb-4427-8937-b73a36b125cc",
+  "pendingTransition": false,
+  "adSuspended": false,
+  "bridgeConnected": true,
+  "capabilities": {
+    "providerMode": "mock",
+    "fullscreenAvailable": true,
+    "rewardedAvailable": true,
+    "startupDue": false
+  },
+  "error": "completed",
+  "direction": 1,
+  "angleRadians": 14.83565967320551,
+  "elapsedMs": 7457.480000000075,
+  "score": 74,
+  "tier": 1,
+  "difficulty": 1.1342346400000014,
+  "projectileCount": 1,
+  "revive": {
+    "consumed": false,
+    "offerMs": 0,
+    "finalized": true
+  },
+  "userMute": false,
+  "effectiveSuspension": false
+}

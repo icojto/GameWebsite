@@ -385,3 +385,20 @@ test('bridge authenticates source/origin/game and deduplicates requests and ackn
   bridge.dispose(); bridge.receive({ ...event, data: { ...data, requestId: 'two' } });
   assert.equal(h.service.stats.rewarded.requests, 1);
 });
+
+
+import { conciseEvents, mvpStatus, MVP_EVENT_LIMIT } from '../src/ads/dev/view-model.ts';
+test('MVP exposes actual timing/cooldown block reasons and bounded concise history',()=>{
+ const h=harness();h.service.setGameState('menu');
+ assert.equal(mvpStatus(h.service,true)['Block reason'],'not-enough-active-play');h.service.devAction('eligible');assert.equal(mvpStatus(h.service,true)['Interstitial eligibility'],'Eligible');
+ h.service.interstitialCooldownAt=h.service.lastInterstitial=0;assert.equal(mvpStatus(h.service,true)['Block reason'],'cooldown');h.service.devAction('eligible');assert.equal(mvpStatus(h.service,true)['Block reason'],'cooldown');h.service.devAction('cooldown');assert.equal(mvpStatus(h.service,true)['Interstitial eligibility'],'Eligible');
+ for(let i=0;i<25;i++)h.service.emit('diagnostic-'+i,undefined,undefined,'sample');assert.equal(conciseEvents(h.service.events).length,MVP_EVENT_LIMIT);assert.ok(conciseEvents(h.service.events)[0].includes('diagnostic-24'));assert.ok(!conciseEvents(h.service.events).some(x=>x.includes('{')));
+ assert.equal(mvpStatus(h.service,false)['Block reason'],'renderer-disconnected');
+});
+test('MVP session shown/attempt diagnostics survive Clear Stats without widening safety limits',async()=>{
+ const h=harness();h.service.register({...h.service.placements.get('rewarded'),maxPerRun:1});
+ const request={...base,requestId:'mvp-reward',adType:'rewarded',placementId:'rewarded',runId:'qa-run',userInitiated:true};
+ const result=await h.service.request(request);assert.equal(result.result,'completed');assert.equal(h.service.sessionAdsShown,1);
+ assert.deepEqual(h.service.rewardAttempt('rewarded','qa-run'),{used:1,remaining:0});h.service.clearStats();assert.equal(h.service.sessionAdsShown,1);assert.deepEqual(h.service.rewardAttempt('rewarded','qa-run'),{used:1,remaining:0});
+ assert.equal(h.service.acknowledge(request.requestId,request.gameId,request.placementId),true);assert.equal((await h.service.request({...request,requestId:'mvp-denied'})).reason,'placement-run-cap');
+});
