@@ -32,16 +32,27 @@ class PointerCanvas extends EventTarget {
   releasePointerCapture(id:number){this.captured.delete(id);this.send('lostpointercapture',id);}
   send(type:string,id=1,x=10,y=10,button=0,pointerType='mouse'){const event=new Event(type,{cancelable:true});Object.assign(event,{pointerId:id,clientX:x,clientY:y,button,pointerType});(type==='pointermove'||type==='pointerup'||type==='pointercancel'?this.ownerDocument.defaultView:this).dispatchEvent(event);return event;}
 }
-function pointerBoard(){
-  const canvas=new PointerCanvas(),controller=new TurnController(()=>0),gesture=new Gesture();controller.start();controller.state.board.fill(0);controller.state.board[0]=1;
+function pointerBoard(source=0){
+  const canvas=new PointerCanvas(),controller=new TurnController(()=>0),gesture=new Gesture();controller.start();controller.state.board.fill(0);controller.state.board[source]=1;
   let enabled=true,accepted=0;const at=(x:number,y:number)=>cellAt(x,y,0,0,20);
-  const input=bindBoardPointer(canvas as unknown as HTMLElement,{enabled:()=>enabled && controller.phase==='PLAYING',begin:(x,y,id)=>gesture.begin(at(x,y),id),release:(x,y,id)=>{const action=gesture.end(at(x,y),id);if(action&&controller.act(...action))accepted++;},cancel:()=>gesture.reset()});
+  const input=bindBoardPointer(canvas as unknown as HTMLElement,{enabled:()=>enabled && controller.phase==='PLAYING',begin:(x,y,id)=>gesture.begin(at(x,y),id,x,y),move:(x,y,id)=>gesture.move(x,y,id,8),release:(x,y,id)=>{const action=gesture.end(at(x,y),id,x,y,8);if(action&&controller.act(...action))accepted++;},cancel:()=>gesture.reset()});
   return {canvas,controller,gesture,input,disable(){enabled=false},get accepted(){return accepted}};
 }
 test('captured touch/pen/mouse drag releases one valid move and ignores duplicate up',()=>{
  const h=pointerBoard();assert.equal(h.canvas.send('pointerdown').defaultPrevented,true);assert.equal(h.canvas.hasPointerCapture(1),true);
  h.canvas.send('pointermove',1,30,10);h.canvas.send('pointerup',1,30,10);h.canvas.send('pointerup',1,30,10);
  assert.equal(h.accepted,1);assert.equal(h.controller.state.moves,1);assert.equal(h.controller.phase,'RESOLVING');assert.equal(h.canvas.captured.size,0);h.input.destroy();
+});
+test('short directional swipes lock the first cardinal direction and move one adjacent cell',()=>{
+ const right=pointerBoard();right.canvas.send('pointerdown',1,10,10);right.canvas.send('pointermove',1,19,14);assert.deepEqual(right.gesture.preview,{from:0,to:1,direction:'right'});right.canvas.send('pointerup',1,55,14);assert.equal(right.accepted,1);assert.equal(right.controller.state.moves,1);right.input.destroy();
+ const down=pointerBoard();down.canvas.send('pointerdown',1,10,10,-1,'touch');down.canvas.send('pointermove',1,14,19,-1,'touch');assert.deepEqual(down.gesture.preview,{from:0,to:6,direction:'down'});down.canvas.send('pointerup',1,14,55,-1,'touch');assert.equal(down.accepted,1);assert.equal(down.controller.state.moves,1);down.input.destroy();
+ const up=pointerBoard(7);up.canvas.send('pointerdown',1,30,30);up.canvas.send('pointermove',1,34,21);assert.deepEqual(up.gesture.preview,{from:7,to:1,direction:'up'});up.canvas.send('pointerup',1,34,5);assert.equal(up.accepted,1);up.input.destroy();
+ const left=pointerBoard(7);left.canvas.send('pointerdown',1,30,30);left.canvas.send('pointermove',1,21,34);assert.deepEqual(left.gesture.preview,{from:7,to:6,direction:'left'});left.canvas.send('pointerup',1,5,34);assert.equal(left.accepted,1);left.input.destroy();
+ const diagonal=pointerBoard();diagonal.canvas.send('pointerdown',1,10,10);diagonal.canvas.send('pointermove',1,22,18);assert.deepEqual(diagonal.gesture.preview,{from:0,to:1,direction:'right'});diagonal.canvas.send('pointermove',1,10,25);assert.deepEqual(diagonal.gesture.preview,{from:0,to:1,direction:'right'});diagonal.canvas.send('pointerup',1,10,25);assert.equal(diagonal.accepted,1);diagonal.input.destroy();
+ const tap=pointerBoard();tap.canvas.send('pointerdown',1,10,10);tap.canvas.send('pointermove',1,16,13);tap.canvas.send('pointerup',1,16,13);assert.equal(tap.accepted,0);assert.equal(tap.gesture.selected,0);tap.input.destroy();
+});
+test('directional swipes cannot wrap across board edges',()=>{
+ const h=pointerBoard();h.canvas.send('pointerdown',1,10,10);h.canvas.send('pointermove',1,1,10);assert.deepEqual(h.gesture.preview,{from:0,to:null,direction:'left'});h.canvas.send('pointerup',1,1,10);assert.equal(h.accepted,0);assert.equal(h.controller.state.moves,0);h.input.destroy();
 });
 test('Android touch button=-1 with denied capture still releases one board action',()=>{
  const h=pointerBoard();h.canvas.failCapture=true;
@@ -50,10 +61,10 @@ test('Android touch button=-1 with denied capture still releases one board actio
  h.canvas.send('pointerup',7,30,10,-1,'touch');h.canvas.send('pointerup',7,30,10,-1,'touch');
  assert.equal(h.accepted,1);assert.equal(h.controller.state.moves,1);assert.equal(h.gesture.pointer,null);h.input.destroy();
 });
-test('tap source/destination remains one accepted move; invalid diagonal drag is free',()=>{
+test('tap source/destination remains one accepted move; diagonal movement locks to its dominant cardinal axis',()=>{
  const h=pointerBoard();h.canvas.send('pointerdown');h.canvas.send('pointerup');assert.equal(h.gesture.selected,0);
  h.canvas.send('pointerdown',1,30,10);h.canvas.send('pointerup',1,30,10);assert.equal(h.accepted,1);h.input.destroy();
- const invalid=pointerBoard();const before=JSON.stringify(invalid.controller.state);invalid.canvas.send('pointerdown');invalid.canvas.send('pointermove',1,30,30);invalid.canvas.send('pointerup',1,30,30);assert.equal(invalid.accepted,0);assert.equal(JSON.stringify(invalid.controller.state),before);invalid.input.destroy();
+ const diagonal=pointerBoard();diagonal.canvas.send('pointerdown');diagonal.canvas.send('pointermove',1,30,30);diagonal.canvas.send('pointerup',1,30,30);assert.equal(diagonal.accepted,1);assert.equal(diagonal.controller.state.moves,1);diagonal.input.destroy();
 });
 test('cancel, capture loss, blur and disabled release cannot commit or leave selection',()=>{
  for(const event of ['pointercancel','lostpointercapture','blur','disabled']){

@@ -2,6 +2,7 @@
 export interface BoardPointerHooks {
   enabled(): boolean;
   begin(x: number, y: number, id: number): void;
+  move?(x: number, y: number, id: number): void;
   release(x: number, y: number, id: number): void;
   cancel(): void;
 }
@@ -28,6 +29,7 @@ export function bindBoardPointer(canvas: HTMLElement, hooks: BoardPointerHooks) 
     if (event.pointerId !== owner) return;
     event.preventDefault();
     if (!hooks.enabled()) cancel();
+    else hooks.move?.(event.clientX, event.clientY, owner);
   }
   function up(event: PointerEvent) {
     if (event.pointerId !== owner) return;
